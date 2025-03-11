@@ -8,7 +8,6 @@
 
 PrivacyHub is an AI-powered privacy policy analyzer that helps users understand and evaluate website privacy practices. It provides detailed analysis, scoring, and recommendations for privacy policies.
 
-![PrivacyHub Screenshot](https://raw.githubusercontent.com/privacypriority/privacyhub/main/public/screenshot.png)
 
 ## Features
 
