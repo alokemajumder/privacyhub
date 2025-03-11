@@ -62,5 +62,3 @@ npm run dev
 ```
 
 The application will be available at `http://localhost:5173`.
-
-[Rest of README.md content remains the same...]
