@@ -1,0 +1,28 @@
+# Netlify configuration file
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Add security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "interest-cohort=()"
+    Content-Security-Policy = """
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      img-src 'self' data: https: blob:;
+      font-src 'self' https://fonts.gstatic.com;
+      connect-src 'self' https://api.openrouter.ai https://corsproxy.io https://api.allorigins.win https://www.google.com;
+      frame-src 'self';
+      """

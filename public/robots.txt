@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://privacyhub.in/sitemap.xml
