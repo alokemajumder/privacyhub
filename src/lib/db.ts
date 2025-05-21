@@ -369,6 +369,26 @@ const extractBrandName = (siteName: string, siteUrl: string): string => {
   }
 };
 
+// Get analysis by ID from IndexedDB
+export const getAnalysisById = async (id: number): Promise<PrivacyAnalysis | undefined> => {
+  return handleDBOperation(async (db) => {
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(STORE_NAME, 'readonly');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.get(id);
+
+      request.onsuccess = () => {
+        resolve(request.result); // Resolves with the object or undefined if not found
+      };
+
+      request.onerror = () => {
+        console.error('Error fetching analysis by ID:', request.error);
+        reject(request.error);
+      };
+    });
+  });
+};
+
 // Initialize database and return support status
 export const initializeDatabase = async (): Promise<boolean> => {
   try {
