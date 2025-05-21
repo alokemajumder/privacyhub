@@ -12,37 +12,40 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, isLoading }) => {
   const [error, setError] = useState('');
   
   const validateUrl = (input: string): boolean => {
-    // Basic URL validation
-    if (!input.trim()) {
-      setError('Please enter a URL');
+    const trimmedInput = input.trim();
+
+    if (!trimmedInput) {
+      setError('Please enter a URL or domain name.');
+      return false;
+    }
+
+    // Check for a dot, basic check for domain/URL structure
+    if (!trimmedInput.includes('.')) {
+      setError('Invalid format. Please enter a valid domain (e.g., example.com) or a full URL.');
+      return false;
+    }
+
+    // If it looks like a full URL path, it should have a scheme
+    if (trimmedInput.includes('/') && !trimmedInput.match(/^https?:\/\//i)) {
+      setError('Full URLs should start with http:// or https://. For domains like example.com, we will try https automatically.');
       return false;
     }
     
-    // If it's just a domain name, that's fine now - we'll find the privacy policy
-    if (!input.includes('/') && !input.includes(' ')) {
-      setError('');
-      return true;
+    // Add any other simple, universal URL validation if desired (e.g. no spaces)
+    if (trimmedInput.includes(' ')) {
+        setError('URL cannot contain spaces.');
+        return false;
     }
-    
-    // Check if it looks like a privacy policy URL
-    const lowerInput = input.toLowerCase();
-    const privacyKeywords = ['privacy', 'policy', 'data', 'terms'];
-    const containsPrivacyKeyword = privacyKeywords.some(keyword => lowerInput.includes(keyword));
-    
-    if (!containsPrivacyKeyword) {
-      setError('This doesn\'t look like a privacy policy URL. We\'ll try to find the privacy policy for this domain.');
-      // Still return true since we'll try to find the privacy policy
-      return true;
-    }
-    
+
     setError('');
     return true;
   };
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateUrl(url)) {
-      onSearch(url);
+    const trimmedUrl = url.trim(); // Trim the URL
+    if (validateUrl(trimmedUrl)) { // Validate the trimmed URL
+      onSearch(trimmedUrl); // Pass the trimmed URL to onSearch
     }
   };
   

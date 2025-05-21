@@ -312,12 +312,16 @@ export const findPrivacyPolicyUrl = async (
       }
     }
     
-    // If all else fails, just return the domain (we'll try to find the policy on the main page)
-    console.log('No privacy policy found, using domain:', domain);
-    return domain; // Return the original domain as fallback
+    // If all else fails, throw an error
+    console.log('No privacy policy found for domain:', domain);
+    throw new Error('Could not automatically locate the privacy policy URL for this domain. Please try providing a direct link to the privacy policy.');
   } catch (error) {
     console.error('Error finding privacy policy URL:', error);
-    return domain; // Return the original domain as fallback
+    if (error instanceof Error) {
+      throw error; // Re-throw the original error
+    }
+    // If it's not an Error instance, wrap it or throw a generic one
+    throw new Error('An unknown error occurred while trying to find the privacy policy URL.');
   }
 };
 
