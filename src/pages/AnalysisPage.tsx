@@ -5,30 +5,45 @@ import { ArrowLeft } from 'lucide-react';
 import DetailedAnalysis from '../components/DetailedAnalysis';
 import SEOHead from '../components/SEOHead';
 import { PrivacyAnalysis } from '../types';
-import { getAllAnalyses, deleteAnalysis, updateAnalysis } from '../lib/db';
+import { getAnalysisById, deleteAnalysis, updateAnalysis } from '../lib/db';
 import { analyzePrivacyPolicy } from '../utils/analyzer';
 
 const AnalysisPage: React.FC = () => {
-  const { brandName, id } = useParams<{ brandName: string; id: string }>();
+  const { brandName, id: idString } = useParams<{ brandName: string; id: string }>();
   const navigate = useNavigate();
   const [analysis, setAnalysis] = useState<PrivacyAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadAnalysis();
-  }, [brandName, id]);
+  }, [brandName, idString]);
 
   const loadAnalysis = async () => {
+    setLoading(true);
     try {
-      const analyses = await getAllAnalyses();
-      const found = analyses.find(a => 
-        a.brandName?.toLowerCase().replace(/\s+/g, '-') === brandName &&
-        a.id?.toString() === id
-      );
-      
-      if (found) {
+      if (!idString) {
+        console.error('No ID provided in URL');
+        navigate('/');
+        return;
+      }
+
+      const numericId = parseInt(idString, 10);
+      if (isNaN(numericId)) {
+        console.error('Invalid ID provided in URL:', idString);
+        navigate('/');
+        return;
+      }
+
+      const found = await getAnalysisById(numericId);
+
+      if (found && found.brandName?.toLowerCase().replace(/\s+/g, '-') === brandName) {
         setAnalysis(found);
       } else {
+        if (!found) {
+          console.log(`Analysis with ID ${numericId} not found.`);
+        } else {
+          console.log(`Brand name mismatch: URL brandName "${brandName}", fetched brandName "${found.brandName?.toLowerCase().replace(/\s+/g, '-')}"`);
+        }
         navigate('/');
       }
     } catch (error) {
@@ -83,7 +98,7 @@ const AnalysisPage: React.FC = () => {
       <SEOHead 
         title={`${analysis.siteName} Privacy Policy Analysis | PrivacyHub.in`}
         description={analysis.summary}
-        canonicalUrl={`https://privacyhub.in/privacy-policy-analyzer/${brandName}/${id}`}
+        canonicalUrl={`https://privacyhub.in/privacy-policy-analyzer/${brandName}/${idString}`}
         analysis={analysis}
       />
       
