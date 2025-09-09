@@ -28,12 +28,21 @@ function initializeDatabase() {
       risk_level TEXT NOT NULL,
       gdpr_compliance TEXT NOT NULL,
       ccpa_compliance TEXT NOT NULL,
+      dpdp_act_compliance TEXT,
       analysis_data TEXT NOT NULL,
       screenshot_url TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  // Add DPDP Act compliance column to existing tables if it doesn't exist
+  try {
+    db.exec(`ALTER TABLE analyses ADD COLUMN dpdp_act_compliance TEXT`);
+    console.log('Added dpdp_act_compliance column to existing table');
+  } catch (error) {
+    // Column already exists, ignore error
+  }
 
   // Create index on hostname for fast lookups
   db.exec(`
@@ -57,6 +66,7 @@ export interface StoredAnalysis {
   risk_level: string;
   gdpr_compliance: string;
   ccpa_compliance: string;
+  dpdp_act_compliance?: string;
   analysis_data: string;
   screenshot_url: string | null;
   created_at: string;
@@ -72,6 +82,7 @@ export function saveAnalysis(
     regulatory_compliance: {
       gdpr_compliance: string;
       ccpa_compliance: string;
+      dpdp_act_compliance?: string;
     };
   },
   screenshotUrl?: string
@@ -83,8 +94,8 @@ export function saveAnalysis(
   const stmt = db.prepare(`
     INSERT INTO analyses (
       url, hostname, overall_score, privacy_grade, risk_level,
-      gdpr_compliance, ccpa_compliance, analysis_data, screenshot_url
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      gdpr_compliance, ccpa_compliance, dpdp_act_compliance, analysis_data, screenshot_url
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   const result = stmt.run(
@@ -95,6 +106,7 @@ export function saveAnalysis(
     analysisResult.risk_level,
     analysisResult.regulatory_compliance.gdpr_compliance,
     analysisResult.regulatory_compliance.ccpa_compliance,
+    analysisResult.regulatory_compliance.dpdp_act_compliance || null,
     JSON.stringify(analysisResult),
     screenshotUrl || null
   );
@@ -102,16 +114,16 @@ export function saveAnalysis(
   return result.lastInsertRowid as number;
 }
 
-export function getRecentAnalyses(limit: number = 10): StoredAnalysis[] {
+export function getRecentAnalyses(limit: number = 10, offset: number = 0): StoredAnalysis[] {
   const db = getDatabase();
   
   const stmt = db.prepare(`
     SELECT * FROM analyses
     ORDER BY created_at DESC
-    LIMIT ?
+    LIMIT ? OFFSET ?
   `);
 
-  return stmt.all(limit) as StoredAnalysis[];
+  return stmt.all(limit, offset) as StoredAnalysis[];
 }
 
 export function getAnalysesByHostname(hostname: string): StoredAnalysis[] {

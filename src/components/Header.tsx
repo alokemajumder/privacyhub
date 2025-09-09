@@ -12,7 +12,6 @@ export function Header() {
   const navigation = [
     { name: 'Analyzer', href: '/' },
     { name: 'Digital Fingerprint', href: '/digital-fingerprint' },
-    { name: 'History', href: '/history' },
     { name: 'Methodology', href: '/methodology' },
     { name: 'Support', href: '/support' },
     { name: 'About', href: '/about' },

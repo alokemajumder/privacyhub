@@ -6,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
   Heart, 
-  Coffee, 
   Server, 
   Zap, 
   ExternalLink,
@@ -22,30 +21,20 @@ export function SupportSection() {
     { service: 'Database Storage', cost: '$5/month', description: 'Analysis history and user data' },
   ];
 
-  const supportTiers = [
+  const supportOptions = [
     {
-      name: 'Coffee',
-      amount: '$5',
-      icon: <Coffee className="h-6 w-6" />,
-      color: 'bg-yellow-100 text-yellow-800',
-      description: 'Buy us a coffee ☕ - covers ~2,500 analyses',
-      url: 'https://ko-fi.com/privacyhub'
-    },
-    {
-      name: 'Monthly',
-      amount: '$25',
+      name: 'Generic Donation',
       icon: <Heart className="h-6 w-6" />,
       color: 'bg-pink-100 text-pink-800',
-      description: 'Monthly support - covers server costs',
+      description: 'Support infrastructure costs and keep PrivacyHub free for everyone',
       url: 'https://github.com/sponsors/privacypriority'
     },
     {
-      name: 'Sponsor',
-      amount: '$100',
+      name: 'Open Source Contribution',
       icon: <Gift className="h-6 w-6" />,
       color: 'bg-purple-100 text-purple-800',
-      description: 'Sponsor tier - helps expand features',
-      url: 'https://opencollective.com/privacyhub'
+      description: 'Contribute code, report bugs, or improve documentation on GitHub',
+      url: 'https://github.com/privacypriority/privacyhub'
     }
   ];
 
@@ -89,26 +78,25 @@ export function SupportSection() {
           </div>
 
           {/* Support Options */}
-          <div className="grid md:grid-cols-3 gap-6">
-            {supportTiers.map((tier, index) => (
+          <div className="grid md:grid-cols-2 gap-6">
+            {supportOptions.map((option, index) => (
               <Card key={index} className="border-2 border-blue-200 hover:border-blue-300 transition-colors">
-                <CardContent className="p-6 text-center">
-                  <div className="flex items-center justify-center mb-3">
-                    <div className={`p-3 rounded-full ${tier.color.replace('text-', 'bg-').replace('-800', '-100')}`}>
-                      {tier.icon}
+                <CardContent className="p-8 text-center">
+                  <div className="flex items-center justify-center mb-4">
+                    <div className={`p-4 rounded-full ${option.color.replace('text-', 'bg-').replace('-800', '-100')}`}>
+                      {option.icon}
                     </div>
                   </div>
-                  <h4 className="text-xl font-bold text-gray-900 mb-2">{tier.name}</h4>
-                  <div className="text-3xl font-bold text-blue-600 mb-3">{tier.amount}</div>
-                  <p className="text-sm text-gray-600 mb-6">{tier.description}</p>
+                  <h4 className="text-xl font-bold text-gray-900 mb-4">{option.name}</h4>
+                  <p className="text-gray-600 mb-6 leading-relaxed">{option.description}</p>
                   <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" asChild>
                     <a
-                      href={tier.url}
+                      href={option.url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-2"
                     >
-                      Support Now
+                      {option.name === 'Generic Donation' ? 'Donate Now' : 'Contribute'}
                       <ExternalLink className="h-4 w-4" />
                     </a>
                   </Button>

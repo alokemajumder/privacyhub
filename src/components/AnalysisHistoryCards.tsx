@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +16,7 @@ interface AnalysisData {
   risk_level: string;
   gdpr_compliance: string;
   ccpa_compliance: string;
+  dpdp_act_compliance?: string;
   created_at: string;
   analysis_data: {
     overall_score: number;
@@ -24,6 +25,7 @@ interface AnalysisData {
     regulatory_compliance: {
       gdpr_compliance: string;
       ccpa_compliance: string;
+      dpdp_act_compliance?: string;
     };
   };
 }
@@ -32,27 +34,44 @@ export function AnalysisHistoryCards() {
   const [analyses, setAnalyses] = useState<AnalysisData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
 
-  useEffect(() => {
-    fetchAnalyses();
-  }, []);
-
-  const fetchAnalyses = async () => {
+  const fetchAnalyses = useCallback(async (reset = true) => {
     try {
-      setLoading(true);
-      const response = await fetch('/api/history?limit=12');
+      if (reset) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
+      
+      const currentCount = reset ? 0 : analyses.length;
+      const response = await fetch(`/api/history?limit=24&offset=${currentCount}`);
       if (!response.ok) {
         throw new Error('Failed to fetch analyses');
       }
       const data = await response.json();
-      setAnalyses(data.analyses);
+      
+      if (reset) {
+        setAnalyses(data.analyses);
+      } else {
+        setAnalyses(prev => [...prev, ...data.analyses]);
+      }
+      
+      // Check if there might be more analyses
+      setHasMore(data.analyses.length === 24);
     } catch (err) {
       console.error('Error fetching analyses:', err);
       setError('Failed to load analysis history');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
-  };
+  }, [analyses.length]);
+
+  useEffect(() => {
+    fetchAnalyses();
+  }, [fetchAnalyses]);
 
   const getRiskColor = (riskLevel: string) => {
     switch (riskLevel?.toUpperCase()) {
@@ -109,12 +128,10 @@ export function AnalysisHistoryCards() {
     return (
       <div className="space-y-6">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">
-            Recent Analysis History
-          </h2>
-          <p className="text-lg text-gray-600 mb-8">
-            Explore privacy analyses from our community
-          </p>
+          <div className="inline-flex items-center gap-2 bg-slate-100 px-4 py-2 rounded-full text-sm font-medium text-slate-600 mb-4">
+            <Clock className="w-4 h-4" />
+            Loading Recent Analyses...
+          </div>
         </div>
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -146,7 +163,7 @@ export function AnalysisHistoryCards() {
         <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
         <h3 className="text-lg font-semibold text-gray-900 mb-2">Unable to Load Analysis History</h3>
         <p className="text-gray-600 mb-4">{error}</p>
-        <Button onClick={fetchAnalyses} variant="outline">
+        <Button onClick={() => fetchAnalyses()} variant="outline">
           Try Again
         </Button>
       </div>
@@ -155,35 +172,35 @@ export function AnalysisHistoryCards() {
 
   if (analyses.length === 0) {
     return (
-      <div className="text-center py-12">
-        <Shield className="w-16 h-16 text-gray-400 mx-auto mb-6" />
-        <h3 className="text-2xl font-bold text-gray-900 mb-4">No Analyses Yet</h3>
-        <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-          Be the first to analyze a privacy policy! Use our analyzer above to get started and contribute to our community database.
-        </p>
-        <Button asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-          <a href="#analyzer">Start Analysis</a>
-        </Button>
+      <div className="text-center py-16">
+        <div className="max-w-md mx-auto">
+          <Shield className="w-20 h-20 text-slate-400 mx-auto mb-6" />
+          <h3 className="text-2xl font-bold text-slate-900 mb-4">Start Building Our Community Database</h3>
+          <p className="text-lg text-slate-600 mb-8 leading-relaxed">
+            Be the first to analyze a privacy policy and help build our global community database. 
+            All analyses are publicly shared to help others make informed privacy decisions.
+          </p>
+          <Button size="lg" asChild className="bg-slate-900 hover:bg-slate-800 text-white px-8 py-3">
+            <a href="#analyzer">Analyze First Policy</a>
+          </Button>
+          <p className="text-sm text-slate-500 mt-4">
+            Every analysis is stored globally and visible to all visitors
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-          Recent Analysis History
-        </h2>
-        <p className="text-lg text-gray-600 mb-2">
-          Explore privacy analyses from our community
-        </p>
-        <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+    <div className="space-y-6">
+      {analyses.length > 0 && (
+        <div className="flex items-center justify-center gap-2 text-sm text-slate-600 bg-slate-100 px-4 py-2 rounded-full w-fit mx-auto">
           <TrendingUp className="w-4 h-4" />
-          <span>{analyses.length} recent analyses available</span>
+          <span>{analyses.length} community analyses</span>
         </div>
-      </div>
+      )}
       
-      <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {analyses.map((analysis) => (
           <Link 
             key={analysis.id} 
@@ -323,14 +340,27 @@ export function AnalysisHistoryCards() {
         ))}
       </div>
       
-      {/* View All Link */}
-      <div className="text-center">
-        <Button asChild variant="outline" size="lg">
-          <Link href="/history">
-            View All Analyses →
-          </Link>
-        </Button>
-      </div>
+      {/* Load More Button */}
+      {hasMore && (
+        <div className="text-center pt-4">
+          <Button 
+            variant="outline" 
+            size="lg"
+            onClick={() => fetchAnalyses(false)}
+            disabled={loadingMore}
+            className="min-w-[200px]"
+          >
+            {loadingMore ? (
+              <>
+                <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin mr-2"></div>
+                Loading...
+              </>
+            ) : (
+              'Load More Analyses'
+            )}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
