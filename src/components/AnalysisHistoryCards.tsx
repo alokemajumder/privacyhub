@@ -175,16 +175,16 @@ export function AnalysisHistoryCards() {
       <div className="text-center py-16">
         <div className="max-w-md mx-auto">
           <Shield className="w-20 h-20 text-slate-400 mx-auto mb-6" />
-          <h3 className="text-2xl font-bold text-slate-900 mb-4">Start Building Our Community Database</h3>
+          <h3 className="text-2xl font-bold text-slate-900 mb-4">No Privacy Analyses Yet</h3>
           <p className="text-lg text-slate-600 mb-8 leading-relaxed">
-            Be the first to analyze a privacy policy and help build our global community database. 
-            All analyses are publicly shared to help others make informed privacy decisions.
+            Start protecting your privacy by analyzing the first website or app privacy policy. 
+            Understand what data they collect and how they use your personal information.
           </p>
           <Button size="lg" asChild className="bg-slate-900 hover:bg-slate-800 text-white px-8 py-3">
-            <a href="#analyzer">Analyze First Policy</a>
+            <a href="#analyzer">Analyze Your First Privacy Policy</a>
           </Button>
           <p className="text-sm text-slate-500 mt-4">
-            Every analysis is stored globally and visible to all visitors
+            Get instant insights about your privacy rights and data protection
           </p>
         </div>
       </div>
