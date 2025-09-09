@@ -41,7 +41,7 @@ export default function HomePage() {
             Next.js Version Coming Soon
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            We're currently migrating PrivacyHub to Next.js with modern shadcn/ui components. 
+            We&apos;re currently migrating PrivacyHub to Next.js with modern shadcn/ui components. 
             All backend services (SQLite, Firecrawl, OpenRouter) and API routes have been successfully migrated.
           </p>
         </CardContent>
@@ -56,7 +56,7 @@ export default function HomePage() {
             </h3>
             <div className="prose prose-sm max-w-none">
               <p className="text-muted-foreground text-lg mb-6 text-center max-w-4xl mx-auto">
-                In today's digital age, your personal data is more valuable—and vulnerable—than ever. Every website you visit, app you use, and service you sign up for collects data about you. Understanding how this data is collected, used, and protected is crucial for maintaining your privacy and security online.
+                In today&apos;s digital age, your personal data is more valuable—and vulnerable—than ever. Every website you visit, app you use, and service you sign up for collects data about you. Understanding how this data is collected, used, and protected is crucial for maintaining your privacy and security online.
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
@@ -129,7 +129,7 @@ export default function HomePage() {
                   PrivacyHub is an open source project dedicated to improving privacy transparency across the web. We believe in the power of community collaboration to create more effective privacy tools for everyone.
                 </p>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  By contributing to PrivacyHub, you're helping build a more privacy-conscious internet where users can better understand how their data is being used and protected.
+                  By contributing to PrivacyHub, you&apos;re helping build a more privacy-conscious internet where users can better understand how their data is being used and protected.
                 </p>
                 <div className="flex flex-wrap gap-4 mt-6">
                   <Button variant="outline" asChild>

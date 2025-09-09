@@ -7,7 +7,7 @@ interface RecentSearchesProps {
   onSelect: (analysis: PrivacyAnalysis) => void;
 }
 
-export default function RecentSearches({ analyses, onSelect }: RecentSearchesProps) {
+export default function RecentSearches({ analyses: _analyses, onSelect: _onSelect }: RecentSearchesProps) {
   return (
     <div className="mt-12">
       <h3 className="text-xl font-bold text-foreground mb-6">Recent Searches</h3>
