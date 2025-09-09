@@ -5,6 +5,7 @@ import { Github } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import PrivacyAnalyzer from '@/components/PrivacyAnalyzer';
 
 export default function HomePage() {
   return (
@@ -34,18 +35,10 @@ export default function HomePage() {
         </div>
       </div>
       
-      {/* Coming Soon Message */}
-      <Card className="mb-16">
-        <CardContent className="p-12 text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-4">
-            Next.js Version Coming Soon
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            We&apos;re currently migrating PrivacyHub to Next.js with modern shadcn/ui components. 
-            All backend services (SQLite, Firecrawl, OpenRouter) and API routes have been successfully migrated.
-          </p>
-        </CardContent>
-      </Card>
+      {/* Privacy Analyzer */}
+      <div className="mb-16">
+        <PrivacyAnalyzer />
+      </div>
       
       {/* Why Online Privacy Matters Section */}
       <div className="mt-20">
