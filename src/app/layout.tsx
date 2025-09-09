@@ -1,20 +1,37 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: 'swap',
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: "Privacy Policy Analyzer | PrivacyHub",
-  description: "Understand how websites handle your personal data. Get detailed analysis, scoring, and recommendations for any privacy policy in seconds.",
+  title: "Privacy Policy Analyzer | PrivacyHub.in",
+  description: "Professional privacy policy analysis powered by AI. Understand how websites handle your personal data with comprehensive scoring, regulatory compliance checks, and actionable recommendations.",
+  keywords: "privacy policy, GDPR, CCPA, privacy analysis, data protection, privacy compliance, AI analysis",
+  authors: [{ name: "PrivacyHub.in" }],
+  openGraph: {
+    title: "Privacy Policy Analyzer | PrivacyHub.in",
+    description: "Professional privacy policy analysis powered by AI",
+    type: "website",
+    url: "https://privacyhub.in",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Privacy Policy Analyzer | PrivacyHub.in",
+    description: "Professional privacy policy analysis powered by AI",
+  },
 };
 
 export default function RootLayout({
@@ -23,11 +40,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+    <html lang="en" className="scroll-smooth">
+      <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased min-h-screen bg-white`}>
+        <Header />
+        <main>{children}</main>
+        <Footer />
       </body>
     </html>
   );

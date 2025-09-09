@@ -21,7 +21,7 @@ test.describe('Homepage', () => {
   test('should display feature badges', async ({ page }) => {
     await expect(page.locator('text=AI-Powered Analysis')).toBeVisible();
     await expect(page.locator('text=90+ Privacy Criteria')).toBeVisible();
-    await expect(page.locator('text=Community Database')).toBeVisible();
+    await expect(page.locator('text=Community Supported')).toBeVisible();
   });
 
   test('should display coming soon section', async ({ page }) => {
