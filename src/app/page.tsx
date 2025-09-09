@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import PrivacyAnalyzer from '@/components/PrivacyAnalyzer';
+import { AnalysisHistory } from '@/components/AnalysisHistory';
 
 export default function HomePage() {
   return (
@@ -38,6 +39,11 @@ export default function HomePage() {
       {/* Privacy Analyzer */}
       <div className="mb-16">
         <PrivacyAnalyzer />
+      </div>
+
+      {/* Analysis History */}
+      <div className="mb-16">
+        <AnalysisHistory />
       </div>
       
       {/* Why Online Privacy Matters Section */}

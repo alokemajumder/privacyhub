@@ -6,7 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, CheckCircle, Search, ExternalLink } from 'lucide-react';
+import { CircularProgress } from '@/components/ui/circular-progress';
+import { ScoreGauge } from '@/components/ui/score-gauge';
+import { Heatmap } from '@/components/ui/heatmap';
+import { ScoreCard } from '@/components/ui/score-card';
+import { MethodologySection } from '@/components/MethodologySection';
+import { AlertCircle, CheckCircle, Search, ExternalLink, Shield, Lock, Eye, Users, FileText, Scale } from 'lucide-react';
 
 interface AnalysisResult {
   url: string;
@@ -193,94 +198,191 @@ export default function PrivacyAnalyzer() {
       {/* Results */}
       {result && (
         <div className="space-y-6">
-          {/* Overall Score */}
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="text-xl font-bold text-foreground">Privacy Analysis Results</h3>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-muted-foreground">for</span>
-                    <a 
-                      href={result.url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline flex items-center gap-1"
-                    >
-                      {new URL(result.url).hostname}
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
+          {/* Overall Score Dashboard */}
+          <Card className="bg-gradient-to-br from-gray-50 to-gray-100 border-2">
+            <CardContent className="p-8">
+              {/* Header */}
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-foreground mb-2">Privacy Analysis Results</h3>
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-muted-foreground">Analysis for</span>
+                  <a 
+                    href={result.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline flex items-center gap-1 font-medium"
+                  >
+                    {new URL(result.url).hostname}
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </div>
+              </div>
+
+              {/* Main Score Visualization */}
+              <div className="grid md:grid-cols-3 gap-8 mb-8">
+                {/* Circular Progress */}
+                <div className="flex flex-col items-center">
+                  <CircularProgress 
+                    value={result.analysis.overall_score * 10} 
+                    size={160}
+                    strokeWidth={12}
+                    showValue={false}
+                  />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <div className={`text-4xl font-bold ${getScoreColor(result.analysis.overall_score)}`}>
+                      {result.analysis.overall_score.toFixed(1)}
+                    </div>
+                    <div className="text-sm text-gray-500">Overall Score</div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <Badge className={`text-2xl px-4 py-2 ${getGradeColor(result.analysis.privacy_grade)}`}>
-                    {result.analysis.privacy_grade}
-                  </Badge>
-                  <div className={`text-2xl font-bold mt-1 ${getScoreColor(result.analysis.overall_score)}`}>
-                    {result.analysis.overall_score}/10
+
+                {/* Score Gauge */}
+                <div className="flex items-center justify-center">
+                  <ScoreGauge 
+                    score={result.analysis.overall_score}
+                    size="lg"
+                    label="Privacy Protection Level"
+                  />
+                </div>
+
+                {/* Grade and Risk Level */}
+                <div className="flex flex-col items-center justify-center space-y-4">
+                  <div className="text-center">
+                    <Badge className={`text-3xl px-6 py-3 ${getGradeColor(result.analysis.privacy_grade)}`}>
+                      {result.analysis.privacy_grade}
+                    </Badge>
+                    <div className="text-sm text-gray-600 mt-2">Privacy Grade</div>
+                  </div>
+                  
+                  <div className="text-center">
+                    <Badge className={`px-4 py-2 border-2 ${getRiskLevelColor(result.analysis.risk_level)}`}>
+                      {result.analysis.risk_level.replace('-', ' ')} RISK
+                    </Badge>
                   </div>
                 </div>
               </div>
               
-              <p className="text-muted-foreground mb-4">
-                {result.analysis.executive_summary}
-              </p>
+              {/* Executive Summary */}
+              <div className="bg-white rounded-lg p-6 mb-6 border border-gray-200">
+                <h4 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Executive Summary
+                </h4>
+                <p className="text-gray-700 leading-relaxed">
+                  {result.analysis.executive_summary}
+                </p>
+              </div>
               
-              {/* Risk Level and Compliance Status */}
-              <div className="flex flex-wrap items-center gap-3 mb-4">
-                <Badge className={`px-3 py-1 border ${getRiskLevelColor(result.analysis.risk_level)}`}>
-                  Risk Level: {result.analysis.risk_level}
-                </Badge>
-                <Badge className={`px-3 py-1 ${getComplianceColor(result.analysis.regulatory_compliance.gdpr_compliance)}`}>
-                  GDPR: {result.analysis.regulatory_compliance.gdpr_compliance.replace('_', ' ')}
-                </Badge>
+              {/* Compliance Status */}
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Scale className="h-5 w-5 text-blue-600" />
+                      <span className="font-medium">GDPR Compliance</span>
+                    </div>
+                    <Badge className={`px-3 py-1 ${getComplianceColor(result.analysis.regulatory_compliance.gdpr_compliance)}`}>
+                      {result.analysis.regulatory_compliance.gdpr_compliance.replace('_', ' ')}
+                    </Badge>
+                  </div>
+                </div>
+                
                 {result.analysis.regulatory_compliance.ccpa_compliance !== 'NOT_APPLICABLE' && (
-                  <Badge className={`px-3 py-1 ${getComplianceColor(result.analysis.regulatory_compliance.ccpa_compliance)}`}>
-                    CCPA: {result.analysis.regulatory_compliance.ccpa_compliance.replace('_', ' ')}
-                  </Badge>
+                  <div className="bg-white rounded-lg p-4 border border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Shield className="h-5 w-5 text-purple-600" />
+                        <span className="font-medium">CCPA Compliance</span>
+                      </div>
+                      <Badge className={`px-3 py-1 ${getComplianceColor(result.analysis.regulatory_compliance.ccpa_compliance)}`}>
+                        {result.analysis.regulatory_compliance.ccpa_compliance.replace('_', ' ')}
+                      </Badge>
+                    </div>
+                  </div>
                 )}
               </div>
-              
-              <Progress 
-                value={result.analysis.overall_score * 10} 
-                className="w-full h-3"
-              />
             </CardContent>
           </Card>
 
-          {/* Category Scores */}
-          <Card>
-            <CardContent className="p-6">
-              <h4 className="text-lg font-semibold mb-4">Detailed Analysis</h4>
-              <div className="grid gap-4">
-                {Object.entries(result.analysis.categories).map(([key, category]) => (
-                  <div key={key} className="space-y-3 border border-gray-100 rounded-lg p-4">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium capitalize text-base">
-                        {key.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                      </span>
-                      <span className={`font-semibold text-lg ${getScoreColor(category.score)}`}>
-                        {category.score}/10
-                      </span>
-                    </div>
-                    <Progress value={category.score * 10} className="h-3" />
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">
-                        {category.reasoning}
-                      </p>
-                      {category.regulatory_notes && (
-                        <div className="bg-blue-50 border-l-4 border-blue-200 p-3 rounded">
+          {/* Category Scores Dashboard */}
+          <div className="grid lg:grid-cols-2 gap-6">
+            {/* Score Cards Grid */}
+            <Card>
+              <CardContent className="p-6">
+                <h4 className="text-xl font-semibold mb-6 flex items-center gap-2">
+                  <Eye className="h-6 w-6" />
+                  Category Analysis
+                </h4>
+                
+                <div className="grid gap-4">
+                  {Object.entries(result.analysis.categories).map(([key, category]) => {
+                    const getIcon = (categoryKey: string) => {
+                      switch (categoryKey) {
+                        case 'data_collection': return <Shield className="h-5 w-5" />;
+                        case 'data_sharing': return <Users className="h-5 w-5" />;
+                        case 'user_rights': return <Scale className="h-5 w-5" />;
+                        case 'security_measures': return <Lock className="h-5 w-5" />;
+                        case 'compliance_framework': return <FileText className="h-5 w-5" />;
+                        case 'transparency': return <Eye className="h-5 w-5" />;
+                        default: return <Shield className="h-5 w-5" />;
+                      }
+                    };
+                    
+                    return (
+                      <ScoreCard
+                        key={key}
+                        title={key.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        score={category.score}
+                        description={category.reasoning}
+                        icon={getIcon(key)}
+                        className="hover:shadow-md transition-all duration-200"
+                      />
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Heatmap Visualization */}
+            <Card>
+              <CardContent className="p-6">
+                <div className="space-y-6">
+                  <Heatmap
+                    data={Object.entries(result.analysis.categories).map(([key, category]) => {
+                      const weights: Record<string, number> = {
+                        'data_collection': 30,
+                        'data_sharing': 25,
+                        'user_rights': 20,
+                        'security_measures': 15,
+                        'compliance_framework': 7,
+                        'transparency': 3
+                      };
+                      
+                      return {
+                        label: key.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+                        value: category.score,
+                        weight: weights[key] || 10
+                      };
+                    })}
+                  />
+                  
+                  {/* Regulatory Notes */}
+                  <div className="space-y-3">
+                    <h5 className="text-sm font-semibold text-gray-700">Regulatory Compliance Notes</h5>
+                    {Object.entries(result.analysis.categories).map(([key, category]) => (
+                      category.regulatory_notes && (
+                        <div key={key} className="bg-blue-50 border-l-4 border-blue-200 p-3 rounded">
                           <p className="text-sm text-blue-800">
-                            <strong>Regulatory Note:</strong> {category.regulatory_notes}
+                            <strong>{key.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}:</strong> {category.regulatory_notes}
                           </p>
                         </div>
-                      )}
-                    </div>
+                      )
+                    ))}
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Critical Findings */}
           {result.analysis.critical_findings && (
@@ -417,6 +519,9 @@ export default function PrivacyAnalyzer() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Methodology Section */}
+          <MethodologySection />
 
           {/* Analysis Metadata */}
           <Card>

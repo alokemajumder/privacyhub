@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import FirecrawlApp from '@mendable/firecrawl-js';
+import { saveAnalysis } from '@/lib/database';
 
 // Initialize OpenAI client inside the route handler to avoid build-time issues
 function getOpenAIClient() {
@@ -262,6 +263,15 @@ export async function POST(request: NextRequest) {
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError);
       throw new Error('Failed to parse analysis results');
+    }
+
+    // Save analysis to database
+    try {
+      const analysisId = saveAnalysis(url, analysis);
+      console.log('Analysis saved to database with ID:', analysisId);
+    } catch (dbError) {
+      console.error('Failed to save analysis to database:', dbError);
+      // Don't fail the request if database save fails
     }
 
     // Add metadata
