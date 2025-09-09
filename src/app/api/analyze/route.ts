@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import axios from 'axios';
-import * as cheerio from 'cheerio';
+import FirecrawlApp from '@mendable/firecrawl-js';
 
 // Initialize OpenAI client inside the route handler to avoid build-time issues
 function getOpenAIClient() {
@@ -11,35 +10,12 @@ function getOpenAIClient() {
   });
 }
 
-// Simple web scraper function
-async function scrapeWebpage(url: string): Promise<string> {
-  try {
-    const response = await axios.get(url, {
-      timeout: 10000,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.5',
-        'Accept-Encoding': 'gzip, deflate',
-        'Connection': 'keep-alive',
-        'Upgrade-Insecure-Requests': '1',
-      }
-    });
-    
-    const $ = cheerio.load(response.data);
-    
-    // Remove script and style elements
-    $('script, style, nav, header, footer, .navigation, #navigation').remove();
-    
-    // Extract text content
-    const text = $('body').text()
-      .replace(/\s+/g, ' ')
-      .trim();
-    
-    return text;
-  } catch (_error) {
-    throw new Error('Failed to fetch webpage content');
+// Initialize Firecrawl client
+function getFirecrawlClient() {
+  if (!process.env.FIRECRAWL_API_KEY) {
+    throw new Error('FIRECRAWL_API_KEY environment variable is required');
   }
+  return new FirecrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY });
 }
 
 const PRIVACY_ANALYSIS_PROMPT = `
@@ -99,9 +75,12 @@ Provide your response in this JSON format:
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('Privacy analysis request received');
+    
     const { url } = await request.json();
 
     if (!url) {
+      console.error('No URL provided in request');
       return NextResponse.json({ error: 'URL is required' }, { status: 400 });
     }
 
@@ -109,17 +88,91 @@ export async function POST(request: NextRequest) {
     try {
       new URL(url);
     } catch {
+      console.error('Invalid URL format:', url);
       return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
     }
 
-    console.log('Scraping URL:', url);
+    // Check environment variables
+    if (!process.env.FIRECRAWL_API_KEY) {
+      console.error('FIRECRAWL_API_KEY not configured');
+      return NextResponse.json({ error: 'API configuration error. FIRECRAWL_API_KEY not found.' }, { status: 500 });
+    }
 
-    // Scrape webpage content
-    const content = await scrapeWebpage(url);
+    if (!process.env.OPENROUTER_API_KEY) {
+      console.error('OPENROUTER_API_KEY not configured');
+      return NextResponse.json({ error: 'API configuration error. OPENROUTER_API_KEY not found.' }, { status: 500 });
+    }
 
-    if (!content || content.length < 100) {
+    console.log('Scraping URL with Firecrawl:', url);
+
+    // Use Firecrawl to extract content
+    const firecrawl = getFirecrawlClient();
+    let content = '';
+    
+    try {
+      // Try different API call formats for compatibility
+      let scrapeResponse: unknown;
+      try {
+        // V4 API format
+        scrapeResponse = await (firecrawl as unknown as { scrape: (params: { url: string; formats: string[]; onlyMainContent: boolean; waitFor: number }) => Promise<unknown> }).scrape({
+          url: url,
+          formats: ['markdown'],
+          onlyMainContent: true,
+          waitFor: 2000,
+        });
+      } catch (_v4Error) {
+        console.log('V4 format failed, trying V3 format');
+        // Fallback to V3 API format
+        scrapeResponse = await (firecrawl as unknown as { scrape: (url: string, params: { formats: string[]; onlyMainContent: boolean }) => Promise<unknown> }).scrape(url, {
+          formats: ['markdown'],
+          onlyMainContent: true,
+        });
+      }
+
+      console.log('Firecrawl response:', scrapeResponse);
+
+      // Handle different response formats
+      if (!scrapeResponse) {
+        throw new Error('No response from Firecrawl');
+      }
+
+      // Handle different response formats with type checking
+      const response = scrapeResponse as Record<string, unknown>;
+      
+      // V4 format check
+      if (response.data && typeof response.data === 'object') {
+        const data = response.data as Record<string, unknown>;
+        if (typeof data.markdown === 'string') {
+          content = data.markdown;
+        }
+      }
+      // V3 format check
+      else if (response.success && response.data && typeof response.data === 'object') {
+        const data = response.data as Record<string, unknown>;
+        content = (typeof data.markdown === 'string' ? data.markdown : '') || 
+                  (typeof data.content === 'string' ? data.content : '') || '';
+      }
+      // Direct response format
+      else if (typeof response.markdown === 'string') {
+        content = response.markdown;
+      }
+      else {
+        console.error('Unexpected Firecrawl response format:', scrapeResponse);
+        throw new Error('Unexpected response format from Firecrawl');
+      }
+
+      if (!content || content.length < 100) {
+        return NextResponse.json({ 
+          error: 'Extracted content is too short or empty. Please provide a direct link to a privacy policy page.' 
+        }, { status: 400 });
+      }
+
+      console.log('Content extracted successfully, length:', content.length);
+      
+    } catch (firecrawlError) {
+      console.error('Firecrawl API error:', firecrawlError);
       return NextResponse.json({ 
-        error: 'Failed to extract content from URL. Please check if the URL is accessible and contains a privacy policy.' 
+        error: 'Failed to extract content using Firecrawl. Please verify the URL is accessible and try again.' 
       }, { status: 400 });
     }
     
@@ -140,7 +193,7 @@ export async function POST(request: NextRequest) {
     // Analyze with OpenRouter AI
     const openai = getOpenAIClient();
     const completion = await openai.chat.completions.create({
-      model: "anthropic/claude-3.5-sonnet",
+      model: "deepseek/deepseek-chat",
       messages: [
         {
           role: "system",
