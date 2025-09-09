@@ -167,54 +167,40 @@ export function AnalysisDetailView({ analysis }: Props) {
         <Card>
           <CardContent className="p-8">
             <div className="text-center space-y-8">
-              {/* Main Score Display - Clean and Simple */}
-              <div className="space-y-4">
-                <div className="relative inline-block">
-                  <div className="w-32 h-32 relative mx-auto">
-                    <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 100 100">
-                      {/* Background Circle */}
-                      <circle
-                        cx="50"
-                        cy="50"
-                        r="40"
-                        stroke="#e5e7eb"
-                        strokeWidth="8"
-                        fill="transparent"
-                      />
-                      {/* Progress Circle */}
-                      <circle
-                        cx="50"
-                        cy="50"
-                        r="40"
-                        stroke={
-                          normalizedScore >= 80 ? '#10b981' :
-                          normalizedScore >= 60 ? '#3b82f6' :
-                          normalizedScore >= 40 ? '#f59e0b' :
-                          normalizedScore >= 20 ? '#f97316' :
-                          '#ef4444'
-                        }
-                        strokeWidth="8"
-                        fill="transparent"
-                        strokeDasharray={`${2 * Math.PI * 40}`}
-                        strokeDashoffset={`${2 * Math.PI * 40 * (1 - normalizedScore / 100)}`}
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                    {/* Score Text Overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-gray-900 leading-none">
-                          {displayScore.toFixed(1)}
-                        </div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          SCORE
-                        </div>
+              {/* Main Score Display - Simple Card Design */}
+              <div className="space-y-6">
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 border border-blue-100">
+                  <div className="text-center space-y-4">
+                    <div className="space-y-2">
+                      <div className="text-5xl font-bold text-gray-900">
+                        {displayScore.toFixed(1)}
+                      </div>
+                      <div className="text-lg text-gray-600 font-medium">Overall Privacy Score</div>
+                    </div>
+                    
+                    {/* Score Bar */}
+                    <div className="max-w-xs mx-auto">
+                      <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
+                        <div 
+                          className={`h-3 rounded-full transition-all duration-500 ${
+                            normalizedScore >= 80 ? 'bg-green-500' :
+                            normalizedScore >= 60 ? 'bg-blue-500' :
+                            normalizedScore >= 40 ? 'bg-yellow-500' :
+                            normalizedScore >= 20 ? 'bg-orange-500' :
+                            'bg-red-500'
+                          }`}
+                          style={{ width: `${Math.min(normalizedScore, 100)}%` }}
+                        />
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <span>0</span>
+                        <span>Poor</span>
+                        <span>Good</span>
+                        <span>10</span>
                       </div>
                     </div>
                   </div>
                 </div>
-                
-                <h3 className="text-xl font-bold text-gray-900">Overall Privacy Score</h3>
               </div>
 
               {/* Grade and Risk Level - Side by Side */}

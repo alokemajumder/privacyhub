@@ -34,9 +34,9 @@ interface DataCategory {
 export function DigitalFingerprintProfessional() {
   const [browserData, setBrowserData] = useState<Record<string, Record<string, unknown>> | null>(null);
   const [loading, setLoading] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
+  const [showDetails, setShowDetails] = useState(true);
   const [copiedItems, setCopiedItems] = useState<Set<string>>(new Set());
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['identity']));
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['identity', 'language', 'screen', 'hardware', 'network', 'media', 'storage', 'features', 'privacy', 'fingerprinting', 'fonts', 'performance']));
 
   const collectBrowserData = useCallback(async () => {
     const data: Record<string, Record<string, unknown>> = {
@@ -44,12 +44,29 @@ export function DigitalFingerprintProfessional() {
       identity: {
         userAgent: navigator.userAgent,
         platform: navigator.platform,
-        language: navigator.language,
-        languages: navigator.languages ? Array.from(navigator.languages).join(', ') : 'N/A',
-        cookieEnabled: navigator.cookieEnabled,
-        doNotTrack: navigator.doNotTrack || 'Not set',
+        appName: navigator.appName,
+        appVersion: navigator.appVersion,
+        appCodeName: navigator.appCodeName,
+        product: navigator.product,
+        productSub: navigator.productSub,
         vendor: navigator.vendor,
-        onLine: navigator.onLine,
+        vendorSub: navigator.vendorSub,
+        buildID: (navigator as Record<string, unknown>).buildID || 'N/A',
+        oscpu: (navigator as Record<string, unknown>).oscpu || 'N/A',
+      },
+
+      // Language & Locale
+      language: {
+        primaryLanguage: navigator.language,
+        allLanguages: navigator.languages ? Array.from(navigator.languages).join(', ') : 'N/A',
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        timezoneOffset: `UTC${new Date().getTimezoneOffset() > 0 ? '-' : '+'}${Math.abs(new Date().getTimezoneOffset() / 60)}`,
+        locale: Intl.DateTimeFormat().resolvedOptions().locale,
+        currency: Intl.NumberFormat().resolvedOptions().currency || 'N/A',
+        calendar: Intl.DateTimeFormat().resolvedOptions().calendar || 'N/A',
+        numberingSystem: Intl.DateTimeFormat().resolvedOptions().numberingSystem || 'N/A',
+        dateFormat: new Intl.DateTimeFormat().format(new Date()),
+        timeFormat: new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: 'numeric', second: 'numeric' }).format(new Date()),
       },
 
       // Screen & Display
@@ -57,50 +74,123 @@ export function DigitalFingerprintProfessional() {
         resolution: `${screen.width} × ${screen.height}`,
         availableSpace: `${screen.availWidth} × ${screen.availHeight}`,
         colorDepth: `${screen.colorDepth}-bit`,
-        pixelRatio: window.devicePixelRatio,
-        orientation: 'N/A',
-        touchSupport: 'ontouchstart' in window,
-        maxTouchPoints: navigator.maxTouchPoints || 0,
+        pixelDepth: `${screen.pixelDepth}-bit`,
+        devicePixelRatio: window.devicePixelRatio,
+        screenOrientation: screen.orientation ? screen.orientation.type : 'N/A',
+        screenAngle: screen.orientation ? screen.orientation.angle : 'N/A',
+        innerWidth: window.innerWidth,
+        innerHeight: window.innerHeight,
+        outerWidth: window.outerWidth,
+        outerHeight: window.outerHeight,
+        screenLeft: window.screenLeft || window.screenX,
+        screenTop: window.screenTop || window.screenY,
       },
 
-      // Location & Time
-      location: {
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        timezoneOffset: `UTC${new Date().getTimezoneOffset() > 0 ? '-' : '+'}${Math.abs(new Date().getTimezoneOffset() / 60)}`,
-        locale: Intl.DateTimeFormat().resolvedOptions().locale,
-        dateFormat: new Intl.DateTimeFormat().format(new Date()),
-      },
-
-      // Hardware
+      // Hardware Capabilities
       hardware: {
         cpuCores: navigator.hardwareConcurrency || 'Unknown',
-        deviceMemory: (navigator as unknown as Record<string, unknown>).deviceMemory ? `${(navigator as unknown as Record<string, unknown>).deviceMemory} GB` : 'N/A',
+        deviceMemory: (navigator as Record<string, unknown>).deviceMemory ? `${(navigator as Record<string, unknown>).deviceMemory} GB` : 'N/A',
         maxTouchPoints: navigator.maxTouchPoints || 0,
+        touchSupport: 'ontouchstart' in window,
+        pointerEvents: 'PointerEvent' in window,
+        vibrationAPI: 'vibrate' in navigator,
+        gamepads: navigator.getGamepads ? navigator.getGamepads().length : 'N/A',
+        webkitTemporaryStorage: 'webkitTemporaryStorage' in navigator,
+        webkitPersistentStorage: 'webkitPersistentStorage' in navigator,
       },
 
-      // Network
+      // Network Information
       network: {
         onLine: navigator.onLine,
         connectionType: 'Unknown',
         downlink: 'N/A',
+        effectiveType: 'N/A',
         rtt: 'N/A',
+        saveData: 'N/A',
       },
 
-      // Privacy Features
+      // Media Capabilities
+      media: {
+        mediaDevices: 'mediaDevices' in navigator,
+        webRTC: 'RTCPeerConnection' in window,
+        webAudio: 'AudioContext' in window || 'webkitAudioContext' in window,
+        speechRecognition: 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window,
+        speechSynthesis: 'speechSynthesis' in window,
+        webMIDI: 'requestMIDIAccess' in navigator,
+        mediaRecorder: 'MediaRecorder' in window,
+      },
+
+      // Storage & Database
+      storage: {
+        localStorage: typeof localStorage !== 'undefined',
+        sessionStorage: typeof sessionStorage !== 'undefined',
+        indexedDB: 'indexedDB' in window,
+        webSQL: 'openDatabase' in window,
+        cookies: navigator.cookieEnabled,
+        serviceWorker: 'serviceWorker' in navigator,
+        cacheAPI: 'caches' in window,
+        storageQuota: 'storage' in navigator && 'estimate' in (navigator as Record<string, unknown>).storage,
+      },
+
+      // Browser Features
+      features: {
+        webGL: !!window.WebGLRenderingContext,
+        webGL2: !!window.WebGL2RenderingContext,
+        webAssembly: 'WebAssembly' in window,
+        sharedArrayBuffer: 'SharedArrayBuffer' in window,
+        webWorkers: 'Worker' in window,
+        webSockets: 'WebSocket' in window,
+        fetch: 'fetch' in window,
+        webVR: 'getVRDisplays' in navigator,
+        webXR: 'xr' in navigator,
+        bluetooth: 'bluetooth' in navigator,
+        usb: 'usb' in navigator,
+        serial: 'serial' in navigator,
+        hid: 'hid' in navigator,
+        geolocation: 'geolocation' in navigator,
+        notifications: 'Notification' in window,
+        pushManager: 'PushManager' in window,
+      },
+
+      // Security & Privacy
       privacy: {
+        doNotTrack: navigator.doNotTrack || 'Not set',
+        globalPrivacyControl: (navigator as Record<string, unknown>).globalPrivacyControl || 'Not set',
         cookiesEnabled: navigator.cookieEnabled,
-        localStorageAvailable: typeof Storage !== 'undefined',
-        sessionStorageAvailable: typeof Storage !== 'undefined',
-        indexedDBAvailable: 'indexedDB' in window,
+        thirdPartyCookies: 'N/A',
         privateMode: await detectPrivateMode(),
+        adBlocker: 'N/A',
+        tracking: 'N/A',
+        referrer: document.referrer || 'Direct visit',
       },
 
-      // WebGL & Canvas
+      // Canvas & WebGL Fingerprinting
       fingerprinting: {
         canvasSupport: !!document.createElement('canvas').getContext,
+        canvasFingerprint: 'N/A',
         webGLSupport: false,
         webGLVendor: 'N/A',
         webGLRenderer: 'N/A',
+        webGLVersion: 'N/A',
+        webGLShadingLanguage: 'N/A',
+        webGLExtensions: 'N/A',
+      },
+
+      // Fonts & Text Rendering
+      fonts: {
+        availableFonts: 'N/A',
+        fontFingerprint: 'N/A',
+        textMetrics: 'N/A',
+      },
+
+      // Performance & Timing
+      performance: {
+        performanceAPI: 'performance' in window,
+        navigationTiming: 'navigation' in performance,
+        resourceTiming: 'getEntriesByType' in performance,
+        userTiming: 'mark' in performance,
+        highResTime: 'now' in performance,
+        memoryInfo: 'memory' in performance ? JSON.stringify((performance as Record<string, unknown>).memory) : 'N/A',
       }
     };
 
@@ -114,20 +204,126 @@ export function DigitalFingerprintProfessional() {
       }
     }
 
+    // Canvas Fingerprinting
+    try {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        canvas.width = 200;
+        canvas.height = 50;
+        ctx.textBaseline = 'top';
+        ctx.font = '14px Arial';
+        ctx.fillStyle = '#f60';
+        ctx.fillRect(125, 1, 62, 20);
+        ctx.fillStyle = '#069';
+        ctx.fillText('Canvas fingerprint 🌐', 2, 15);
+        ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
+        ctx.fillText('Canvas fingerprint 🌐', 4, 17);
+        data.fingerprinting.canvasFingerprint = canvas.toDataURL().substring(0, 50) + '...';
+      }
+    } catch {
+      data.fingerprinting.canvasFingerprint = 'Blocked or unavailable';
+    }
+
     // WebGL Information
     try {
       const canvas = document.createElement('canvas');
       const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
       if (gl) {
         data.fingerprinting.webGLSupport = true;
+        data.fingerprinting.webGLVersion = gl.getParameter(gl.VERSION);
+        data.fingerprinting.webGLShadingLanguage = gl.getParameter(gl.SHADING_LANGUAGE_VERSION);
+        
         const debugInfo = (gl as WebGLRenderingContext).getExtension('WEBGL_debug_renderer_info');
         if (debugInfo) {
           data.fingerprinting.webGLVendor = (gl as WebGLRenderingContext).getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
           data.fingerprinting.webGLRenderer = (gl as WebGLRenderingContext).getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
         }
+        
+        const extensions = gl.getSupportedExtensions();
+        data.fingerprinting.webGLExtensions = extensions ? extensions.join(', ') : 'None';
       }
     } catch {
       // WebGL not available
+    }
+
+    // Font Detection
+    try {
+      const baseFonts = ['monospace', 'sans-serif', 'serif'];
+      const testFonts = [
+        'Arial', 'Helvetica', 'Times New Roman', 'Courier New', 'Verdana', 'Georgia', 'Palatino',
+        'Garamond', 'Bookman', 'Comic Sans MS', 'Trebuchet MS', 'Arial Black', 'Impact',
+        'Calibri', 'Cambria', 'Consolas', 'Lucida Console', 'Tahoma', 'Segoe UI',
+        'Apple SD Gothic Neo', 'Malgun Gothic', 'Microsoft YaHei'
+      ];
+      
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        const testString = 'mmmmmmmmmmlli';
+        const testSize = '72px';
+        const h = 100;
+        const w = 100;
+        
+        canvas.width = w;
+        canvas.height = h;
+        
+        const defaultWidth: Record<string, number> = {};
+        const defaultHeight: Record<string, number> = {};
+        
+        for (const font of baseFonts) {
+          ctx.font = `${testSize} ${font}`;
+          const metrics = ctx.measureText(testString);
+          defaultWidth[font] = metrics.width;
+          defaultHeight[font] = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+        }
+        
+        const detectedFonts: string[] = [];
+        for (const font of testFonts) {
+          let detected = false;
+          for (const baseFont of baseFonts) {
+            ctx.font = `${testSize} ${font}, ${baseFont}`;
+            const metrics = ctx.measureText(testString);
+            const width = metrics.width;
+            const height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+            
+            if (width !== defaultWidth[baseFont] || height !== defaultHeight[baseFont]) {
+              detected = true;
+              break;
+            }
+          }
+          if (detected) {
+            detectedFonts.push(font);
+          }
+        }
+        
+        data.fonts.availableFonts = detectedFonts.join(', ') || 'None detected';
+        data.fonts.fontFingerprint = `${detectedFonts.length} fonts detected`;
+      }
+    } catch {
+      data.fonts.availableFonts = 'Detection failed';
+      data.fonts.fontFingerprint = 'N/A';
+    }
+
+    // Audio Context Fingerprinting
+    try {
+      const audioCtx = new (window.AudioContext || (window as unknown as Record<string, unknown>).webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const analyser = audioCtx.createAnalyser();
+      const gain = audioCtx.createGain();
+      const scriptProcessor = audioCtx.createScriptProcessor(4096, 1, 1);
+      
+      gain.gain.value = 0;
+      oscillator.frequency.value = 10000;
+      oscillator.connect(analyser);
+      analyser.connect(scriptProcessor);
+      scriptProcessor.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      data.fingerprinting.audioContext = 'Available';
+      audioCtx.close();
+    } catch {
+      data.fingerprinting.audioContext = 'Blocked or unavailable';
     }
 
     // Battery API
@@ -255,6 +451,16 @@ export function DigitalFingerprintProfessional() {
       }))
     },
     {
+      name: 'Language & Locale',
+      icon: <Globe className="w-5 h-5" />,
+      riskLevel: 'high',
+      description: 'Language preferences and regional settings that reveal location',
+      dataPoints: Object.entries(browserData.language).map(([key, value]) => ({
+        label: key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()),
+        value: String(value)
+      }))
+    },
+    {
       name: 'Display & Screen',
       icon: <Monitor className="w-5 h-5" />,
       riskLevel: 'high',
@@ -265,17 +471,7 @@ export function DigitalFingerprintProfessional() {
       }))
     },
     {
-      name: 'Location & Timezone',
-      icon: <MapPin className="w-5 h-5" />,
-      riskLevel: 'high',
-      description: 'Geographic and temporal data revealing your location',
-      dataPoints: Object.entries(browserData.location).map(([key, value]) => ({
-        label: key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()),
-        value: String(value)
-      }))
-    },
-    {
-      name: 'Hardware Information',
+      name: 'Hardware Capabilities',
       icon: <Cpu className="w-5 h-5" />,
       riskLevel: 'moderate',
       description: 'Device capabilities and performance characteristics',
@@ -285,7 +481,7 @@ export function DigitalFingerprintProfessional() {
       }))
     },
     {
-      name: 'Network Details',
+      name: 'Network Information',
       icon: <Wifi className="w-5 h-5" />,
       riskLevel: 'moderate',
       description: 'Connection information and network capabilities',
@@ -295,10 +491,40 @@ export function DigitalFingerprintProfessional() {
       }))
     },
     {
+      name: 'Media Capabilities',
+      icon: <Eye className="w-5 h-5" />,
+      riskLevel: 'moderate',
+      description: 'Audio, video, and media device access capabilities',
+      dataPoints: Object.entries(browserData.media).map(([key, value]) => ({
+        label: key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()),
+        value: String(value)
+      }))
+    },
+    {
+      name: 'Storage & Database',
+      icon: <Shield className="w-5 h-5" />,
+      riskLevel: 'moderate',
+      description: 'Browser storage and database capabilities',
+      dataPoints: Object.entries(browserData.storage).map(([key, value]) => ({
+        label: key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()),
+        value: String(value)
+      }))
+    },
+    {
+      name: 'Browser Features',
+      icon: <CheckCircle className="w-5 h-5" />,
+      riskLevel: 'moderate',
+      description: 'Advanced browser APIs and feature support',
+      dataPoints: Object.entries(browserData.features).map(([key, value]) => ({
+        label: key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()),
+        value: String(value)
+      }))
+    },
+    {
       name: 'Privacy Settings',
       icon: <Shield className="w-5 h-5" />,
       riskLevel: 'low',
-      description: 'Browser privacy and storage configurations',
+      description: 'Browser privacy and tracking configurations',
       dataPoints: Object.entries(browserData.privacy).map(([key, value]) => ({
         label: key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()),
         value: String(value)
@@ -310,6 +536,26 @@ export function DigitalFingerprintProfessional() {
       riskLevel: 'critical',
       description: 'Advanced tracking techniques used for unique identification',
       dataPoints: Object.entries(browserData.fingerprinting).map(([key, value]) => ({
+        label: key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()),
+        value: String(value)
+      }))
+    },
+    {
+      name: 'Font Detection',
+      icon: <Eye className="w-5 h-5" />,
+      riskLevel: 'high',
+      description: 'Installed fonts that can uniquely identify your system',
+      dataPoints: Object.entries(browserData.fonts).map(([key, value]) => ({
+        label: key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()),
+        value: String(value)
+      }))
+    },
+    {
+      name: 'Performance & Timing',
+      icon: <RefreshCw className="w-5 h-5" />,
+      riskLevel: 'low',
+      description: 'Browser performance APIs and timing information',
+      dataPoints: Object.entries(browserData.performance).map(([key, value]) => ({
         label: key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()),
         value: String(value)
       }))

@@ -29,24 +29,24 @@ export function Footer() {
             <h3 className="font-semibold text-gray-900 mb-3">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#analyzer" className="text-gray-600 hover:text-blue-600 transition-colors">
+                <Link href="/" className="text-gray-600 hover:text-blue-600 transition-colors">
                   Privacy Analyzer
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#history" className="text-gray-600 hover:text-blue-600 transition-colors">
+                <Link href="/" className="text-gray-600 hover:text-blue-600 transition-colors">
                   Analysis History
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#methodology" className="text-gray-600 hover:text-blue-600 transition-colors">
+                <Link href="/methodology" className="text-gray-600 hover:text-blue-600 transition-colors">
                   Methodology
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#about" className="text-gray-600 hover:text-blue-600 transition-colors">
+                <Link href="/about" className="text-gray-600 hover:text-blue-600 transition-colors">
                   About Privacy
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -124,13 +124,13 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a
-                  href="#donate"
+                <Link
+                  href="/support"
                   className="text-blue-600 hover:text-blue-800 transition-colors font-medium flex items-center gap-1"
                 >
                   <Heart className="h-4 w-4" />
                   Support Us
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

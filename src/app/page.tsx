@@ -52,14 +52,6 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* CTA Button */}
-              <Button 
-                size="lg" 
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-semibold"
-                onClick={() => document.getElementById('analyzer')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                Check Your App&rsquo;s Privacy →
-              </Button>
             </div>
 
             {/* Privacy Analyzer */}
