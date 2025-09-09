@@ -19,7 +19,6 @@ import {
   Fingerprint,
   Download,
   ExternalLink,
-  MapPin,
   ChevronRight
 } from 'lucide-react';
 
@@ -51,8 +50,8 @@ export function DigitalFingerprintProfessional() {
         productSub: navigator.productSub,
         vendor: navigator.vendor,
         vendorSub: navigator.vendorSub,
-        buildID: (navigator as Record<string, unknown>).buildID || 'N/A',
-        oscpu: (navigator as Record<string, unknown>).oscpu || 'N/A',
+        buildID: (navigator as unknown as Record<string, unknown>).buildID || 'N/A',
+        oscpu: (navigator as unknown as Record<string, unknown>).oscpu || 'N/A',
       },
 
       // Language & Locale
@@ -89,7 +88,7 @@ export function DigitalFingerprintProfessional() {
       // Hardware Capabilities
       hardware: {
         cpuCores: navigator.hardwareConcurrency || 'Unknown',
-        deviceMemory: (navigator as Record<string, unknown>).deviceMemory ? `${(navigator as Record<string, unknown>).deviceMemory} GB` : 'N/A',
+        deviceMemory: (navigator as unknown as Record<string, unknown>).deviceMemory ? `${(navigator as unknown as Record<string, unknown>).deviceMemory} GB` : 'N/A',
         maxTouchPoints: navigator.maxTouchPoints || 0,
         touchSupport: 'ontouchstart' in window,
         pointerEvents: 'PointerEvent' in window,
@@ -129,7 +128,7 @@ export function DigitalFingerprintProfessional() {
         cookies: navigator.cookieEnabled,
         serviceWorker: 'serviceWorker' in navigator,
         cacheAPI: 'caches' in window,
-        storageQuota: 'storage' in navigator && 'estimate' in (navigator as Record<string, unknown>).storage,
+        storageQuota: 'storage' in navigator && !!(navigator as unknown as Record<string, unknown>).storage,
       },
 
       // Browser Features
@@ -155,7 +154,7 @@ export function DigitalFingerprintProfessional() {
       // Security & Privacy
       privacy: {
         doNotTrack: navigator.doNotTrack || 'Not set',
-        globalPrivacyControl: (navigator as Record<string, unknown>).globalPrivacyControl || 'Not set',
+        globalPrivacyControl: (navigator as unknown as Record<string, unknown>).globalPrivacyControl || 'Not set',
         cookiesEnabled: navigator.cookieEnabled,
         thirdPartyCookies: 'N/A',
         privateMode: await detectPrivateMode(),
@@ -229,15 +228,15 @@ export function DigitalFingerprintProfessional() {
     try {
       const canvas = document.createElement('canvas');
       const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-      if (gl) {
+      if (gl && gl instanceof WebGLRenderingContext) {
         data.fingerprinting.webGLSupport = true;
         data.fingerprinting.webGLVersion = gl.getParameter(gl.VERSION);
         data.fingerprinting.webGLShadingLanguage = gl.getParameter(gl.SHADING_LANGUAGE_VERSION);
         
-        const debugInfo = (gl as WebGLRenderingContext).getExtension('WEBGL_debug_renderer_info');
+        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
         if (debugInfo) {
-          data.fingerprinting.webGLVendor = (gl as WebGLRenderingContext).getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
-          data.fingerprinting.webGLRenderer = (gl as WebGLRenderingContext).getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+          data.fingerprinting.webGLVendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
+          data.fingerprinting.webGLRenderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
         }
         
         const extensions = gl.getSupportedExtensions();
