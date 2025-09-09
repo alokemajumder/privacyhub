@@ -66,27 +66,6 @@ export function AnalysisDetailView({ analysis }: Props) {
     return hostname.replace(/^www\./, '');
   };
 
-  const getRiskColor = (riskLevel: string) => {
-    switch (riskLevel?.toUpperCase()) {
-      case 'HIGH': return 'bg-red-100 text-red-800 border-red-200';
-      case 'MODERATE-HIGH': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'MODERATE': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'LOW': return 'bg-green-100 text-green-800 border-green-200';
-      case 'EXEMPLARY': return 'bg-blue-100 text-blue-800 border-blue-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
-
-  const getGradeColor = (grade: string) => {
-    switch (grade?.toUpperCase()) {
-      case 'A': return 'bg-green-100 text-green-800 border-green-300';
-      case 'B': return 'bg-blue-100 text-blue-800 border-blue-300';
-      case 'C': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-      case 'D': return 'bg-orange-100 text-orange-800 border-orange-300';
-      case 'F': return 'bg-red-100 text-red-800 border-red-300';
-      default: return 'bg-gray-100 text-gray-800 border-gray-300';
-    }
-  };
 
   const getComplianceIcon = (compliance: string) => {
     switch (compliance?.toUpperCase()) {
@@ -97,13 +76,6 @@ export function AnalysisDetailView({ analysis }: Props) {
     }
   };
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-blue-600';
-    if (score >= 40) return 'text-yellow-600';
-    if (score >= 20) return 'text-orange-600';
-    return 'text-red-600';
-  };
 
   const downloadReport = () => {
     const reportData = {

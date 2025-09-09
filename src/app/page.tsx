@@ -26,7 +26,7 @@ export default function HomePage() {
               <p className="text-lg md:text-xl text-slate-600 mb-8 leading-relaxed">
                 Every day you use apps and visit websites that collect your personal information. 
                 Do you know how they use it? Our free privacy analyzer helps you understand 
-                what's really happening with your data.
+                what&rsquo;s really happening with your data.
               </p>
               
               {/* Privacy Concerns */}
@@ -58,7 +58,7 @@ export default function HomePage() {
                 className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-semibold"
                 onClick={() => document.getElementById('analyzer')?.scrollIntoView({ behavior: 'smooth' })}
               >
-                Check Your App's Privacy →
+                Check Your App&rsquo;s Privacy →
               </Button>
             </div>
 
@@ -85,7 +85,7 @@ export default function HomePage() {
             </h2>
             <p className="text-lg text-slate-600 max-w-4xl mx-auto">
               Your personal data is valuable. Companies collect it to make money, governments use it for surveillance, 
-              and hackers want to steal it. Here's what you need to know:
+              and hackers want to steal it. Here&rsquo;s what you need to know:
             </p>
           </div>
           
@@ -141,7 +141,7 @@ export default function HomePage() {
             </h2>
             <p className="text-lg text-slate-600 max-w-3xl mx-auto">
               Our community has analyzed thousands of privacy policies from apps and websites you use every day. 
-              Discover which ones protect your privacy and which ones don't.
+              Discover which ones protect your privacy and which ones don&rsquo;t.
             </p>
           </div>
           
@@ -220,7 +220,7 @@ export default function HomePage() {
                 <div>
                   <h4 className="text-lg font-bold text-white mb-2">Review App Permissions</h4>
                   <p className="text-slate-300 text-sm">
-                    Check what permissions your apps have. Turn off location, camera, and microphone access for apps that don't need them.
+                    Check what permissions your apps have. Turn off location, camera, and microphone access for apps that don&rsquo;t need them.
                   </p>
                 </div>
               </div>

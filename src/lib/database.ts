@@ -40,7 +40,7 @@ function initializeDatabase() {
   try {
     db.exec(`ALTER TABLE analyses ADD COLUMN dpdp_act_compliance TEXT`);
     console.log('Added dpdp_act_compliance column to existing table');
-  } catch (error) {
+  } catch {
     // Column already exists, ignore error
   }
 
