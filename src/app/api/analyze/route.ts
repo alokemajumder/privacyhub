@@ -6,7 +6,7 @@ import FirecrawlApp from '@mendable/firecrawl-js';
 function getOpenAIClient() {
   return new OpenAI({
     baseURL: "https://openrouter.ai/api/v1",
-    apiKey: process.env.OPENROUTER_API_KEY,
+    apiKey: process.env.OPENROUTER_API,
   });
 }
 
@@ -98,9 +98,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'API configuration error. FIRECRAWL_API_KEY not found.' }, { status: 500 });
     }
 
-    if (!process.env.OPENROUTER_API_KEY) {
-      console.error('OPENROUTER_API_KEY not configured');
-      return NextResponse.json({ error: 'API configuration error. OPENROUTER_API_KEY not found.' }, { status: 500 });
+    if (!process.env.OPENROUTER_API) {
+      console.error('OPENROUTER_API not configured');
+      return NextResponse.json({ error: 'API configuration error. OPENROUTER_API not found.' }, { status: 500 });
     }
 
     console.log('Scraping URL with Firecrawl:', url);
