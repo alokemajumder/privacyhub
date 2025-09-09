@@ -1,15 +1,11 @@
 'use client';
 
 import React from 'react';
-import { Github, AlertCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import PrivacyAnalyzer from '@/components/PrivacyAnalyzer';
-import { AnalysisHistory } from '@/components/AnalysisHistory';
-import { MethodologySection } from '@/components/MethodologySection';
-import { BrowserDataExposure } from '@/components/BrowserDataExposure';
-import { SupportSection } from '@/components/SupportSection';
+import { AnalysisHistoryCards } from '@/components/AnalysisHistoryCards';
 
 export default function HomePage() {
   return (
@@ -52,182 +48,86 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Browser Data Exposure Section */}
-      <section id="browser-exposure" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      {/* Analysis History Cards Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent mb-4">
-              What Data Your Browser Is Leaking
-            </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              Discover what information websites can automatically collect about you without your explicit permission. 
-              This educational tool reveals your digital fingerprint. <strong className="text-green-600">Your data stays private</strong> - 
-              nothing is stored, saved, or shared. Everything is analyzed locally and discarded when you close the tab.
-            </p>
-          </div>
-          <BrowserDataExposure />
-        </div>
-      </section>
-
-      {/* Analysis History Section */}
-      <section id="history" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <AnalysisHistory />
-        </div>
-      </section>
-
-      {/* Methodology Section */}
-      <section id="methodology" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-4">
-              Our Analysis Methodology
-            </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              Professional privacy assessment using evidence-based evaluation framework with regulatory compliance standards.
-            </p>
-          </div>
-          <MethodologySection />
-        </div>
-      </section>
-
-      {/* Support Section */}
-      <section id="donate" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-              Keep Privacy Analysis Free
-            </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              Help us maintain this free privacy service by supporting our infrastructure costs. 
-              Every contribution keeps privacy analysis accessible to everyone.
-            </p>
-          </div>
-          <SupportSection />
+          <AnalysisHistoryCards />
         </div>
       </section>
       
-      {/* About Privacy Section */}
-      <section id="about" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      {/* Quick Links Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
-          <Card className="border-0 shadow-xl">
-            <CardContent className="p-8 lg:p-12">
-              <h2 className="text-4xl font-bold text-center mb-8 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                Why Privacy Analysis Matters
-              </h2>
-              <p className="text-xl text-gray-600 mb-12 text-center max-w-4xl mx-auto leading-relaxed">
-                In today&apos;s digital age, your personal data is more valuable—and vulnerable—than ever. 
-                Understanding how websites handle your information is crucial for maintaining your privacy and security online.
-              </p>
-              
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                      <AlertCircle className="h-6 w-6 text-red-600" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900">Key Privacy Concerns</h3>
-                  </div>
-                  <ul className="space-y-4">
-                    {[
-                      "Personal data collection and storage practices",
-                      "Third-party data sharing agreements", 
-                      "Targeted advertising and user profiling",
-                      "Data breach notification policies",
-                      "Long-term data retention periods"
-                    ].map((concern, index) => (
-                      <li key={index} className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></div>
-                        <span className="text-gray-700">{concern}</span>
-                      </li>
-                    ))}
-                  </ul>
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">
+              Explore PrivacyHub
+            </h2>
+            <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+              Discover more privacy tools and resources to protect your digital rights.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer border-blue-200">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-6 h-6 bg-red-600 rounded-full"></div>
                 </div>
-                
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                      <AlertCircle className="h-6 w-6 text-orange-600" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900">Potential User Impact</h3>
-                  </div>
-                  <ul className="space-y-4">
-                    {[
-                      "Identity theft and financial fraud risks",
-                      "Manipulation through targeted content",
-                      "Unauthorized financial exploitation", 
-                      "Loss of personal autonomy and choice",
-                      "Invasive behavioral surveillance"
-                    ].map((impact, index) => (
-                      <li key={index} className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
-                        <span className="text-gray-700">{impact}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-              
-              <div className="text-center p-8 bg-blue-50 rounded-2xl">
-                <p className="text-lg text-blue-900 max-w-4xl mx-auto leading-relaxed">
-                  Privacy policies are your window into how companies handle your personal information. 
-                  By understanding these policies, you can make informed decisions about which services to trust 
-                  with your data and how to protect your privacy online.
+                <h3 className="text-lg font-bold text-gray-900 mb-3">Digital Fingerprint</h3>
+                <p className="text-gray-600 mb-4 text-sm">
+                  See what information your browser reveals to websites automatically.
                 </p>
-              </div>
-            </CardContent>
-          </Card>
-          
-          {/* Open Source Contribution Section */}
-          <Card className="mt-12 border-0 shadow-xl">
-            <CardContent className="p-8 lg:p-12">
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Open Source Contribution</h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                  PrivacyHub.in is an open source project dedicated to improving privacy transparency across the web.
+                <Button variant="outline" size="sm" asChild>
+                  <a href="/digital-fingerprint">Explore →</a>
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer border-indigo-200">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-6 h-6 bg-indigo-600 rounded-full"></div>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-3">Analysis History</h3>
+                <p className="text-gray-600 mb-4 text-sm">
+                  View privacy analysis results and community insights.
                 </p>
-              </div>
-              
-              <div className="grid lg:grid-cols-2 gap-12">
-                <div className="space-y-6">
-                  <p className="text-gray-700 leading-relaxed">
-                    We believe in the power of community collaboration to create more effective privacy tools for everyone. 
-                    By contributing to PrivacyHub, you&apos;re helping build a more privacy-conscious internet where users 
-                    can better understand how their data is being used and protected.
-                  </p>
-                  <Button size="lg" asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                    <a 
-                      href="https://github.com/privacypriority/privacyhub" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex items-center space-x-2"
-                    >
-                      <Github className="h-5 w-5" />
-                      <span>Contribute on GitHub</span>
-                    </a>
-                  </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <a href="/history">View History →</a>
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer border-gray-200">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-6 h-6 bg-gray-600 rounded-full"></div>
                 </div>
-                
-                <div>
-                  <h4 className="text-xl font-bold text-gray-900 mb-6">Ways to Contribute</h4>
-                  <ul className="space-y-4">
-                    {[
-                      "Improve AI analysis algorithms for more accurate privacy policy scoring",
-                      "Enhance the policy detection system to better locate privacy policies", 
-                      "Add support for additional languages and regional privacy regulations",
-                      "Develop browser extensions for instant privacy policy analysis",
-                      "Report bugs and suggest new features to improve user experience"
-                    ].map((way, index) => (
-                      <li key={index} className="flex items-start gap-3">
-                        <Badge className="bg-blue-100 text-blue-800 mt-1">{index + 1}</Badge>
-                        <span className="text-gray-700">{way}</span>
-                      </li>
-                    ))}
-                  </ul>
+                <h3 className="text-lg font-bold text-gray-900 mb-3">Our Methodology</h3>
+                <p className="text-gray-600 mb-4 text-sm">
+                  Learn how our privacy assessment framework works.
+                </p>
+                <Button variant="outline" size="sm" asChild>
+                  <a href="/methodology">Learn More →</a>
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer border-purple-200">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-6 h-6 bg-purple-600 rounded-full"></div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+                <h3 className="text-lg font-bold text-gray-900 mb-3">Support Us</h3>
+                <p className="text-gray-600 mb-4 text-sm">
+                  Help keep privacy analysis free for everyone.
+                </p>
+                <Button variant="outline" size="sm" asChild>
+                  <a href="/support">Support →</a>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </section>
     </div>

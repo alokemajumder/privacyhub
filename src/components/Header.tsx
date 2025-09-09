@@ -10,11 +10,12 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navigation = [
-    { name: 'Analyzer', href: '#analyzer' },
-    { name: 'Browser Data', href: '#browser-exposure' },
-    { name: 'History', href: '#history' },
-    { name: 'Methodology', href: '#methodology' },
-    { name: 'About', href: '#about' },
+    { name: 'Analyzer', href: '/' },
+    { name: 'Digital Fingerprint', href: '/digital-fingerprint' },
+    { name: 'History', href: '/history' },
+    { name: 'Methodology', href: '/methodology' },
+    { name: 'Support', href: '/support' },
+    { name: 'About', href: '/about' },
   ];
 
   return (
