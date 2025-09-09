@@ -134,7 +134,7 @@ export function AnalysisHistoryCards() {
           </div>
         </div>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(8)].map((_, i) => (
             <Card key={i} className="animate-pulse">
               <CardContent className="p-6">
@@ -200,7 +200,7 @@ export function AnalysisHistoryCards() {
         </div>
       )}
       
-      <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {analyses.map((analysis) => (
           <Link 
             key={analysis.id} 
@@ -233,7 +233,7 @@ export function AnalysisHistoryCards() {
                 <div className="mb-6">
                   {/* Score and Grade Display */}
                   <div className="bg-gray-50 rounded-xl p-4 mb-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
                       {/* Privacy Grade */}
                       <div className="text-center">
                         <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center font-bold text-xl border-2 shadow-sm ${getGradeColor(analysis.privacy_grade)}`}>
