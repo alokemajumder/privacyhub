@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { CircularProgress } from '@/components/ui/circular-progress';
-import { ScoreGauge } from '@/components/ui/score-gauge';
 import { Heatmap } from '@/components/ui/heatmap';
 import { ScoreCard } from '@/components/ui/score-card';
 import { 
@@ -81,7 +80,6 @@ export default function PrivacyAnalyzerNew() {
     { step: 'Calculating compliance scores...', status: 'pending' },
     { step: 'Generating recommendations...', status: 'pending' }
   ]);
-  const [currentStep, setCurrentStep] = useState(0);
 
   const simulateProgress = useCallback(() => {
     const steps = [...loadingSteps];
@@ -96,7 +94,6 @@ export default function PrivacyAnalyzerNew() {
           if (stepIndex < steps.length) {
             steps[stepIndex].status = 'completed';
             setLoadingSteps([...steps]);
-            setCurrentStep(stepIndex + 1);
             stepIndex++;
           }
         }, Math.random() * 3000 + 2000); // 2-5 seconds per step
@@ -117,7 +114,6 @@ export default function PrivacyAnalyzerNew() {
     setLoading(true);
     setError('');
     setResult(null);
-    setCurrentStep(0);
     setLoadingSteps(prev => prev.map(step => ({ ...step, status: 'pending' })));
 
     const cleanup = simulateProgress();

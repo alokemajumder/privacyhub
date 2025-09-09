@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
           onlyMainContent: true,
           waitFor: 2000,
         });
-      } catch (_v4Error) {
+      } catch {
         console.log('V4 format failed, trying V3 format');
         // Fallback to V3 API format
         scrapeResponse = await (firecrawl as unknown as { scrape: (url: string, params: { formats: string[]; onlyMainContent: boolean }) => Promise<unknown> }).scrape(url, {
