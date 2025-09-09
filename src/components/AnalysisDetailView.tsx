@@ -153,7 +153,7 @@ export function AnalysisDetailView({ analysis }: Props) {
 
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
         {/* Quick Summary Cards */}
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="space-y-6">
           {/* Privacy Grade */}
           <Card className="text-center">
             <CardContent className="pt-6">
@@ -203,7 +203,7 @@ export function AnalysisDetailView({ analysis }: Props) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-6">
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <DollarSign className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
@@ -224,9 +224,8 @@ export function AnalysisDetailView({ analysis }: Props) {
                     </p>
                   </div>
                 </div>
-              </div>
-              
-              <div className="space-y-4">
+                </div>
+                
                 <div className="flex items-start gap-3">
                   <Lock className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
                   <div>
@@ -247,7 +246,6 @@ export function AnalysisDetailView({ analysis }: Props) {
                   </div>
                 </div>
               </div>
-            </div>
           </CardContent>
         </Card>
 
@@ -319,7 +317,7 @@ export function AnalysisDetailView({ analysis }: Props) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4">
+            <div className="space-y-4">
               {/* GDPR */}
               <div className="flex items-center justify-between p-4 rounded-lg border">
                 <div className="flex items-center gap-3">
