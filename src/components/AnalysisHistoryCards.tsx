@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Shield, Clock, TrendingUp, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import { Shield, Clock, TrendingUp, AlertTriangle, CheckCircle, XCircle, ChevronRight } from 'lucide-react';
 
 interface AnalysisData {
   id: number;
@@ -74,6 +74,14 @@ export function AnalysisHistoryCards() {
       case 'F': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 90) return 'text-green-600';
+    if (score >= 80) return 'text-blue-600';
+    if (score >= 70) return 'text-yellow-600';
+    if (score >= 60) return 'text-orange-600';
+    return 'text-red-600';
   };
 
   const getComplianceIcon = (compliance: string) => {
@@ -175,98 +183,139 @@ export function AnalysisHistoryCards() {
         </div>
       </div>
       
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {analyses.map((analysis) => (
           <Link 
             key={analysis.id} 
             href={`/analysis/${analysis.id}`}
             className="block group"
           >
-            <Card className="h-full hover:shadow-lg transition-all duration-300 group-hover:scale-105 border-gray-200 group-hover:border-blue-300">
+            <Card className="h-full hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1 border border-gray-200 group-hover:border-blue-400 bg-white">
               <CardContent className="p-6">
-                {/* Header */}
-                <div className="mb-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Shield className="w-4 h-4 text-white" />
+                {/* Header Section */}
+                <div className="mb-6">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <Shield className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-bold text-gray-900 truncate text-base leading-tight">
+                          {formatHostname(analysis.hostname)}
+                        </h3>
+                        <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
+                          <Clock className="w-3 h-3 flex-shrink-0" />
+                          <span>{formatDate(analysis.created_at)}</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-semibold text-gray-900 truncate text-sm">
-                        {formatHostname(analysis.hostname)}
-                      </h3>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <Clock className="w-3 h-3" />
-                    <span>{formatDate(analysis.created_at)}</span>
                   </div>
                 </div>
 
-                {/* Scores */}
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="text-center">
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${getGradeColor(analysis.privacy_grade)}`}>
-                        {analysis.privacy_grade || 'N/A'}
+                {/* Main Metrics Section */}
+                <div className="mb-6">
+                  {/* Score and Grade Display */}
+                  <div className="bg-gray-50 rounded-xl p-4 mb-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      {/* Privacy Grade */}
+                      <div className="text-center">
+                        <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center font-bold text-xl border-2 shadow-sm ${getGradeColor(analysis.privacy_grade)}`}>
+                          {analysis.privacy_grade || 'N/A'}
+                        </div>
+                        <div className="mt-2">
+                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Grade</p>
+                          <p className="text-sm text-gray-700 font-medium">Privacy Rating</p>
+                        </div>
                       </div>
-                      <span className="text-xs text-gray-500 mt-1 block">Grade</span>
+                      
+                      {/* Privacy Score */}
+                      <div className="text-center">
+                        <div className="relative">
+                          <div className={`text-3xl font-bold ${getScoreColor(analysis.overall_score)} mb-1`}>
+                            {Math.round(analysis.overall_score)}
+                            <span className="text-lg text-gray-500 font-normal">/100</span>
+                          </div>
+                          {/* Score Bar */}
+                          <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                            <div 
+                              className={`h-2 rounded-full transition-all duration-300 ${
+                                analysis.overall_score >= 80 ? 'bg-green-500' :
+                                analysis.overall_score >= 60 ? 'bg-blue-500' :
+                                analysis.overall_score >= 40 ? 'bg-yellow-500' :
+                                analysis.overall_score >= 20 ? 'bg-orange-500' :
+                                'bg-red-500'
+                              }`}
+                              style={{ width: `${Math.min(analysis.overall_score, 100)}%` }}
+                            />
+                          </div>
+                        </div>
+                        <div className="mt-1">
+                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Score</p>
+                          <p className="text-sm text-gray-700 font-medium">Privacy Points</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Risk Level Badge */}
+                  <div className="mb-4">
+                    <Badge 
+                      variant="outline" 
+                      className={`w-full justify-center py-2 text-sm font-medium border-2 ${getRiskColor(analysis.risk_level)}`}
+                    >
+                      {analysis.risk_level?.replace('_', ' ') || 'Unknown'} Risk Level
+                    </Badge>
+                  </div>
+                </div>
+
+                {/* Compliance Section */}
+                <div className="mb-6">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Regulatory Compliance</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        {getComplianceIcon(analysis.gdpr_compliance)}
+                        <div>
+                          <span className="text-sm font-medium text-gray-900">GDPR</span>
+                          <p className="text-xs text-gray-500">General Data Protection</p>
+                        </div>
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        analysis.gdpr_compliance === 'COMPLIANT' ? 'bg-green-100 text-green-800 border border-green-200' :
+                        analysis.gdpr_compliance === 'PARTIALLY_COMPLIANT' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' :
+                        'bg-red-100 text-red-800 border border-red-200'
+                      }`}>
+                        {analysis.gdpr_compliance?.replace('_', ' ') || 'Unknown'}
+                      </span>
                     </div>
                     
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-gray-900">
-                        {Math.round(analysis.overall_score)}
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        {getComplianceIcon(analysis.ccpa_compliance)}
+                        <div>
+                          <span className="text-sm font-medium text-gray-900">CCPA</span>
+                          <p className="text-xs text-gray-500">California Consumer Privacy</p>
+                        </div>
                       </div>
-                      <span className="text-xs text-gray-500">Score</span>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        analysis.ccpa_compliance === 'COMPLIANT' ? 'bg-green-100 text-green-800 border border-green-200' :
+                        analysis.ccpa_compliance === 'PARTIALLY_COMPLIANT' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' :
+                        'bg-red-100 text-red-800 border border-red-200'
+                      }`}>
+                        {analysis.ccpa_compliance?.replace('_', ' ') || 'Unknown'}
+                      </span>
                     </div>
-                  </div>
-                  
-                  <Badge 
-                    variant="outline" 
-                    className={`w-full justify-center text-xs ${getRiskColor(analysis.risk_level)}`}
-                  >
-                    {analysis.risk_level?.replace('_', ' ') || 'Unknown'} Risk
-                  </Badge>
-                </div>
-
-                {/* Compliance */}
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      {getComplianceIcon(analysis.gdpr_compliance)}
-                      <span className="text-gray-700">GDPR</span>
-                    </div>
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      analysis.gdpr_compliance === 'COMPLIANT' ? 'bg-green-100 text-green-800' :
-                      analysis.gdpr_compliance === 'PARTIALLY_COMPLIANT' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {analysis.gdpr_compliance?.replace('_', ' ') || 'Unknown'}
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      {getComplianceIcon(analysis.ccpa_compliance)}
-                      <span className="text-gray-700">CCPA</span>
-                    </div>
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      analysis.ccpa_compliance === 'COMPLIANT' ? 'bg-green-100 text-green-800' :
-                      analysis.ccpa_compliance === 'PARTIALLY_COMPLIANT' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {analysis.ccpa_compliance?.replace('_', ' ') || 'Unknown'}
-                    </span>
                   </div>
                 </div>
 
-                {/* View Button */}
+                {/* Action Button */}
                 <Button 
                   variant="outline" 
-                  size="sm" 
-                  className="w-full group-hover:bg-blue-50 group-hover:border-blue-300 group-hover:text-blue-700"
+                  size="default" 
+                  className="w-full font-medium group-hover:bg-blue-50 group-hover:border-blue-500 group-hover:text-blue-700 transition-all duration-200"
                 >
-                  View Analysis
+                  View Full Analysis
+                  <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </CardContent>
             </Card>
