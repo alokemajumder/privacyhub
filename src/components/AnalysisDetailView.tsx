@@ -66,6 +66,18 @@ export function AnalysisDetailView({ analysis }: Props) {
     return hostname.replace(/^www\./, '');
   };
 
+  // Normalize score to 0-100 range for display
+  const normalizeScore = (score: number) => {
+    // If score is already 0-100, use as is
+    if (score <= 100) return score;
+    // If score is 0-10, multiply by 10
+    if (score <= 10) return score * 10;
+    return score;
+  };
+
+  const displayScore = analysis.overall_score;
+  const normalizedScore = normalizeScore(analysis.overall_score);
+
   const getGradeColor = (grade: string) => {
     switch (grade?.toUpperCase()) {
       case 'A': return 'text-green-600 bg-green-50 border-green-200';
@@ -123,10 +135,10 @@ export function AnalysisDetailView({ analysis }: Props) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
-      {/* Simple Header */}
+      {/* Enhanced Header */}
       <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-6">
             <Button variant="ghost" asChild className="text-gray-600 hover:text-gray-900">
               <Link href="/">
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -139,76 +151,79 @@ export function AnalysisDetailView({ analysis }: Props) {
             </Button>
           </div>
           
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-              <Shield className="w-6 h-6 text-blue-600" />
+          <div className="text-center">
+            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <Shield className="w-8 h-8 text-white" />
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">{formatHostname(analysis.hostname)}</h1>
-              <p className="text-gray-600">Privacy Report • {formatDate(analysis.created_at)}</p>
-            </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">{formatHostname(analysis.hostname)}</h1>
+            <p className="text-lg text-gray-600">Privacy Policy Analysis</p>
+            <p className="text-sm text-gray-500 mt-1">Analyzed on {formatDate(analysis.created_at)}</p>
           </div>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+      <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
         {/* Privacy Overview Summary */}
         <Card>
           <CardContent className="p-8">
-            <div className="text-center space-y-6">
-              {/* Main Score Circle */}
-              <div className="relative inline-flex items-center justify-center">
-                <div className="w-40 h-40 relative">
-                  {/* Background Circle */}
-                  <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 160 160">
-                    <circle
-                      cx="80"
-                      cy="80"
-                      r="70"
-                      stroke="currentColor"
-                      strokeWidth="12"
-                      fill="transparent"
-                      className="text-gray-200"
-                    />
-                    {/* Progress Circle */}
-                    <circle
-                      cx="80"
-                      cy="80"
-                      r="70"
-                      stroke="currentColor"
-                      strokeWidth="12"
-                      fill="transparent"
-                      strokeDasharray={`${2 * Math.PI * 70}`}
-                      strokeDashoffset={`${2 * Math.PI * 70 * (1 - analysis.overall_score / 100)}`}
-                      className={
-                        analysis.overall_score >= 80 ? 'text-green-500' :
-                        analysis.overall_score >= 60 ? 'text-blue-500' :
-                        analysis.overall_score >= 40 ? 'text-yellow-500' :
-                        analysis.overall_score >= 20 ? 'text-orange-500' :
-                        'text-red-500'
-                      }
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  {/* Score Text */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="text-4xl font-bold text-gray-900">
-                        {analysis.overall_score.toFixed(1)}
+            <div className="text-center space-y-8">
+              {/* Main Score Display - Clean and Simple */}
+              <div className="space-y-4">
+                <div className="relative inline-block">
+                  <div className="w-32 h-32 relative mx-auto">
+                    <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 100 100">
+                      {/* Background Circle */}
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        stroke="#e5e7eb"
+                        strokeWidth="8"
+                        fill="transparent"
+                      />
+                      {/* Progress Circle */}
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        stroke={
+                          normalizedScore >= 80 ? '#10b981' :
+                          normalizedScore >= 60 ? '#3b82f6' :
+                          normalizedScore >= 40 ? '#f59e0b' :
+                          normalizedScore >= 20 ? '#f97316' :
+                          '#ef4444'
+                        }
+                        strokeWidth="8"
+                        fill="transparent"
+                        strokeDasharray={`${2 * Math.PI * 40}`}
+                        strokeDashoffset={`${2 * Math.PI * 40 * (1 - normalizedScore / 100)}`}
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    {/* Score Text Overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-gray-900 leading-none">
+                          {displayScore.toFixed(1)}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          SCORE
+                        </div>
                       </div>
-                      <div className="text-base text-gray-500 font-medium">Overall Score</div>
                     </div>
                   </div>
                 </div>
+                
+                <h3 className="text-xl font-bold text-gray-900">Overall Privacy Score</h3>
               </div>
 
-              {/* Grade and Risk Level Row */}
-              <div className="flex items-center justify-center gap-12">
+              {/* Grade and Risk Level - Side by Side */}
+              <div className="grid grid-cols-2 gap-8 max-w-md mx-auto">
                 <div className="text-center">
-                  <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full text-3xl font-bold shadow-lg border-4 ${getGradeColor(analysis.privacy_grade)}`}>
+                  <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center text-2xl font-bold shadow-lg border-2 ${getGradeColor(analysis.privacy_grade)}`}>
                     {analysis.privacy_grade || 'F'}
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mt-2">Privacy Grade</h3>
+                  <h4 className="font-bold text-gray-900 mt-3 mb-1">Privacy Grade</h4>
                   <p className="text-sm text-gray-600">
                     {analysis.privacy_grade === 'A' ? 'Excellent' :
                      analysis.privacy_grade === 'B' ? 'Good' :
@@ -219,12 +234,13 @@ export function AnalysisDetailView({ analysis }: Props) {
                 </div>
 
                 <div className="text-center">
-                  <div className={`inline-flex items-center justify-center px-6 py-4 rounded-full text-lg font-bold shadow-lg ${getRiskColor(analysis.risk_level)}`}>
-                    <AlertTriangle className="w-5 h-5 mr-2" />
-                    {analysis.risk_level?.replace('-', ' ') || 'Unknown'} Risk
+                  <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center shadow-lg ${getRiskColor(analysis.risk_level)}`}>
+                    <AlertTriangle className="w-6 h-6" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mt-2">Risk Level</h3>
-                  <p className="text-sm text-gray-600">Privacy Protection Level</p>
+                  <h4 className="font-bold text-gray-900 mt-3 mb-1">Risk Level</h4>
+                  <p className="text-sm text-gray-600">
+                    {analysis.risk_level?.replace('-', ' ') || 'Unknown'} Risk
+                  </p>
                 </div>
               </div>
             </div>
@@ -240,49 +256,47 @@ export function AnalysisDetailView({ analysis }: Props) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <DollarSign className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-semibold text-orange-900 mb-1">Data Monetization</h4>
-                    <p className="text-sm text-orange-800">
-                      This website may collect and use your personal information for commercial purposes. Your data could be shared with advertisers or sold to third parties.
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <Eye className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-semibold text-orange-900 mb-1">Tracking & Surveillance</h4>
-                    <p className="text-sm text-orange-800">
-                      Your browsing behavior, location, and online activities may be monitored and recorded. This data creates a detailed profile about you.
-                    </p>
-                  </div>
-                </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <Lock className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-semibold text-orange-900 mb-1">Data Security</h4>
-                    <p className="text-sm text-orange-800">
-                      Consider how well your personal information is protected from hackers, data breaches, and unauthorized access.
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <UserCheck className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-semibold text-orange-900 mb-1">Your Rights</h4>
-                    <p className="text-sm text-orange-800">
-                      You have legal rights to access, correct, or delete your personal data. Check if this website respects and facilitates these rights.
-                    </p>
-                  </div>
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <DollarSign className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-orange-900 mb-1">Data Monetization</h4>
+                  <p className="text-sm text-orange-800">
+                    This website may collect and use your personal information for commercial purposes. Your data could be shared with advertisers or sold to third parties.
+                  </p>
                 </div>
               </div>
+              
+              <div className="flex items-start gap-3">
+                <Eye className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-orange-900 mb-1">Tracking & Surveillance</h4>
+                  <p className="text-sm text-orange-800">
+                    Your browsing behavior, location, and online activities may be monitored and recorded. This data creates a detailed profile about you.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <Lock className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-orange-900 mb-1">Data Security</h4>
+                  <p className="text-sm text-orange-800">
+                    Consider how well your personal information is protected from hackers, data breaches, and unauthorized access.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <UserCheck className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-orange-900 mb-1">Your Rights</h4>
+                  <p className="text-sm text-orange-800">
+                    You have legal rights to access, correct, or delete your personal data. Check if this website respects and facilitates these rights.
+                  </p>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -350,64 +364,73 @@ export function AnalysisDetailView({ analysis }: Props) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Scale className="w-5 h-5 text-purple-600" />
-              Legal Protection Status
+              How Well Are You Protected?
             </CardTitle>
+            <p className="text-sm text-gray-600 mt-2">
+              This shows how well the website follows major privacy laws that protect your personal information.
+            </p>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {/* GDPR */}
-              <div className="flex items-center justify-between p-4 rounded-lg border">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-lg ${getComplianceStatus(analysis.gdpr_compliance).bg} flex items-center justify-center`}>
-                    {React.createElement(getComplianceStatus(analysis.gdpr_compliance).icon, {
-                      className: `w-5 h-5 ${getComplianceStatus(analysis.gdpr_compliance).color}`
-                    })}
+              <div className="p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full ${getComplianceStatus(analysis.gdpr_compliance).bg} flex items-center justify-center`}>
+                      {React.createElement(getComplianceStatus(analysis.gdpr_compliance).icon, {
+                        className: `w-4 h-4 ${getComplianceStatus(analysis.gdpr_compliance).color}`
+                      })}
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900">GDPR</h4>
+                      <p className="text-xs text-gray-500">European Union • Strongest privacy law globally</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">GDPR (European Union)</h4>
-                    <p className="text-sm text-gray-600">European privacy law protection</p>
+                  <div className={`px-3 py-1 rounded-full text-xs font-medium ${getComplianceStatus(analysis.gdpr_compliance).bg} ${getComplianceStatus(analysis.gdpr_compliance).color}`}>
+                    {getComplianceStatus(analysis.gdpr_compliance).text}
                   </div>
                 </div>
-                <Badge variant="outline" className={getComplianceStatus(analysis.gdpr_compliance).color}>
-                  {getComplianceStatus(analysis.gdpr_compliance).text}
-                </Badge>
               </div>
 
               {/* CCPA */}
-              <div className="flex items-center justify-between p-4 rounded-lg border">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-lg ${getComplianceStatus(analysis.ccpa_compliance).bg} flex items-center justify-center`}>
-                    {React.createElement(getComplianceStatus(analysis.ccpa_compliance).icon, {
-                      className: `w-5 h-5 ${getComplianceStatus(analysis.ccpa_compliance).color}`
-                    })}
+              <div className="p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full ${getComplianceStatus(analysis.ccpa_compliance).bg} flex items-center justify-center`}>
+                      {React.createElement(getComplianceStatus(analysis.ccpa_compliance).icon, {
+                        className: `w-4 h-4 ${getComplianceStatus(analysis.ccpa_compliance).color}`
+                      })}
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900">CCPA</h4>
+                      <p className="text-xs text-gray-500">California, USA • Consumer privacy rights</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">CCPA (California, USA)</h4>
-                    <p className="text-sm text-gray-600">California privacy law protection</p>
+                  <div className={`px-3 py-1 rounded-full text-xs font-medium ${getComplianceStatus(analysis.ccpa_compliance).bg} ${getComplianceStatus(analysis.ccpa_compliance).color}`}>
+                    {getComplianceStatus(analysis.ccpa_compliance).text}
                   </div>
                 </div>
-                <Badge variant="outline" className={getComplianceStatus(analysis.ccpa_compliance).color}>
-                  {getComplianceStatus(analysis.ccpa_compliance).text}
-                </Badge>
               </div>
 
               {/* DPDP Act 2023 */}
               {analysis.dpdp_act_compliance && (
-                <div className="flex items-center justify-between p-4 rounded-lg border">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-lg ${getComplianceStatus(analysis.dpdp_act_compliance).bg} flex items-center justify-center`}>
-                      {React.createElement(getComplianceStatus(analysis.dpdp_act_compliance).icon, {
-                        className: `w-5 h-5 ${getComplianceStatus(analysis.dpdp_act_compliance).color}`
-                      })}
+                <div className="p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-full ${getComplianceStatus(analysis.dpdp_act_compliance).bg} flex items-center justify-center`}>
+                        {React.createElement(getComplianceStatus(analysis.dpdp_act_compliance).icon, {
+                          className: `w-4 h-4 ${getComplianceStatus(analysis.dpdp_act_compliance).color}`
+                        })}
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-900">DPDP Act 2023</h4>
+                        <p className="text-xs text-gray-500">India • Digital personal data protection</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900">DPDP Act 2023 (India)</h4>
-                      <p className="text-sm text-gray-600">Indian data protection law</p>
+                    <div className={`px-3 py-1 rounded-full text-xs font-medium ${getComplianceStatus(analysis.dpdp_act_compliance).bg} ${getComplianceStatus(analysis.dpdp_act_compliance).color}`}>
+                      {getComplianceStatus(analysis.dpdp_act_compliance).text}
                     </div>
                   </div>
-                  <Badge variant="outline" className={getComplianceStatus(analysis.dpdp_act_compliance).color}>
-                    {getComplianceStatus(analysis.dpdp_act_compliance).text}
-                  </Badge>
                 </div>
               )}
             </div>
