@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { BrowserDataExposureEnhanced } from '@/components/BrowserDataExposureEnhanced';
+import { DigitalFingerprintProfessional } from '@/components/DigitalFingerprintProfessional';
 
 export const metadata: Metadata = {
   title: "Your Digital Fingerprint Analysis | PrivacyHub.in",
@@ -49,7 +49,7 @@ export default function DigitalFingerprintPage() {
       {/* Browser Data Exposure Tool */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <BrowserDataExposureEnhanced />
+          <DigitalFingerprintProfessional />
         </div>
       </section>
 
