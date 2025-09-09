@@ -17,22 +17,53 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Privacy Policy Analyzer | PrivacyHub.in",
-  description: "Professional privacy policy analysis powered by AI. Understand how websites handle your personal data with comprehensive scoring, regulatory compliance checks, and actionable recommendations.",
-  keywords: "privacy policy, GDPR, CCPA, privacy analysis, data protection, privacy compliance, AI analysis",
+  metadataBase: new URL('https://privacyhub.in'),
+  title: "Know What Apps Do With Your Data | PrivacyHub.in",
+  description: "Free privacy checker for everyday users. Understand how the apps and websites you use daily handle your personal data. Learn to protect your digital privacy with simple, actionable tips.",
+  keywords: "privacy awareness, data privacy, personal data protection, app privacy, digital privacy, privacy education, GDPR rights, privacy policy checker, data security",
   authors: [{ name: "PrivacyHub.in" }],
+  icons: {
+    icon: [
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+    other: [
+      {
+        rel: 'icon',
+        url: '/favicon.ico',
+      },
+    ],
+  },
+  manifest: '/site.webmanifest',
   openGraph: {
     title: "Privacy Policy Analyzer | PrivacyHub.in",
     description: "Professional privacy policy analysis powered by AI",
     type: "website",
     url: "https://privacyhub.in",
+    images: [
+      {
+        url: '/android-chrome-512x512.png',
+        width: 512,
+        height: 512,
+        alt: 'PrivacyHub Logo',
+      }
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Privacy Policy Analyzer | PrivacyHub.in",
     description: "Professional privacy policy analysis powered by AI",
+    images: ['/android-chrome-512x512.png'],
   },
 };
+
+export function generateViewport() {
+  return {
+    themeColor: '#1e293b',
+  }
+}
 
 export default function RootLayout({
   children,

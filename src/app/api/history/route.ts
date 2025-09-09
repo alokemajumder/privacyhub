@@ -5,9 +5,10 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '10');
+    const offset = parseInt(searchParams.get('offset') || '0');
     const includeStats = searchParams.get('stats') === 'true';
 
-    const analyses = getRecentAnalyses(limit);
+    const analyses = getRecentAnalyses(limit, offset);
     
     // Parse analysis_data back to JSON for each result
     const formattedAnalyses = analyses.map(analysis => ({

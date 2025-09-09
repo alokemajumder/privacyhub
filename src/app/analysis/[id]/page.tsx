@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   
   return {
     title: `${hostname} Privacy Analysis | PrivacyHub.in`,
-    description: `Detailed privacy policy analysis for ${hostname}. Grade: ${(analysis as unknown as { privacy_grade: string }).privacy_grade}, Score: ${Math.round((analysis as unknown as { overall_score: number }).overall_score)}. Comprehensive GDPR & CCPA compliance review.`,
+    description: `Detailed privacy policy analysis for ${hostname}. Grade: ${(analysis as unknown as { privacy_grade: string }).privacy_grade}, Score: ${Math.round((analysis as unknown as { overall_score: number }).overall_score)}. Comprehensive GDPR, CCPA & DPDP Act 2023 compliance review.`,
     openGraph: {
       title: `${hostname} Privacy Analysis | PrivacyHub.in`,
       description: `Privacy grade ${(analysis as unknown as { privacy_grade: string }).privacy_grade} with ${Math.round((analysis as unknown as { overall_score: number }).overall_score)} score. ${(analysis as unknown as { risk_level: string }).risk_level} risk level.`,

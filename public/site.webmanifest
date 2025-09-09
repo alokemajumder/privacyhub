@@ -1,0 +1,22 @@
+{
+  "name": "PrivacyHub - Privacy Policy Analyzer",
+  "short_name": "PrivacyHub",
+  "description": "Professional AI-powered privacy policy analysis with regulatory compliance checks",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#1e293b",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/"
+}
