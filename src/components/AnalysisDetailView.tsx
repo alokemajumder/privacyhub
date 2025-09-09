@@ -152,47 +152,80 @@ export function AnalysisDetailView({ analysis }: Props) {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        {/* Quick Summary Cards */}
-        <div className="space-y-6">
-          {/* Privacy Grade */}
-          <Card className="text-center">
-            <CardContent className="pt-6">
-              <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full text-2xl font-bold border-2 ${getGradeColor(analysis.privacy_grade)}`}>
-                {analysis.privacy_grade || 'F'}
+        {/* Privacy Overview Summary */}
+        <Card>
+          <CardContent className="p-8">
+            <div className="text-center space-y-6">
+              {/* Main Score Circle */}
+              <div className="relative inline-flex items-center justify-center">
+                <div className="w-32 h-32 relative">
+                  {/* Background Circle */}
+                  <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r="45"
+                      stroke="currentColor"
+                      strokeWidth="8"
+                      fill="transparent"
+                      className="text-gray-200"
+                    />
+                    {/* Progress Circle */}
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r="45"
+                      stroke="currentColor"
+                      strokeWidth="8"
+                      fill="transparent"
+                      strokeDasharray={`${2 * Math.PI * 45}`}
+                      strokeDashoffset={`${2 * Math.PI * 45 * (1 - analysis.overall_score / 100)}`}
+                      className={
+                        analysis.overall_score >= 80 ? 'text-green-500' :
+                        analysis.overall_score >= 60 ? 'text-blue-500' :
+                        analysis.overall_score >= 40 ? 'text-yellow-500' :
+                        analysis.overall_score >= 20 ? 'text-orange-500' :
+                        'text-red-500'
+                      }
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  {/* Score Text */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-gray-900">
+                        {Math.round(analysis.overall_score)}
+                      </div>
+                      <div className="text-sm text-gray-500">out of 100</div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <h3 className="font-semibold text-gray-900 mt-4">Privacy Grade</h3>
-              <p className="text-sm text-gray-600">
-                {analysis.privacy_grade === 'A' ? 'Excellent' :
-                 analysis.privacy_grade === 'B' ? 'Good' :
-                 analysis.privacy_grade === 'C' ? 'Average' :
-                 analysis.privacy_grade === 'D' ? 'Poor' :
-                 'Very Poor'}
-              </p>
-            </CardContent>
-          </Card>
 
-          {/* Privacy Score */}
-          <Card className="text-center">
-            <CardContent className="pt-6">
-              <div className="text-3xl font-bold text-gray-900 mb-2">
-                {Math.round(analysis.overall_score)}
-              </div>
-              <h3 className="font-semibold text-gray-900">Privacy Score</h3>
-              <p className="text-sm text-gray-600">out of 100</p>
-            </CardContent>
-          </Card>
+              {/* Grade and Status */}
+              <div className="space-y-4">
+                <div>
+                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl text-2xl font-bold shadow-lg ${getGradeColor(analysis.privacy_grade)}`}>
+                    {analysis.privacy_grade || 'F'}
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mt-2">Privacy Grade</h3>
+                  <p className="text-gray-600">
+                    {analysis.privacy_grade === 'A' ? 'Excellent Protection' :
+                     analysis.privacy_grade === 'B' ? 'Good Protection' :
+                     analysis.privacy_grade === 'C' ? 'Average Protection' :
+                     analysis.privacy_grade === 'D' ? 'Poor Protection' :
+                     'Very Poor Protection'}
+                  </p>
+                </div>
 
-          {/* Risk Level */}
-          <Card className="text-center">
-            <CardContent className="pt-6">
-              <div className={`inline-flex px-4 py-2 rounded-full text-sm font-semibold ${getRiskColor(analysis.risk_level)}`}>
-                {analysis.risk_level?.replace('-', ' ') || 'Unknown'} Risk
+                <div className={`inline-flex items-center px-6 py-3 rounded-full text-sm font-semibold ${getRiskColor(analysis.risk_level)}`}>
+                  <AlertTriangle className="w-4 h-4 mr-2" />
+                  {analysis.risk_level?.replace('-', ' ') || 'Unknown'} Privacy Risk
+                </div>
               </div>
-              <h3 className="font-semibold text-gray-900 mt-4">Privacy Risk</h3>
-              <p className="text-sm text-gray-600">For your data</p>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* What You Should Be Aware Of - NEW SECTION */}
         <Card className="border-orange-200 bg-orange-50">
