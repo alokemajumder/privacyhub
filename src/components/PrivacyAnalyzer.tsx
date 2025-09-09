@@ -13,17 +13,32 @@ interface AnalysisResult {
   timestamp: string;
   analysis: {
     overall_score: number;
+    risk_level: string;
+    regulatory_compliance: {
+      gdpr_compliance: string;
+      ccpa_compliance: string;
+      major_violations: string[];
+    };
     categories: {
       [key: string]: {
         score: number;
         reasoning: string;
+        regulatory_notes?: string;
       };
     };
-    key_concerns: string[];
-    positive_aspects: string[];
-    recommendations: string[];
+    critical_findings: {
+      high_risk_practices: string[];
+      regulatory_gaps: string[];
+      data_subject_impacts: string[];
+    };
+    positive_practices: string[];
+    actionable_recommendations: {
+      immediate_actions: string[];
+      medium_term_improvements: string[];
+      best_practice_adoption: string[];
+    };
     privacy_grade: string;
-    summary: string;
+    executive_summary: string;
   };
 }
 
@@ -73,6 +88,27 @@ export default function PrivacyAnalyzer() {
     if (['C+', 'C', 'C-'].includes(grade)) return 'text-yellow-600 bg-yellow-50';
     if (['D+', 'D', 'D-'].includes(grade)) return 'text-orange-600 bg-orange-50';
     return 'text-red-600 bg-red-50';
+  };
+
+  const getRiskLevelColor = (riskLevel: string) => {
+    switch (riskLevel) {
+      case 'EXEMPLARY': return 'text-green-700 bg-green-100 border-green-200';
+      case 'LOW': return 'text-green-600 bg-green-50 border-green-200';
+      case 'MODERATE': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      case 'MODERATE-HIGH': return 'text-orange-600 bg-orange-50 border-orange-200';
+      case 'HIGH': return 'text-red-600 bg-red-50 border-red-200';
+      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+    }
+  };
+
+  const getComplianceColor = (status: string) => {
+    switch (status) {
+      case 'COMPLIANT': return 'text-green-600 bg-green-50';
+      case 'PARTIALLY_COMPLIANT': return 'text-yellow-600 bg-yellow-50';
+      case 'NON_COMPLIANT': return 'text-red-600 bg-red-50';
+      case 'NOT_APPLICABLE': return 'text-gray-600 bg-gray-50';
+      default: return 'text-gray-600 bg-gray-50';
+    }
   };
 
   const getScoreColor = (score: number) => {
@@ -187,8 +223,23 @@ export default function PrivacyAnalyzer() {
               </div>
               
               <p className="text-muted-foreground mb-4">
-                {result.analysis.summary}
+                {result.analysis.executive_summary}
               </p>
+              
+              {/* Risk Level and Compliance Status */}
+              <div className="flex flex-wrap items-center gap-3 mb-4">
+                <Badge className={`px-3 py-1 border ${getRiskLevelColor(result.analysis.risk_level)}`}>
+                  Risk Level: {result.analysis.risk_level}
+                </Badge>
+                <Badge className={`px-3 py-1 ${getComplianceColor(result.analysis.regulatory_compliance.gdpr_compliance)}`}>
+                  GDPR: {result.analysis.regulatory_compliance.gdpr_compliance.replace('_', ' ')}
+                </Badge>
+                {result.analysis.regulatory_compliance.ccpa_compliance !== 'NOT_APPLICABLE' && (
+                  <Badge className={`px-3 py-1 ${getComplianceColor(result.analysis.regulatory_compliance.ccpa_compliance)}`}>
+                    CCPA: {result.analysis.regulatory_compliance.ccpa_compliance.replace('_', ' ')}
+                  </Badge>
+                )}
+              </div>
               
               <Progress 
                 value={result.analysis.overall_score * 10} 
@@ -203,81 +254,169 @@ export default function PrivacyAnalyzer() {
               <h4 className="text-lg font-semibold mb-4">Detailed Analysis</h4>
               <div className="grid gap-4">
                 {Object.entries(result.analysis.categories).map(([key, category]) => (
-                  <div key={key} className="space-y-2">
+                  <div key={key} className="space-y-3 border border-gray-100 rounded-lg p-4">
                     <div className="flex items-center justify-between">
-                      <span className="font-medium capitalize">
-                        {key.replace('_', ' ')}
+                      <span className="font-medium capitalize text-base">
+                        {key.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                       </span>
-                      <span className={`font-semibold ${getScoreColor(category.score)}`}>
+                      <span className={`font-semibold text-lg ${getScoreColor(category.score)}`}>
                         {category.score}/10
                       </span>
                     </div>
-                    <Progress value={category.score * 10} className="h-2" />
-                    <p className="text-sm text-muted-foreground">
-                      {category.reasoning}
-                    </p>
+                    <Progress value={category.score * 10} className="h-3" />
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">
+                        {category.reasoning}
+                      </p>
+                      {category.regulatory_notes && (
+                        <div className="bg-blue-50 border-l-4 border-blue-200 p-3 rounded">
+                          <p className="text-sm text-blue-800">
+                            <strong>Regulatory Note:</strong> {category.regulatory_notes}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
 
-          {/* Key Findings */}
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Concerns */}
-            <Card>
+          {/* Critical Findings */}
+          {result.analysis.critical_findings && (
+            <Card className="border-red-200 bg-red-50">
               <CardContent className="p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <AlertCircle className="h-5 w-5 text-red-500" />
-                  <h4 className="font-semibold">Key Concerns</h4>
+                  <AlertCircle className="h-6 w-6 text-red-600" />
+                  <h4 className="text-lg font-semibold text-red-800">Critical Findings</h4>
                 </div>
-                <ul className="space-y-2">
-                  {result.analysis.key_concerns.map((concern, index) => (
-                    <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
-                      <div className="w-1.5 h-1.5 bg-red-500 rounded-full mt-2 flex-shrink-0" />
-                      {concern}
-                    </li>
-                  ))}
-                </ul>
+                
+                <div className="grid md:grid-cols-3 gap-6">
+                  {/* High Risk Practices */}
+                  {result.analysis.critical_findings.high_risk_practices?.length > 0 && (
+                    <div>
+                      <h5 className="font-medium text-red-700 mb-2">High Risk Practices</h5>
+                      <ul className="space-y-2">
+                        {result.analysis.critical_findings.high_risk_practices.map((practice, index) => (
+                          <li key={index} className="text-sm text-red-600 flex items-start gap-2">
+                            <div className="w-2 h-2 bg-red-500 rounded-full mt-1.5 flex-shrink-0" />
+                            {practice}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {/* Regulatory Gaps */}
+                  {result.analysis.critical_findings.regulatory_gaps?.length > 0 && (
+                    <div>
+                      <h5 className="font-medium text-red-700 mb-2">Regulatory Gaps</h5>
+                      <ul className="space-y-2">
+                        {result.analysis.critical_findings.regulatory_gaps.map((gap, index) => (
+                          <li key={index} className="text-sm text-red-600 flex items-start gap-2">
+                            <div className="w-2 h-2 bg-red-500 rounded-full mt-1.5 flex-shrink-0" />
+                            {gap}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {/* Data Subject Impacts */}
+                  {result.analysis.critical_findings.data_subject_impacts?.length > 0 && (
+                    <div>
+                      <h5 className="font-medium text-red-700 mb-2">User Impact</h5>
+                      <ul className="space-y-2">
+                        {result.analysis.critical_findings.data_subject_impacts.map((impact, index) => (
+                          <li key={index} className="text-sm text-red-600 flex items-start gap-2">
+                            <div className="w-2 h-2 bg-red-500 rounded-full mt-1.5 flex-shrink-0" />
+                            {impact}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
+          )}
 
-            {/* Positive Aspects */}
-            <Card>
+          {/* Positive Practices */}
+          {result.analysis.positive_practices?.length > 0 && (
+            <Card className="border-green-200 bg-green-50">
               <CardContent className="p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                  <h4 className="font-semibold">Positive Aspects</h4>
+                  <CheckCircle className="h-6 w-6 text-green-600" />
+                  <h4 className="text-lg font-semibold text-green-800">Privacy-Protective Practices</h4>
                 </div>
                 <ul className="space-y-2">
-                  {result.analysis.positive_aspects.map((aspect, index) => (
-                    <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
-                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0" />
-                      {aspect}
+                  {result.analysis.positive_practices.map((practice, index) => (
+                    <li key={index} className="text-sm text-green-700 flex items-start gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mt-1.5 flex-shrink-0" />
+                      {practice}
                     </li>
                   ))}
                 </ul>
               </CardContent>
             </Card>
+          )}
 
-            {/* Recommendations */}
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Search className="h-5 w-5 text-blue-500" />
-                  <h4 className="font-semibold">Recommendations</h4>
-                </div>
-                <ul className="space-y-2">
-                  {result.analysis.recommendations.map((rec, index) => (
-                    <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
-                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
-                      {rec}
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
+          {/* Actionable Recommendations */}
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <Search className="h-6 w-6 text-blue-600" />
+                <h4 className="text-lg font-semibold">Actionable Recommendations</h4>
+              </div>
+              
+              <div className="grid md:grid-cols-3 gap-6">
+                {/* Immediate Actions */}
+                {result.analysis.actionable_recommendations?.immediate_actions?.length > 0 && (
+                  <div className="border-l-4 border-red-400 pl-4">
+                    <h5 className="font-medium text-red-700 mb-3">🚨 Immediate Actions</h5>
+                    <ul className="space-y-2">
+                      {result.analysis.actionable_recommendations.immediate_actions.map((action, index) => (
+                        <li key={index} className="text-sm text-gray-700 flex items-start gap-2">
+                          <div className="w-1.5 h-1.5 bg-red-500 rounded-full mt-2 flex-shrink-0" />
+                          {action}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {/* Medium Term */}
+                {result.analysis.actionable_recommendations?.medium_term_improvements?.length > 0 && (
+                  <div className="border-l-4 border-yellow-400 pl-4">
+                    <h5 className="font-medium text-yellow-700 mb-3">⏳ Medium Term</h5>
+                    <ul className="space-y-2">
+                      {result.analysis.actionable_recommendations.medium_term_improvements.map((improvement, index) => (
+                        <li key={index} className="text-sm text-gray-700 flex items-start gap-2">
+                          <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 flex-shrink-0" />
+                          {improvement}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {/* Best Practices */}
+                {result.analysis.actionable_recommendations?.best_practice_adoption?.length > 0 && (
+                  <div className="border-l-4 border-blue-400 pl-4">
+                    <h5 className="font-medium text-blue-700 mb-3">✨ Best Practices</h5>
+                    <ul className="space-y-2">
+                      {result.analysis.actionable_recommendations.best_practice_adoption.map((practice, index) => (
+                        <li key={index} className="text-sm text-gray-700 flex items-start gap-2">
+                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
+                          {practice}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Analysis Metadata */}
           <Card>
