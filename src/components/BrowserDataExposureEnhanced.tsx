@@ -9,8 +9,6 @@ import {
   EyeOff, 
   Globe, 
   Monitor, 
-  Smartphone, 
-  MapPin, 
   Clock, 
   Wifi, 
   AlertTriangle,
@@ -19,16 +17,12 @@ import {
   Copy,
   CheckCircle,
   Shield,
-  Camera,
-  Mic,
-  Battery,
   Cpu,
   HardDrive,
   Navigation,
   Fingerprint,
   Lock,
   Zap,
-  Users,
   Activity
 } from 'lucide-react';
 
@@ -268,7 +262,6 @@ export function BrowserDataExposureEnhanced() {
   const [collectedDataPoints, setCollectedDataPoints] = useState(0);
 
   const collectComprehensiveBrowserData = async (): Promise<ComprehensiveBrowserData> => {
-    let dataPoints = 0;
     
     const data: ComprehensiveBrowserData = {
       // Basic Browser Information
@@ -280,7 +273,7 @@ export function BrowserDataExposureEnhanced() {
         cookieEnabled: navigator.cookieEnabled,
         doNotTrack: navigator.doNotTrack,
         onLine: navigator.onLine,
-        javaEnabled: (navigator as any).javaEnabled?.() || false,
+        javaEnabled: (navigator as { javaEnabled?: () => boolean }).javaEnabled?.() || false,
         product: navigator.product,
         productSub: navigator.productSub,
         vendor: navigator.vendor,
@@ -288,8 +281,8 @@ export function BrowserDataExposureEnhanced() {
         appCodeName: navigator.appCodeName,
         appName: navigator.appName,
         appVersion: navigator.appVersion,
-        oscpu: (navigator as any).oscpu,
-        buildID: (navigator as any).buildID,
+        oscpu: (navigator as { oscpu?: string }).oscpu,
+        buildID: (navigator as { buildID?: string }).buildID,
       },
       
       // Screen Information
@@ -300,10 +293,10 @@ export function BrowserDataExposureEnhanced() {
         availHeight: screen.availHeight,
         colorDepth: screen.colorDepth,
         pixelDepth: screen.pixelDepth,
-        orientation: (screen as any).orientation?.type || 'unknown',
+        orientation: (screen as { orientation?: { type: string } }).orientation?.type || 'unknown',
         touchSupport: 'ontouchstart' in window,
         maxTouchPoints: navigator.maxTouchPoints || 0,
-        msMaxTouchPoints: (navigator as any).msMaxTouchPoints,
+        msMaxTouchPoints: (navigator as { msMaxTouchPoints?: number }).msMaxTouchPoints,
         pointerEnabled: 'PointerEvent' in window,
         devicePixelRatio: window.devicePixelRatio,
       },
@@ -322,12 +315,12 @@ export function BrowserDataExposureEnhanced() {
         frameElement: window.frameElement !== null,
         length: window.length,
         name: window.name,
-        locationbar: !!(window as any).locationbar?.visible,
-        menubar: !!(window as any).menubar?.visible,
-        personalbar: !!(window as any).personalbar?.visible,
-        scrollbars: !!(window as any).scrollbars?.visible,
-        statusbar: !!(window as any).statusbar?.visible,
-        toolbar: !!(window as any).toolbar?.visible,
+        locationbar: !!(window as { locationbar?: { visible: boolean } }).locationbar?.visible,
+        menubar: !!(window as { menubar?: { visible: boolean } }).menubar?.visible,
+        personalbar: !!(window as { personalbar?: { visible: boolean } }).personalbar?.visible,
+        scrollbars: !!(window as { scrollbars?: { visible: boolean } }).scrollbars?.visible,
+        statusbar: !!(window as { statusbar?: { visible: boolean } }).statusbar?.visible,
+        toolbar: !!(window as { toolbar?: { visible: boolean } }).toolbar?.visible,
         top: window.top === window,
         parent: window.parent === window,
       },
@@ -352,7 +345,7 @@ export function BrowserDataExposureEnhanced() {
       
       // Hardware Information
       hardware: {
-        deviceMemory: (navigator as any).deviceMemory,
+        deviceMemory: (navigator as { deviceMemory?: number }).deviceMemory,
         hardwareConcurrency: navigator.hardwareConcurrency || 0,
         maxTouchPoints: navigator.maxTouchPoints || 0,
       },
@@ -427,9 +420,9 @@ export function BrowserDataExposureEnhanced() {
       
       // Performance
       performance: {
-        jsHeapSizeLimit: (performance as any).memory?.jsHeapSizeLimit,
-        totalJSHeapSize: (performance as any).memory?.totalJSHeapSize,
-        usedJSHeapSize: (performance as any).memory?.usedJSHeapSize,
+        jsHeapSizeLimit: (performance as { memory?: { jsHeapSizeLimit?: number } }).memory?.jsHeapSizeLimit,
+        totalJSHeapSize: (performance as { memory?: { totalJSHeapSize?: number } }).memory?.totalJSHeapSize,
+        usedJSHeapSize: (performance as { memory?: { usedJSHeapSize?: number } }).memory?.usedJSHeapSize,
         timing: {
           navigationStart: performance.timing?.navigationStart || 0,
           loadEventEnd: performance.timing?.loadEventEnd || 0,
@@ -440,7 +433,7 @@ export function BrowserDataExposureEnhanced() {
 
     // Network Information
     if ('connection' in navigator) {
-      const connection = (navigator as any).connection;
+      const connection = (navigator as { connection?: { type?: string; effectiveType?: string; downlink?: number; rtt?: number; saveData?: boolean } }).connection;
       data.network = {
         connectionType: connection?.type || 'unknown',
         effectiveType: connection?.effectiveType || 'unknown',
@@ -453,16 +446,16 @@ export function BrowserDataExposureEnhanced() {
 
     // Battery Information
     try {
-      const battery = await (navigator as any).getBattery?.();
+      const battery = await (navigator as { getBattery?: () => Promise<{ level?: number; charging?: boolean; chargingTime?: number; dischargingTime?: number }> }).getBattery?.();
       if (battery) {
         data.hardware.battery = {
-          charging: battery.charging,
-          chargingTime: battery.chargingTime,
-          dischargingTime: battery.dischargingTime,
-          level: battery.level,
+          charging: battery.charging ?? false,
+          chargingTime: battery.chargingTime ?? 0,
+          dischargingTime: battery.dischargingTime ?? 0,
+          level: battery.level ?? 0,
         };
       }
-    } catch (e) {
+    } catch {
       // Battery API not available
     }
 
@@ -529,7 +522,7 @@ export function BrowserDataExposureEnhanced() {
 
     // Audio Context
     try {
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioContext = window.AudioContext || (window as { webkitAudioContext?: typeof window.AudioContext }).webkitAudioContext;
       if (AudioContext) {
         const audioCtx = new AudioContext();
         data.audio = {
@@ -669,12 +662,12 @@ export function BrowserDataExposureEnhanced() {
     }
 
     // Count total data points
-    const countDataPoints = (obj: any, prefix = ''): number => {
+    const countDataPoints = (obj: Record<string, unknown>, prefix = ''): number => {
       let count = 0;
       for (const key in obj) {
         if (obj[key] !== null && obj[key] !== undefined) {
           if (typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
-            count += countDataPoints(obj[key], `${prefix}${key}.`);
+            count += countDataPoints(obj[key] as Record<string, unknown>, `${prefix}${key}.`);
           } else {
             count++;
           }
@@ -683,7 +676,7 @@ export function BrowserDataExposureEnhanced() {
       return count;
     };
 
-    setCollectedDataPoints(countDataPoints(data));
+    setCollectedDataPoints(countDataPoints(data as unknown as Record<string, unknown>));
 
     return data;
   };
@@ -744,8 +737,8 @@ export function BrowserDataExposureEnhanced() {
       hardware: Cpu,
       webgl: Activity,
       canvas: Fingerprint,
-      audio: Mic,
-      fonts: FileText,
+      audio: Activity,
+      fonts: Globe,
       plugins: HardDrive,
       webrtc: Navigation,
       storage: HardDrive,

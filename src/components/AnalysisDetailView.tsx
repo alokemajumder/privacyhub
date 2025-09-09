@@ -37,7 +37,7 @@ interface AnalysisData {
       gdpr_compliance: string;
       ccpa_compliance: string;
     };
-    categories?: Record<string, any>;
+    categories?: Record<string, unknown>;
     recommendations?: string[];
     key_findings?: string[];
     summary?: string;

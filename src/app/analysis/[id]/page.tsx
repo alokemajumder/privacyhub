@@ -24,7 +24,7 @@ async function getAnalysis(id: string) {
     // Parse the analysis_data JSON
     return {
       ...analysis,
-      analysis_data: JSON.parse(analysis.analysis_data)
+      analysis_data: JSON.parse((analysis as unknown as { analysis_data: string }).analysis_data)
     };
   } catch (error) {
     console.error('Error fetching analysis:', error);
@@ -41,21 +41,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const hostname = analysis.hostname.replace(/^www\./, '');
+  const hostname = (analysis as unknown as { hostname: string }).hostname.replace(/^www\./, '');
   
   return {
     title: `${hostname} Privacy Analysis | PrivacyHub.in`,
-    description: `Detailed privacy policy analysis for ${hostname}. Grade: ${analysis.privacy_grade}, Score: ${Math.round(analysis.overall_score)}. Comprehensive GDPR & CCPA compliance review.`,
+    description: `Detailed privacy policy analysis for ${hostname}. Grade: ${(analysis as unknown as { privacy_grade: string }).privacy_grade}, Score: ${Math.round((analysis as unknown as { overall_score: number }).overall_score)}. Comprehensive GDPR & CCPA compliance review.`,
     openGraph: {
       title: `${hostname} Privacy Analysis | PrivacyHub.in`,
-      description: `Privacy grade ${analysis.privacy_grade} with ${Math.round(analysis.overall_score)} score. ${analysis.risk_level} risk level.`,
+      description: `Privacy grade ${(analysis as unknown as { privacy_grade: string }).privacy_grade} with ${Math.round((analysis as unknown as { overall_score: number }).overall_score)} score. ${(analysis as unknown as { risk_level: string }).risk_level} risk level.`,
       type: 'website',
       url: `https://privacyhub.in/analysis/${params.id}`,
     },
     twitter: {
       card: 'summary_large_image',
       title: `${hostname} Privacy Analysis | PrivacyHub.in`,
-      description: `Privacy grade ${analysis.privacy_grade} with ${Math.round(analysis.overall_score)} score. ${analysis.risk_level} risk level.`,
+      description: `Privacy grade ${(analysis as unknown as { privacy_grade: string }).privacy_grade} with ${Math.round((analysis as unknown as { overall_score: number }).overall_score)} score. ${(analysis as unknown as { risk_level: string }).risk_level} risk level.`,
     },
   };
 }
@@ -67,5 +67,5 @@ export default async function AnalysisPage({ params }: Props) {
     notFound();
   }
 
-  return <AnalysisDetailView analysis={analysis} />;
+  return <AnalysisDetailView analysis={analysis as unknown as typeof analysis & { id: number; url: string; hostname: string; overall_score: number; privacy_grade: string; risk_level: string; gdpr_compliance: string; ccpa_compliance: string; created_at: string }} />;
 }

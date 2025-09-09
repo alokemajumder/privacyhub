@@ -15,7 +15,7 @@ export default function NotFound() {
         </h1>
         
         <p className="text-gray-600 mb-8">
-          The privacy analysis you're looking for doesn't exist or may have been removed. 
+          The privacy analysis you&apos;re looking for doesn&apos;t exist or may have been removed. 
           This could happen if the analysis ID is incorrect or the analysis has expired.
         </p>
         

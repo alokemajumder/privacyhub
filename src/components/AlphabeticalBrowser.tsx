@@ -7,7 +7,7 @@ interface AlphabeticalBrowserProps {
   onSelect: (analysis: PrivacyAnalysis) => void;
 }
 
-export default function AlphabeticalBrowser({ analyses: _analyses, onSelect: _onSelect }: AlphabeticalBrowserProps) {
+export default function AlphabeticalBrowser({ }: AlphabeticalBrowserProps) {
   return (
     <Card>
       <CardContent className="p-6">
