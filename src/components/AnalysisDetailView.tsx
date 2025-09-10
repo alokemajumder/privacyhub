@@ -4,6 +4,10 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { 
   Shield, 
   ArrowLeft, 
@@ -18,7 +22,8 @@ import {
   DollarSign,
   Lock,
   UserCheck,
-  Scale
+  Scale,
+  HelpCircle
 } from 'lucide-react';
 
 interface AnalysisData {
@@ -65,38 +70,8 @@ export function AnalysisDetailView({ analysis }: Props) {
     return hostname.replace(/^www\./, '');
   };
 
-  // Normalize score to 0-100 range for display
-  const normalizeScore = (score: number) => {
-    // If score is already 0-100, use as is
-    if (score <= 100) return score;
-    // If score is 0-10, multiply by 10
-    if (score <= 10) return score * 10;
-    return score;
-  };
 
   const displayScore = analysis.overall_score;
-  const normalizedScore = normalizeScore(analysis.overall_score);
-
-  const getGradeColor = (grade: string) => {
-    switch (grade?.toUpperCase()) {
-      case 'A': return 'text-green-600 bg-green-50 border-green-200';
-      case 'B': return 'text-blue-600 bg-blue-50 border-blue-200';
-      case 'C': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-      case 'D': return 'text-orange-600 bg-orange-50 border-orange-200';
-      case 'F': return 'text-red-600 bg-red-50 border-red-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
-    }
-  };
-
-  const getRiskColor = (risk: string) => {
-    switch (risk?.toUpperCase()) {
-      case 'LOW': return 'text-green-700 bg-green-100';
-      case 'MODERATE': return 'text-yellow-700 bg-yellow-100';
-      case 'MODERATE-HIGH': return 'text-orange-700 bg-orange-100';
-      case 'HIGH': return 'text-red-700 bg-red-100';
-      default: return 'text-gray-700 bg-gray-100';
-    }
-  };
 
   const getComplianceStatus = (compliance: string) => {
     switch (compliance?.toUpperCase()) {
@@ -165,125 +140,142 @@ export function AnalysisDetailView({ analysis }: Props) {
         {/* Privacy Overview Summary */}
         <Card>
           <CardContent className="p-8">
-            <div className="text-center space-y-8">
-              {/* Main Score Display - Simple Card Design */}
-              <div className="space-y-6">
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 border border-blue-100">
-                  <div className="text-center space-y-4">
+            <div className="space-y-6">
+              {/* Main Score Display - Simple Large Text */}
+              <div className="text-center">
+                <div className="text-7xl font-bold text-gray-900 mb-2">
+                  {displayScore.toFixed(1)}
+                  <span className="text-4xl text-gray-500 font-normal">/10</span>
+                </div>
+                <div className="text-xl text-gray-600">Overall Privacy Score</div>
+              </div>
+
+              {/* Progress Bar for Score */}
+              <div className="max-w-md mx-auto">
+                <Progress value={displayScore * 10} className="h-3 mb-2" />
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>Poor</span>
+                  <span>Fair</span>
+                  <span>Good</span>
+                  <span>Excellent</span>
+                </div>
+              </div>
+
+              {/* Grade and Risk Level Badges */}
+              <div className="flex justify-center gap-4 flex-wrap">
+                <HoverCard>
+                  <HoverCardTrigger>
+                    <Badge variant="outline" className="px-4 py-2 text-lg font-bold cursor-help">
+                      Grade: {analysis.privacy_grade || 'F'}
+                    </Badge>
+                  </HoverCardTrigger>
+                  <HoverCardContent className="w-80">
                     <div className="space-y-2">
-                      <div className="text-5xl font-bold text-gray-900">
-                        {displayScore.toFixed(1)}
-                      </div>
-                      <div className="text-lg text-gray-600 font-medium">Overall Privacy Score</div>
+                      <h4 className="text-sm font-semibold">Privacy Grade Explained</h4>
+                      <p className="text-sm text-gray-600">
+                        {analysis.privacy_grade === 'A' ? 'Excellent privacy practices with strong user protections.' :
+                         analysis.privacy_grade === 'B' ? 'Good privacy practices with minor concerns.' :
+                         analysis.privacy_grade === 'C' ? 'Average privacy practices with some issues.' :
+                         analysis.privacy_grade === 'D' ? 'Poor privacy practices with significant concerns.' :
+                         'Very poor privacy practices. Use with caution.'}
+                      </p>
                     </div>
-                    
-                    {/* Score Bar */}
-                    <div className="max-w-xs mx-auto">
-                      <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
-                        <div 
-                          className={`h-3 rounded-full transition-all duration-500 ${
-                            normalizedScore >= 80 ? 'bg-green-500' :
-                            normalizedScore >= 60 ? 'bg-blue-500' :
-                            normalizedScore >= 40 ? 'bg-yellow-500' :
-                            normalizedScore >= 20 ? 'bg-orange-500' :
-                            'bg-red-500'
-                          }`}
-                          style={{ width: `${Math.min(normalizedScore, 100)}%` }}
-                        />
-                      </div>
-                      <div className="flex justify-between text-xs text-gray-500">
-                        <span>0</span>
-                        <span>Poor</span>
-                        <span>Good</span>
-                        <span>10</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                  </HoverCardContent>
+                </HoverCard>
 
-              {/* Grade and Risk Level - Side by Side */}
-              <div className="grid grid-cols-2 gap-8 max-w-md mx-auto">
-                <div className="text-center">
-                  <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center text-2xl font-bold shadow-lg border-2 ${getGradeColor(analysis.privacy_grade)}`}>
-                    {analysis.privacy_grade || 'F'}
-                  </div>
-                  <h4 className="font-bold text-gray-900 mt-3 mb-1">Privacy Grade</h4>
-                  <p className="text-sm text-gray-600">
-                    {analysis.privacy_grade === 'A' ? 'Excellent' :
-                     analysis.privacy_grade === 'B' ? 'Good' :
-                     analysis.privacy_grade === 'C' ? 'Average' :
-                     analysis.privacy_grade === 'D' ? 'Poor' :
-                     'Very Poor'}
-                  </p>
-                </div>
-
-                <div className="text-center">
-                  <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center shadow-lg ${getRiskColor(analysis.risk_level)}`}>
-                    <AlertTriangle className="w-6 h-6" />
-                  </div>
-                  <h4 className="font-bold text-gray-900 mt-3 mb-1">Risk Level</h4>
-                  <p className="text-sm text-gray-600">
-                    {analysis.risk_level?.replace('-', ' ') || 'Unknown'} Risk
-                  </p>
-                </div>
+                <Badge 
+                  variant={analysis.risk_level?.includes('LOW') ? 'default' : 
+                          analysis.risk_level?.includes('MODERATE') ? 'secondary' : 
+                          'destructive'}
+                  className="px-4 py-2 text-lg font-bold"
+                >
+                  {analysis.risk_level?.replace('_', ' ').replace('-', ' ') || 'Unknown'} Risk
+                </Badge>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* What You Should Be Aware Of - NEW SECTION */}
-        <Card className="border-orange-200 bg-orange-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-orange-800">
-              <Eye className="w-5 h-5" />
-              What You Should Be Aware Of
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <DollarSign className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h4 className="font-semibold text-orange-900 mb-1">Data Monetization</h4>
-                  <p className="text-sm text-orange-800">
-                    This website may collect and use your personal information for commercial purposes. Your data could be shared with advertisers or sold to third parties.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <Eye className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h4 className="font-semibold text-orange-900 mb-1">Tracking & Surveillance</h4>
-                  <p className="text-sm text-orange-800">
-                    Your browsing behavior, location, and online activities may be monitored and recorded. This data creates a detailed profile about you.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <Lock className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h4 className="font-semibold text-orange-900 mb-1">Data Security</h4>
-                  <p className="text-sm text-orange-800">
-                    Consider how well your personal information is protected from hackers, data breaches, and unauthorized access.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <UserCheck className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h4 className="font-semibold text-orange-900 mb-1">Your Rights</h4>
-                  <p className="text-sm text-orange-800">
-                    You have legal rights to access, correct, or delete your personal data. Check if this website respects and facilitates these rights.
-                  </p>
-                </div>
-              </div>
+        {/* What You Should Be Aware Of - Using Alert Component */}
+        <Alert className="border-orange-200 bg-orange-50">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Privacy Considerations</AlertTitle>
+          <AlertDescription className="mt-4 space-y-4">
+            <div className="space-y-3">
+              <HoverCard>
+                <HoverCardTrigger className="flex items-start gap-2 cursor-help">
+                  <Badge variant="outline" className="mt-0.5">Data Use</Badge>
+                  <p className="text-sm">Your personal data may be monetized through advertising or third-party sharing.</p>
+                </HoverCardTrigger>
+                <HoverCardContent className="w-80">
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold flex items-center gap-2">
+                      <DollarSign className="w-4 h-4" />
+                      Data Monetization Details
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Many websites generate revenue by collecting user data and sharing it with advertisers, data brokers, and marketing companies. This can include your browsing habits, interests, and personal preferences.
+                    </p>
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
+
+              <HoverCard>
+                <HoverCardTrigger className="flex items-start gap-2 cursor-help">
+                  <Badge variant="outline" className="mt-0.5">Tracking</Badge>
+                  <p className="text-sm">Your online activities and location may be continuously monitored.</p>
+                </HoverCardTrigger>
+                <HoverCardContent className="w-80">
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold flex items-center gap-2">
+                      <Eye className="w-4 h-4" />
+                      Tracking & Surveillance
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Websites use various technologies like cookies, pixels, and fingerprinting to track your behavior across the internet, building detailed profiles about your interests and activities.
+                    </p>
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
+
+              <HoverCard>
+                <HoverCardTrigger className="flex items-start gap-2 cursor-help">
+                  <Badge variant="outline" className="mt-0.5">Security</Badge>
+                  <p className="text-sm">Check how your data is protected from breaches and unauthorized access.</p>
+                </HoverCardTrigger>
+                <HoverCardContent className="w-80">
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold flex items-center gap-2">
+                      <Lock className="w-4 h-4" />
+                      Data Security Measures
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Look for information about encryption, secure storage, access controls, and breach notification procedures to understand how well your data is protected.
+                    </p>
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
+
+              <HoverCard>
+                <HoverCardTrigger className="flex items-start gap-2 cursor-help">
+                  <Badge variant="outline" className="mt-0.5">Rights</Badge>
+                  <p className="text-sm">You have legal rights to control your personal data.</p>
+                </HoverCardTrigger>
+                <HoverCardContent className="w-80">
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold flex items-center gap-2">
+                      <UserCheck className="w-4 h-4" />
+                      Your Privacy Rights
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Under laws like GDPR and CCPA, you have rights to access, correct, delete, and port your data. You can also opt-out of certain data processing activities.
+                    </p>
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
             </div>
-          </CardContent>
-        </Card>
+          </AlertDescription>
+        </Alert>
 
         {/* What This Means for You */}
         {analysis.analysis_data.summary && (
@@ -344,79 +336,146 @@ export function AnalysisDetailView({ analysis }: Props) {
           </Card>
         )}
 
-        {/* Legal Protection Status */}
+        {/* Legal Protection Status with Hover Cards */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Scale className="w-5 h-5 text-purple-600" />
-              How Well Are You Protected?
+              Regulatory Compliance
+              <HoverCard>
+                <HoverCardTrigger>
+                  <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                </HoverCardTrigger>
+                <HoverCardContent className="w-80">
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold">Privacy Law Compliance</h4>
+                    <p className="text-sm text-gray-600">
+                      These indicators show how well the website complies with major privacy regulations that protect your personal data rights.
+                    </p>
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
             </CardTitle>
-            <p className="text-sm text-gray-600 mt-2">
-              This shows how well the website follows major privacy laws that protect your personal information.
-            </p>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {/* GDPR */}
-              <div className="p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full ${getComplianceStatus(analysis.gdpr_compliance).bg} flex items-center justify-center`}>
-                      {React.createElement(getComplianceStatus(analysis.gdpr_compliance).icon, {
-                        className: `w-4 h-4 ${getComplianceStatus(analysis.gdpr_compliance).color}`
-                      })}
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900">GDPR</h4>
-                      <p className="text-xs text-gray-500">European Union • Strongest privacy law globally</p>
-                    </div>
-                  </div>
-                  <div className={`px-3 py-1 rounded-full text-xs font-medium ${getComplianceStatus(analysis.gdpr_compliance).bg} ${getComplianceStatus(analysis.gdpr_compliance).color}`}>
-                    {getComplianceStatus(analysis.gdpr_compliance).text}
-                  </div>
-                </div>
-              </div>
-
-              {/* CCPA */}
-              <div className="p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full ${getComplianceStatus(analysis.ccpa_compliance).bg} flex items-center justify-center`}>
-                      {React.createElement(getComplianceStatus(analysis.ccpa_compliance).icon, {
-                        className: `w-4 h-4 ${getComplianceStatus(analysis.ccpa_compliance).color}`
-                      })}
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900">CCPA</h4>
-                      <p className="text-xs text-gray-500">California, USA • Consumer privacy rights</p>
-                    </div>
-                  </div>
-                  <div className={`px-3 py-1 rounded-full text-xs font-medium ${getComplianceStatus(analysis.ccpa_compliance).bg} ${getComplianceStatus(analysis.ccpa_compliance).color}`}>
-                    {getComplianceStatus(analysis.ccpa_compliance).text}
-                  </div>
-                </div>
-              </div>
-
-              {/* DPDP Act 2023 */}
-              {analysis.dpdp_act_compliance && (
-                <div className="p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-full ${getComplianceStatus(analysis.dpdp_act_compliance).bg} flex items-center justify-center`}>
-                        {React.createElement(getComplianceStatus(analysis.dpdp_act_compliance).icon, {
-                          className: `w-4 h-4 ${getComplianceStatus(analysis.dpdp_act_compliance).color}`
+            <div className="space-y-4">
+              {/* GDPR with HoverCard */}
+              <HoverCard>
+                <HoverCardTrigger asChild>
+                  <div className="p-4 rounded-lg border border-gray-200 hover:border-blue-300 transition-all cursor-help hover:shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        {React.createElement(getComplianceStatus(analysis.gdpr_compliance).icon, {
+                          className: `w-5 h-5 ${getComplianceStatus(analysis.gdpr_compliance).color}`
                         })}
+                        <div>
+                          <h4 className="font-medium text-gray-900">GDPR</h4>
+                          <p className="text-xs text-gray-500">European Privacy Regulation</p>
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="font-medium text-gray-900">DPDP Act 2023</h4>
-                        <p className="text-xs text-gray-500">India • Digital personal data protection</p>
-                      </div>
-                    </div>
-                    <div className={`px-3 py-1 rounded-full text-xs font-medium ${getComplianceStatus(analysis.dpdp_act_compliance).bg} ${getComplianceStatus(analysis.dpdp_act_compliance).color}`}>
-                      {getComplianceStatus(analysis.dpdp_act_compliance).text}
+                      <Badge 
+                        variant={analysis.gdpr_compliance === 'COMPLIANT' ? 'default' : 
+                                analysis.gdpr_compliance === 'PARTIALLY_COMPLIANT' ? 'secondary' : 
+                                'destructive'}
+                      >
+                        {getComplianceStatus(analysis.gdpr_compliance).text}
+                      </Badge>
                     </div>
                   </div>
-                </div>
+                </HoverCardTrigger>
+                <HoverCardContent className="w-80">
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold">General Data Protection Regulation</h4>
+                    <p className="text-sm text-gray-600">
+                      The GDPR is the world&apos;s strongest privacy law, giving EU citizens rights to access, correct, delete, and port their data. It requires explicit consent for data processing.
+                    </p>
+                    <div className="pt-2 border-t">
+                      <p className="text-xs text-gray-500">
+                        Status: {analysis.gdpr_compliance?.replace('_', ' ') || 'Unknown'}
+                      </p>
+                    </div>
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
+
+              {/* CCPA with HoverCard */}
+              <HoverCard>
+                <HoverCardTrigger asChild>
+                  <div className="p-4 rounded-lg border border-gray-200 hover:border-blue-300 transition-all cursor-help hover:shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        {React.createElement(getComplianceStatus(analysis.ccpa_compliance).icon, {
+                          className: `w-5 h-5 ${getComplianceStatus(analysis.ccpa_compliance).color}`
+                        })}
+                        <div>
+                          <h4 className="font-medium text-gray-900">CCPA</h4>
+                          <p className="text-xs text-gray-500">California Privacy Act</p>
+                        </div>
+                      </div>
+                      <Badge 
+                        variant={analysis.ccpa_compliance === 'COMPLIANT' ? 'default' : 
+                                analysis.ccpa_compliance === 'PARTIALLY_COMPLIANT' ? 'secondary' : 
+                                'destructive'}
+                      >
+                        {getComplianceStatus(analysis.ccpa_compliance).text}
+                      </Badge>
+                    </div>
+                  </div>
+                </HoverCardTrigger>
+                <HoverCardContent className="w-80">
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold">California Consumer Privacy Act</h4>
+                    <p className="text-sm text-gray-600">
+                      The CCPA gives California residents the right to know what personal information is collected, the right to delete it, and the right to opt-out of its sale.
+                    </p>
+                    <div className="pt-2 border-t">
+                      <p className="text-xs text-gray-500">
+                        Status: {analysis.ccpa_compliance?.replace('_', ' ') || 'Unknown'}
+                      </p>
+                    </div>
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
+
+              {/* DPDP Act 2023 with HoverCard */}
+              {analysis.dpdp_act_compliance && (
+                <HoverCard>
+                  <HoverCardTrigger asChild>
+                    <div className="p-4 rounded-lg border border-gray-200 hover:border-blue-300 transition-all cursor-help hover:shadow-sm">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          {React.createElement(getComplianceStatus(analysis.dpdp_act_compliance).icon, {
+                            className: `w-5 h-5 ${getComplianceStatus(analysis.dpdp_act_compliance).color}`
+                          })}
+                          <div>
+                            <h4 className="font-medium text-gray-900">DPDP Act 2023</h4>
+                            <p className="text-xs text-gray-500">Indian Data Protection Law</p>
+                          </div>
+                        </div>
+                        <Badge 
+                          variant={analysis.dpdp_act_compliance === 'COMPLIANT' ? 'default' : 
+                                  analysis.dpdp_act_compliance === 'PARTIALLY_COMPLIANT' ? 'secondary' : 
+                                  'destructive'}
+                        >
+                          {getComplianceStatus(analysis.dpdp_act_compliance).text}
+                        </Badge>
+                      </div>
+                    </div>
+                  </HoverCardTrigger>
+                  <HoverCardContent className="w-80">
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-semibold">Digital Personal Data Protection Act 2023</h4>
+                      <p className="text-sm text-gray-600">
+                        India&apos;s comprehensive data protection law that governs the processing of digital personal data, giving individuals rights over their personal information.
+                      </p>
+                      <div className="pt-2 border-t">
+                        <p className="text-xs text-gray-500">
+                          Status: {analysis.dpdp_act_compliance?.replace('_', ' ') || 'Unknown'}
+                        </p>
+                      </div>
+                    </div>
+                  </HoverCardContent>
+                </HoverCard>
               )}
             </div>
           </CardContent>
@@ -454,6 +513,30 @@ export function AnalysisDetailView({ analysis }: Props) {
             </div>
           </CardContent>
         </Card>
+
+        {/* Important Disclaimer */}
+        <Alert className="border-amber-200 bg-amber-50">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Important Disclaimer</AlertTitle>
+          <AlertDescription className="mt-2 space-y-2 text-sm">
+            <p>
+              <strong>Educational Purpose Only:</strong> This analysis and score is based on our proprietary methodology 
+              and is intended for education and privacy awareness purposes only.
+            </p>
+            <p>
+              <strong>Potential Limitations:</strong> The analysis may contain errors, omissions, or inaccuracies. 
+              Privacy policies can change frequently, and our analysis reflects the policy at the time of review.
+            </p>
+            <p>
+              <strong>Not Legal Advice:</strong> This report should not be used as the sole basis for legal, 
+              business, or financial decisions. Always consult qualified professionals for specific advice.
+            </p>
+            <p>
+              <strong>Independent Verification:</strong> We recommend reviewing the actual privacy policy 
+              and consulting with privacy experts for critical assessments.
+            </p>
+          </AlertDescription>
+        </Alert>
 
         {/* Footer Actions */}
         <div className="text-center pt-8">
