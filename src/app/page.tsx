@@ -24,11 +24,22 @@ export default function HomePage() {
                 Know What Apps & Websites Do With Your Personal Data
               </h1>
               <p className="text-lg md:text-xl text-slate-600 mb-8 leading-relaxed">
-                Every day you use apps and visit websites that collect your personal information. 
-                Do you know how they use it? Our free privacy analyzer helps you understand 
+                Every day you use apps and visit websites that collect your personal information.
+                Do you know how they use it? Our free privacy analyzer helps you understand
                 what&rsquo;s really happening with your data.
               </p>
-              
+
+              {/* Privacy Analyzer - Moved to top */}
+              <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 mb-8">
+                <div className="text-center mb-6">
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Free Privacy Checker</h3>
+                  <p className="text-sm text-slate-600">Enter any website or app privacy policy URL to get an instant analysis</p>
+                </div>
+                <div id="analyzer">
+                  <PrivacyAnalyzer />
+                </div>
+              </div>
+
               {/* Privacy Concerns */}
               <div className="bg-orange-50 rounded-lg p-6 mb-8 border border-orange-200">
                 <h3 className="text-lg font-bold text-orange-800 mb-4">Common Privacy Concerns:</h3>
@@ -52,17 +63,6 @@ export default function HomePage() {
                 </div>
               </div>
 
-            </div>
-
-            {/* Privacy Analyzer */}
-            <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-6">
-              <div className="text-center mb-6">
-                <h3 className="text-xl font-bold text-slate-900 mb-2">Free Privacy Checker</h3>
-                <p className="text-sm text-slate-600">Enter any website or app privacy policy URL to get an instant analysis</p>
-              </div>
-              <div id="analyzer">
-                <PrivacyAnalyzer />
-              </div>
             </div>
           </div>
         </div>
