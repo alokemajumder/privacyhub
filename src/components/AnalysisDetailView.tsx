@@ -137,45 +137,52 @@ export function AnalysisDetailView({ analysis }: Props) {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
-        {/* Privacy Overview Summary - Enhanced */}
-        <Card className="border-2">
+        {/* Privacy Overview Summary - Fixed */}
+        <Card className="border-2 shadow-lg">
           <CardContent className="p-8">
             <div className="space-y-8">
-              {/* Main Score Display with Circular Progress */}
-              <div className="text-center space-y-6">
-                <div className="relative inline-flex items-center justify-center">
-                  {/* Circular background */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-48 h-48 rounded-full border-8 border-gray-100"></div>
-                  </div>
-
-                  {/* Circular progress indicator */}
-                  <svg className="absolute w-48 h-48 transform -rotate-90">
+              {/* Main Score Display with Circular Progress - Fixed */}
+              <div className="flex flex-col items-center justify-center space-y-6">
+                {/* Circular Score Container */}
+                <div className="relative flex items-center justify-center w-64 h-64">
+                  {/* Background Circle */}
+                  <svg className="w-full h-full" viewBox="0 0 200 200">
                     <circle
-                      cx="96"
-                      cy="96"
-                      r="88"
-                      stroke={displayScore >= 7 ? '#16a34a' : displayScore >= 5 ? '#eab308' : '#dc2626'}
-                      strokeWidth="8"
+                      cx="100"
+                      cy="100"
+                      r="90"
                       fill="none"
-                      strokeDasharray={`${(displayScore / 10) * 552.64} 552.64`}
+                      stroke="#e5e7eb"
+                      strokeWidth="12"
+                    />
+                    {/* Progress Circle */}
+                    <circle
+                      cx="100"
+                      cy="100"
+                      r="90"
+                      fill="none"
+                      stroke={displayScore >= 7 ? '#16a34a' : displayScore >= 5 ? '#eab308' : '#dc2626'}
+                      strokeWidth="12"
                       strokeLinecap="round"
-                      className="transition-all duration-1000"
+                      strokeDasharray={`${(displayScore / 10) * 565.48} 565.48`}
+                      transform="rotate(-90 100 100)"
+                      className="transition-all duration-1000 ease-out"
                     />
                   </svg>
 
-                  {/* Score Text */}
-                  <div className="relative z-10 text-center">
-                    <div className="text-6xl font-bold text-gray-900">
+                  {/* Score Text - Centered */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <div className="text-6xl font-bold text-gray-900 leading-none">
                       {displayScore.toFixed(1)}
                     </div>
-                    <div className="text-lg text-gray-500 font-medium">out of 10</div>
+                    <div className="text-sm text-gray-500 font-medium mt-2">out of 10</div>
                   </div>
                 </div>
 
-                <div>
-                  <h3 className="text-2xl font-semibold text-gray-900 mb-1">Overall Privacy Score</h3>
-                  <p className="text-gray-600">
+                {/* Title and Description */}
+                <div className="text-center max-w-md">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Overall Privacy Score</h3>
+                  <p className="text-base text-gray-600">
                     {displayScore >= 8 ? 'Excellent privacy protection' :
                      displayScore >= 6.5 ? 'Good privacy standards' :
                      displayScore >= 5 ? 'Fair privacy practices' :
@@ -186,29 +193,33 @@ export function AnalysisDetailView({ analysis }: Props) {
               </div>
 
               {/* Score Breakdown Bar */}
-              <div className="space-y-3">
-                <div className="relative">
-                  <Progress
-                    value={displayScore * 10}
-                    className="h-4 bg-gradient-to-r from-red-100 via-yellow-100 to-green-100"
+              <div className="space-y-3 px-4">
+                <div className="relative h-3 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className={`absolute left-0 top-0 h-full rounded-full transition-all duration-1000 ${
+                      displayScore >= 7 ? 'bg-green-500' :
+                      displayScore >= 5 ? 'bg-yellow-500' :
+                      'bg-red-500'
+                    }`}
+                    style={{ width: `${(displayScore / 10) * 100}%` }}
                   />
                 </div>
-                <div className="flex justify-between text-xs font-medium text-gray-500 px-1">
-                  <span className={displayScore < 3 ? 'text-red-600' : ''}>0 - Poor</span>
-                  <span className={displayScore >= 3 && displayScore < 5 ? 'text-orange-600' : ''}>3 - Fair</span>
-                  <span className={displayScore >= 5 && displayScore < 7 ? 'text-yellow-600' : ''}>5 - Good</span>
-                  <span className={displayScore >= 7 ? 'text-green-600' : ''}>7+ - Excellent</span>
+                <div className="flex justify-between text-xs font-medium text-gray-500">
+                  <span className={displayScore < 3 ? 'text-red-600 font-bold' : ''}>0-3 Poor</span>
+                  <span className={displayScore >= 3 && displayScore < 5 ? 'text-orange-600 font-bold' : ''}>3-5 Fair</span>
+                  <span className={displayScore >= 5 && displayScore < 7 ? 'text-yellow-600 font-bold' : ''}>5-7 Good</span>
+                  <span className={displayScore >= 7 ? 'text-green-600 font-bold' : ''}>7-10 Excellent</span>
                 </div>
               </div>
 
-              {/* Grade and Risk Level - Enhanced Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Grade and Risk Level - Fixed Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
                 <HoverCard>
                   <HoverCardTrigger asChild>
-                    <div className="p-4 rounded-xl border-2 bg-gradient-to-br from-blue-50 to-purple-50 hover:shadow-md transition-all cursor-help">
-                      <div className="text-center space-y-2">
-                        <div className="text-sm font-medium text-gray-600">Privacy Grade</div>
-                        <div className={`text-5xl font-bold ${
+                    <div className="p-6 rounded-xl border-2 bg-gradient-to-br from-blue-50 to-purple-50 hover:shadow-lg transition-all cursor-help">
+                      <div className="text-center space-y-3">
+                        <div className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Privacy Grade</div>
+                        <div className={`text-7xl font-black leading-none ${
                           analysis.privacy_grade === 'A' ? 'text-green-600' :
                           analysis.privacy_grade === 'B' ? 'text-blue-600' :
                           analysis.privacy_grade === 'C' ? 'text-yellow-600' :
@@ -217,7 +228,7 @@ export function AnalysisDetailView({ analysis }: Props) {
                         }`}>
                           {analysis.privacy_grade || 'F'}
                         </div>
-                        <div className="text-xs text-gray-500">Click for details</div>
+                        <div className="text-xs text-gray-500 font-medium">Tap for details</div>
                       </div>
                     </div>
                   </HoverCardTrigger>
@@ -237,21 +248,21 @@ export function AnalysisDetailView({ analysis }: Props) {
 
                 <HoverCard>
                   <HoverCardTrigger asChild>
-                    <div className={`p-4 rounded-xl border-2 hover:shadow-md transition-all cursor-help ${
+                    <div className={`p-6 rounded-xl border-2 hover:shadow-lg transition-all cursor-help ${
                       analysis.risk_level?.includes('LOW') ? 'bg-gradient-to-br from-green-50 to-emerald-50' :
                       analysis.risk_level?.includes('MODERATE') ? 'bg-gradient-to-br from-yellow-50 to-amber-50' :
                       'bg-gradient-to-br from-red-50 to-orange-50'
                     }`}>
-                      <div className="text-center space-y-2">
-                        <div className="text-sm font-medium text-gray-600">Risk Level</div>
-                        <div className={`text-2xl font-bold ${
+                      <div className="text-center space-y-3">
+                        <div className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Risk Level</div>
+                        <div className={`text-3xl font-bold leading-tight ${
                           analysis.risk_level?.includes('LOW') ? 'text-green-600' :
                           analysis.risk_level?.includes('MODERATE') ? 'text-yellow-600' :
                           'text-red-600'
                         }`}>
                           {analysis.risk_level?.replace('_', ' ').replace('-', ' ') || 'Unknown'}
                         </div>
-                        <div className="text-xs text-gray-500">Click for details</div>
+                        <div className="text-xs text-gray-500 font-medium">Tap for details</div>
                       </div>
                     </div>
                   </HoverCardTrigger>
@@ -268,40 +279,46 @@ export function AnalysisDetailView({ analysis }: Props) {
                 </HoverCard>
               </div>
 
-              {/* Quick Stats */}
-              <div className="grid grid-cols-3 gap-4 pt-4 border-t">
-                <div className="text-center">
-                  <div className={`text-2xl font-bold ${
-                    analysis.gdpr_compliance === 'COMPLIANT' ? 'text-green-600' :
-                    analysis.gdpr_compliance === 'PARTIALLY_COMPLIANT' ? 'text-yellow-600' :
-                    'text-red-600'
-                  }`}>
-                    {analysis.gdpr_compliance === 'COMPLIANT' ? '✓' :
-                     analysis.gdpr_compliance === 'PARTIALLY_COMPLIANT' ? '~' : '✗'}
+              {/* Quick Compliance Stats */}
+              <div className="pt-6 border-t border-gray-200">
+                <h4 className="text-sm font-semibold text-gray-700 mb-4 text-center">Regulatory Compliance Status</h4>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="flex flex-col items-center space-y-2">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold ${
+                      analysis.gdpr_compliance === 'COMPLIANT' ? 'bg-green-100 text-green-600' :
+                      analysis.gdpr_compliance === 'PARTIALLY_COMPLIANT' ? 'bg-yellow-100 text-yellow-600' :
+                      'bg-red-100 text-red-600'
+                    }`}>
+                      {analysis.gdpr_compliance === 'COMPLIANT' ? '✓' :
+                       analysis.gdpr_compliance === 'PARTIALLY_COMPLIANT' ? '~' : '✗'}
+                    </div>
+                    <div className="text-xs font-semibold text-gray-700">GDPR</div>
+                    <div className="text-xs text-gray-500 text-center">European Union</div>
                   </div>
-                  <div className="text-xs text-gray-600 mt-1">GDPR</div>
-                </div>
-                <div className="text-center">
-                  <div className={`text-2xl font-bold ${
-                    analysis.ccpa_compliance === 'COMPLIANT' ? 'text-green-600' :
-                    analysis.ccpa_compliance === 'PARTIALLY_COMPLIANT' ? 'text-yellow-600' :
-                    'text-red-600'
-                  }`}>
-                    {analysis.ccpa_compliance === 'COMPLIANT' ? '✓' :
-                     analysis.ccpa_compliance === 'PARTIALLY_COMPLIANT' ? '~' : '✗'}
+                  <div className="flex flex-col items-center space-y-2">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold ${
+                      analysis.ccpa_compliance === 'COMPLIANT' ? 'bg-green-100 text-green-600' :
+                      analysis.ccpa_compliance === 'PARTIALLY_COMPLIANT' ? 'bg-yellow-100 text-yellow-600' :
+                      'bg-red-100 text-red-600'
+                    }`}>
+                      {analysis.ccpa_compliance === 'COMPLIANT' ? '✓' :
+                       analysis.ccpa_compliance === 'PARTIALLY_COMPLIANT' ? '~' : '✗'}
+                    </div>
+                    <div className="text-xs font-semibold text-gray-700">CCPA</div>
+                    <div className="text-xs text-gray-500 text-center">California, USA</div>
                   </div>
-                  <div className="text-xs text-gray-600 mt-1">CCPA</div>
-                </div>
-                <div className="text-center">
-                  <div className={`text-2xl font-bold ${
-                    analysis.dpdp_act_compliance === 'COMPLIANT' ? 'text-green-600' :
-                    analysis.dpdp_act_compliance === 'PARTIALLY_COMPLIANT' ? 'text-yellow-600' :
-                    'text-red-600'
-                  }`}>
-                    {analysis.dpdp_act_compliance === 'COMPLIANT' ? '✓' :
-                     analysis.dpdp_act_compliance === 'PARTIALLY_COMPLIANT' ? '~' : '✗'}
+                  <div className="flex flex-col items-center space-y-2">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold ${
+                      analysis.dpdp_act_compliance === 'COMPLIANT' ? 'bg-green-100 text-green-600' :
+                      analysis.dpdp_act_compliance === 'PARTIALLY_COMPLIANT' ? 'bg-yellow-100 text-yellow-600' :
+                      'bg-red-100 text-red-600'
+                    }`}>
+                      {analysis.dpdp_act_compliance === 'COMPLIANT' ? '✓' :
+                       analysis.dpdp_act_compliance === 'PARTIALLY_COMPLIANT' ? '~' : '✗'}
+                    </div>
+                    <div className="text-xs font-semibold text-gray-700">DPDP Act</div>
+                    <div className="text-xs text-gray-500 text-center">India</div>
                   </div>
-                  <div className="text-xs text-gray-600 mt-1">DPDP</div>
                 </div>
               </div>
             </div>
