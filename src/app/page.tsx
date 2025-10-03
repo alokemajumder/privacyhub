@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import PrivacyAnalyzer from '@/components/PrivacyAnalyzer';
@@ -165,7 +166,7 @@ export default function HomePage() {
                   See exactly what information your browser reveals to every website you visit.
                 </p>
                 <Button variant="outline" size="sm" className="border-slate-600 text-white hover:bg-slate-700" asChild>
-                  <a href="/digital-fingerprint">Check Now →</a>
+                  <Link href="/digital-fingerprint">Check Now →</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -180,7 +181,7 @@ export default function HomePage() {
                   Learn how privacy policies work and what to look for when reading them.
                 </p>
                 <Button variant="outline" size="sm" className="border-slate-600 text-white hover:bg-slate-700" asChild>
-                  <a href="/methodology">Learn More →</a>
+                  <Link href="/methodology">Learn More →</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -195,7 +196,7 @@ export default function HomePage() {
                   Help us build better privacy tools and spread awareness about digital rights.
                 </p>
                 <Button variant="outline" size="sm" className="border-slate-600 text-white hover:bg-slate-700" asChild>
-                  <a href="/support">Get Involved →</a>
+                  <Link href="/support">Get Involved →</Link>
                 </Button>
               </CardContent>
             </Card>
