@@ -137,66 +137,35 @@ export function AnalysisDetailView({ analysis }: Props) {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
-        {/* Privacy Overview Summary - Fixed */}
+        {/* Privacy Overview Summary - Simple Number UI */}
         <Card className="border-2 shadow-lg">
           <CardContent className="p-8">
             <div className="space-y-8">
-              {/* Main Score Display with Circular Progress - Fixed */}
-              <div className="flex flex-col items-center justify-center space-y-6">
-                {/* Circular Score Container */}
-                <div className="relative flex items-center justify-center w-64 h-64">
-                  {/* Background Circle */}
-                  <svg className="w-full h-full" viewBox="0 0 200 200">
-                    <circle
-                      cx="100"
-                      cy="100"
-                      r="90"
-                      fill="none"
-                      stroke="#e5e7eb"
-                      strokeWidth="12"
-                    />
-                    {/* Progress Circle */}
-                    <circle
-                      cx="100"
-                      cy="100"
-                      r="90"
-                      fill="none"
-                      stroke={displayScore >= 7 ? '#16a34a' : displayScore >= 5 ? '#eab308' : '#dc2626'}
-                      strokeWidth="12"
-                      strokeLinecap="round"
-                      strokeDasharray={`${(displayScore / 10) * 565.48} 565.48`}
-                      transform="rotate(-90 100 100)"
-                      className="transition-all duration-1000 ease-out"
-                    />
-                  </svg>
-
-                  {/* Score Text - Centered */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <div className="text-6xl font-bold text-gray-900 leading-none">
-                      {displayScore.toFixed(1)}
-                    </div>
-                    <div className="text-sm text-gray-500 font-medium mt-2">out of 10</div>
-                  </div>
+              {/* Main Score Display - Simple Numbers */}
+              <div className="text-center space-y-4">
+                <h3 className="text-xl font-semibold text-gray-700">Overall Privacy Score</h3>
+                <div className={`text-8xl font-black ${
+                  displayScore >= 7 ? 'text-green-600' :
+                  displayScore >= 5 ? 'text-yellow-600' :
+                  'text-red-600'
+                }`}>
+                  {displayScore.toFixed(1)}
+                  <span className="text-4xl text-gray-400">/10</span>
                 </div>
-
-                {/* Title and Description */}
-                <div className="text-center max-w-md">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Overall Privacy Score</h3>
-                  <p className="text-base text-gray-600">
-                    {displayScore >= 8 ? 'Excellent privacy protection' :
-                     displayScore >= 6.5 ? 'Good privacy standards' :
-                     displayScore >= 5 ? 'Fair privacy practices' :
-                     displayScore >= 3 ? 'Below average privacy' :
-                     'Poor privacy protection'}
-                  </p>
-                </div>
+                <p className="text-lg text-gray-600 font-medium">
+                  {displayScore >= 8 ? 'Excellent privacy protection' :
+                   displayScore >= 6.5 ? 'Good privacy standards' :
+                   displayScore >= 5 ? 'Fair privacy practices' :
+                   displayScore >= 3 ? 'Below average privacy' :
+                   'Poor privacy protection'}
+                </p>
               </div>
 
               {/* Score Breakdown Bar */}
-              <div className="space-y-3 px-4">
+              <div className="space-y-3">
                 <div className="relative h-3 bg-gray-200 rounded-full overflow-hidden">
                   <div
-                    className={`absolute left-0 top-0 h-full rounded-full transition-all duration-1000 ${
+                    className={`h-full rounded-full transition-all duration-1000 ${
                       displayScore >= 7 ? 'bg-green-500' :
                       displayScore >= 5 ? 'bg-yellow-500' :
                       'bg-red-500'
@@ -212,7 +181,7 @@ export function AnalysisDetailView({ analysis }: Props) {
                 </div>
               </div>
 
-              {/* Grade and Risk Level - Fixed Cards */}
+              {/* Grade and Risk Level Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
                 <HoverCard>
                   <HoverCardTrigger asChild>
