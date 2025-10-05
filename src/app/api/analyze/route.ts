@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import FirecrawlApp from '@mendable/firecrawl-js';
-import puppeteer from 'puppeteer';
+import { PlaywrightCrawler } from '@crawlee/playwright';
 import { saveAnalysis as saveSQLiteAnalysis } from '@/lib/database';
 import {
   extractDomain,
@@ -31,71 +31,88 @@ function getFirecrawlClient() {
   return new FirecrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY });
 }
 
-// Puppeteer fallback scraper
-async function scrapeWithPuppeteer(url: string): Promise<string> {
-  const browser = await puppeteer.launch({
+// Crawlee PlaywrightCrawler fallback scraper
+async function scrapeWithCrawlee(url: string): Promise<string> {
+  let extractedContent = '';
+
+  const crawler = new PlaywrightCrawler({
+    // Limit to single request
+    maxRequestsPerCrawl: 1,
+
+    // Headless mode for production
     headless: true,
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-gpu',
-      '--no-first-run',
-      '--no-zygote',
-      '--single-process',
-      '--disable-extensions'
-    ]
+
+    // Browser launch options for Vercel compatibility
+    launchContext: {
+      launchOptions: {
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-gpu',
+        ],
+      },
+    },
+
+    // Request handler
+    async requestHandler({ page, request }) {
+      console.log(`Crawling: ${request.url}`);
+
+      // Wait for page to load
+      await page.waitForLoadState('domcontentloaded');
+
+      // Wait a bit for dynamic content
+      await page.waitForTimeout(2000);
+
+      // Extract main content text
+      extractedContent = await page.evaluate(() => {
+        // Remove script and style elements
+        const elementsToRemove = document.querySelectorAll('script, style, nav, header, footer, aside, [role="navigation"], [role="banner"], [role="complementary"]');
+        elementsToRemove.forEach(el => el.remove());
+
+        // Try to find main content areas
+        const selectors = [
+          'main',
+          '[role="main"]',
+          '.main-content',
+          '#main-content',
+          '.content',
+          '#content',
+          '.privacy-policy',
+          '.policy-content',
+          'article',
+          '.article-content',
+          '.post-content',
+          '.entry-content',
+          '.container',
+          'body'
+        ];
+
+        for (const selector of selectors) {
+          const element = document.querySelector(selector);
+          if (element && element.textContent && element.textContent.trim().length > 500) {
+            return element.textContent.trim();
+          }
+        }
+
+        // Fallback to body text
+        return document.body.textContent?.trim() || '';
+      });
+    },
+
+    // Error handler
+    failedRequestHandler({ request }) {
+      console.error(`Request ${request.url} failed multiple times`);
+    },
   });
 
-  try {
-    const page = await browser.newPage();
-    
-    // Set user agent to avoid bot detection
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
-    
-    // Set reasonable timeout
-    await page.goto(url, { 
-      waitUntil: 'domcontentloaded',
-      timeout: 30000 
-    });
+  // Run the crawler on the URL
+  await crawler.run([url]);
 
-    // Wait a bit for dynamic content
-    await new Promise(resolve => setTimeout(resolve, 2000));
+  // Clean up
+  await crawler.teardown();
 
-    // Extract main content text
-    const content = await page.evaluate(() => {
-      // Remove script and style elements
-      const scripts = document.querySelectorAll('script, style, nav, header, footer, aside');
-      scripts.forEach(el => el.remove());
-
-      // Try to find main content areas
-      const selectors = [
-        'main',
-        '[role="main"]', 
-        '.main-content',
-        '.content',
-        '.privacy-policy',
-        '.policy-content',
-        'article',
-        '.container',
-        'body'
-      ];
-
-      for (const selector of selectors) {
-        const element = document.querySelector(selector);
-        if (element && element.textContent && element.textContent.trim().length > 500) {
-          return element.textContent.trim();
-        }
-      }
-
-      // Fallback to body text
-      return document.body.textContent?.trim() || '';
-    });
-
-    return content;
-  } finally {
-    await browser.close();
-  }
+  return extractedContent;
 }
 
 const PRIVACY_ANALYSIS_PROMPT = `
@@ -326,28 +343,33 @@ export async function POST(request: NextRequest) {
         content = ''; // Reset content to trigger Puppeteer fallback
       }
     } else {
-      console.log('FIRECRAWL_API_KEY not found, will use Puppeteer directly');
+      console.log('FIRECRAWL_API_KEY not found, will use Crawlee PlaywrightCrawler directly');
     }
 
-    // Fallback to Puppeteer if Firecrawl failed or API key not available
+    // Fallback to Crawlee if Firecrawl failed or API key not available
     if (!content || content.length < 100) {
-      console.log('Falling back to Puppeteer scraper...');
+      console.log('Falling back to Crawlee PlaywrightCrawler...');
       try {
-        content = await scrapeWithPuppeteer(sanitizedUrl);
-        scraperUsed = 'puppeteer';
-        
+        content = await scrapeWithCrawlee(sanitizedUrl);
+        scraperUsed = 'crawlee';
+
         if (!content || content.length < 100) {
-          return NextResponse.json({ 
-            error: 'Could not extract sufficient content from the URL. Please verify the URL is accessible and contains a privacy policy.' 
+          return NextResponse.json({
+            error: 'Could not extract sufficient content from the URL. Please verify the URL is accessible and contains a privacy policy.'
           }, { status: 400 });
         }
-        
-        console.log('Content extracted successfully with Puppeteer, length:', content.length);
-        
-      } catch (puppeteerError) {
-        console.error('Puppeteer fallback failed:', puppeteerError);
-        return NextResponse.json({ 
-          error: 'Failed to extract content from the URL. Please verify the URL is accessible and try again.' 
+
+        console.log('Content extracted successfully with Crawlee, length:', content.length);
+
+      } catch (crawleeError) {
+        console.error('Crawlee fallback failed:', crawleeError);
+        errorHandler.log('Crawlee scraping failed', ErrorSeverity.HIGH,
+          crawleeError instanceof Error ? crawleeError : undefined,
+          { url: sanitizedUrl }
+        );
+
+        return NextResponse.json({
+          error: 'Failed to extract content from the URL. Please verify the URL is accessible and try again.'
         }, { status: 400 });
       }
     }
