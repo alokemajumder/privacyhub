@@ -22,12 +22,12 @@ export default function HomePage() {
               </div>
               
               <h1 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6 leading-tight">
-                Know What Apps & Websites Do With Your Personal Data
+                Nobody Reads Privacy Policies. We Do. For You.
               </h1>
               <p className="text-lg md:text-xl text-slate-600 mb-8 leading-relaxed">
-                Every day you use apps and visit websites that collect your personal information.
-                Do you know how they use it? Our free privacy policy analyser helps you understand
-                what&rsquo;s really happening with your data.
+                Let&rsquo;s be honest—you&rsquo;ve never read a privacy policy. Neither has anyone else.
+                But you deserve to know what apps and websites are really doing with your data.
+                We analyze the fine print so you don&rsquo;t have to.
               </p>
 
               {/* Privacy Policy Analyser - Moved to top */}
