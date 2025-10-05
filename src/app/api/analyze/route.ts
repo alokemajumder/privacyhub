@@ -2,17 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import FirecrawlApp from '@mendable/firecrawl-js';
 import { PlaywrightCrawler } from '@crawlee/playwright';
-import { saveAnalysis as saveSQLiteAnalysis } from '@/lib/database';
-import {
-  extractDomain,
-  generateContentHash,
-  checkExistingAnalysis,
-  saveAnalysis as saveFirestoreAnalysis,
-  updateLastChecked
-} from '@/lib/firestore-service';
-import { getOptimizedLogo } from '@/lib/logo-service';
-import { errorHandler, ErrorSeverity } from '@/lib/error-handler';
-import { analysisRateLimiter, getClientIp, createRateLimitHeaders } from '@/lib/rate-limiter';
+// Firebase/Firestore disabled - keeping code for future use
+// import { saveAnalysis as saveSQLiteAnalysis } from '@/lib/database';
+// import {
+//   extractDomain,
+//   generateContentHash,
+//   checkExistingAnalysis,
+//   saveAnalysis as saveFirestoreAnalysis,
+//   updateLastChecked
+// } from '@/lib/firestore-service';
+// import { getOptimizedLogo } from '@/lib/logo-service';
+// import { errorHandler, ErrorSeverity } from '@/lib/error-handler';
+// import { analysisRateLimiter, getClientIp, createRateLimitHeaders } from '@/lib/rate-limiter';
 import { validateUrl } from '@/lib/input-validation';
 
 // Initialize OpenAI client inside the route handler to avoid build-time issues
@@ -221,25 +222,25 @@ export async function POST(request: NextRequest) {
   try {
     console.log('Privacy analysis request received');
 
-    // Rate limiting check
-    const clientIp = getClientIp(request);
-    const rateLimitCheck = analysisRateLimiter.check(clientIp);
-
-    if (!rateLimitCheck.allowed) {
-      const headers = createRateLimitHeaders(
-        rateLimitCheck.remaining,
-        rateLimitCheck.resetTime,
-        5
-      );
-
-      return NextResponse.json(
-        {
-          error: 'Rate limit exceeded. You can analyze up to 5 privacy policies every 15 minutes. Please try again later.',
-          resetTime: new Date(rateLimitCheck.resetTime).toISOString()
-        },
-        { status: 429, headers }
-      );
-    }
+    // Rate limiting disabled for MVP
+    // const clientIp = getClientIp(request);
+    // const rateLimitCheck = analysisRateLimiter.check(clientIp);
+    //
+    // if (!rateLimitCheck.allowed) {
+    //   const headers = createRateLimitHeaders(
+    //     rateLimitCheck.remaining,
+    //     rateLimitCheck.resetTime,
+    //     5
+    //   );
+    //
+    //   return NextResponse.json(
+    //     {
+    //       error: 'Rate limit exceeded. You can analyze up to 5 privacy policies every 15 minutes. Please try again later.',
+    //       resetTime: new Date(rateLimitCheck.resetTime).toISOString()
+    //     },
+    //     { status: 429, headers }
+    //   );
+    // }
 
     const { url } = await request.json();
 
@@ -268,40 +269,32 @@ export async function POST(request: NextRequest) {
     let content = '';
     let scraperUsed = 'unknown';
 
-    // Try Firecrawl first (if API key is available) with retry logic
+    // Try Firecrawl first (if API key is available)
     if (process.env.FIRECRAWL_API_KEY) {
       console.log('Attempting to scrape with Firecrawl...');
       try {
-        // Use retry logic for Firecrawl
-        const scrapeResult = await errorHandler.withRetry(async () => {
-          const firecrawl = getFirecrawlClient();
+        const firecrawl = getFirecrawlClient();
 
-          // Try different API call formats for compatibility
-          let scrapeResponse: unknown;
-          try {
-            // V4 API format with optimized settings
-            scrapeResponse = await (firecrawl as unknown as { scrape: (params: { url: string; formats: string[]; onlyMainContent: boolean; waitFor: number; timeout?: number }) => Promise<unknown> }).scrape({
-              url: sanitizedUrl,
-              formats: ['markdown'],
-              onlyMainContent: true,
-              waitFor: 2000,
-              timeout: 30000, // 30 second timeout
-            });
-          } catch (v4Error) {
-            console.log('V4 format failed, trying V3 format');
-            errorHandler.log('Firecrawl V4 API failed, falling back to V3', ErrorSeverity.LOW,
-              v4Error instanceof Error ? v4Error : undefined
-            );
+        // Try different API call formats for compatibility
+        let scrapeResult: unknown;
+        try {
+          // V4 API format with optimized settings
+          scrapeResult = await (firecrawl as unknown as { scrape: (params: { url: string; formats: string[]; onlyMainContent: boolean; waitFor: number; timeout?: number }) => Promise<unknown> }).scrape({
+            url: sanitizedUrl,
+            formats: ['markdown'],
+            onlyMainContent: true,
+            waitFor: 2000,
+            timeout: 30000, // 30 second timeout
+          });
+        } catch {
+          console.log('V4 format failed, trying V3 format');
 
-            // Fallback to V3 API format
-            scrapeResponse = await (firecrawl as unknown as { scrape: (url: string, params: { formats: string[]; onlyMainContent: boolean }) => Promise<unknown> }).scrape(sanitizedUrl, {
-              formats: ['markdown'],
-              onlyMainContent: true,
-            });
-          }
-
-          return scrapeResponse;
-        }, 2, 2000); // 2 retries, 2 second base delay
+          // Fallback to V3 API format
+          scrapeResult = await (firecrawl as unknown as { scrape: (url: string, params: { formats: string[]; onlyMainContent: boolean }) => Promise<unknown> }).scrape(sanitizedUrl, {
+            formats: ['markdown'],
+            onlyMainContent: true,
+          });
+        }
 
         console.log('Firecrawl response received');
 
@@ -336,11 +329,8 @@ export async function POST(request: NextRequest) {
         }
 
       } catch (firecrawlError) {
-        errorHandler.log('Firecrawl failed after retries', ErrorSeverity.MEDIUM,
-          firecrawlError instanceof Error ? firecrawlError : undefined,
-          { url: sanitizedUrl }
-        );
-        content = ''; // Reset content to trigger Puppeteer fallback
+        console.error('Firecrawl failed:', firecrawlError);
+        content = ''; // Reset content to trigger Crawlee fallback
       }
     } else {
       console.log('FIRECRAWL_API_KEY not found, will use Crawlee PlaywrightCrawler directly');
@@ -363,10 +353,6 @@ export async function POST(request: NextRequest) {
 
       } catch (crawleeError) {
         console.error('Crawlee fallback failed:', crawleeError);
-        errorHandler.log('Crawlee scraping failed', ErrorSeverity.HIGH,
-          crawleeError instanceof Error ? crawleeError : undefined,
-          { url: sanitizedUrl }
-        );
 
         return NextResponse.json({
           error: 'Failed to extract content from the URL. Please verify the URL is accessible and try again.'
@@ -386,33 +372,33 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Extract domain from URL
-    const domain = extractDomain(sanitizedUrl);
-    const contentHash = generateContentHash(content);
-
-    console.log('Domain extracted:', domain);
-    console.log('Content hash generated:', contentHash);
-
-    // Check if we have a recent analysis
-    const existingCheck = await checkExistingAnalysis(domain, contentHash);
-
-    if (existingCheck.exists && !existingCheck.needsUpdate) {
-      console.log('Returning cached analysis (no changes detected, within 30 days)');
-      await updateLastChecked(domain);
-
-      return NextResponse.json({
-        url: sanitizedUrl,
-        domain,
-        cached: true,
-        timestamp: new Date().toISOString(),
-        analysis: existingCheck.data,
-        message: 'Using cached analysis - no changes detected'
-      });
-    }
-
-    if (existingCheck.exists && existingCheck.needsUpdate) {
-      console.log('Content has changed or expired, re-analyzing...');
-    }
+    // Firebase/Firestore caching disabled for MVP
+    // const domain = extractDomain(sanitizedUrl);
+    // const contentHash = generateContentHash(content);
+    //
+    // console.log('Domain extracted:', domain);
+    // console.log('Content hash generated:', contentHash);
+    //
+    // // Check if we have a recent analysis
+    // const existingCheck = await checkExistingAnalysis(domain, contentHash);
+    //
+    // if (existingCheck.exists && !existingCheck.needsUpdate) {
+    //   console.log('Returning cached analysis (no changes detected, within 30 days)');
+    //   await updateLastChecked(domain);
+    //
+    //   return NextResponse.json({
+    //     url: sanitizedUrl,
+    //     domain,
+    //     cached: true,
+    //     timestamp: new Date().toISOString(),
+    //     analysis: existingCheck.data,
+    //     message: 'Using cached analysis - no changes detected'
+    //   });
+    // }
+    //
+    // if (existingCheck.exists && existingCheck.needsUpdate) {
+    //   console.log('Content has changed or expired, re-analyzing...');
+    // }
 
     console.log('Analyzing privacy policy with AI...');
 
@@ -452,51 +438,48 @@ export async function POST(request: NextRequest) {
       throw new Error('Failed to parse analysis results');
     }
 
-    // Save analysis to SQLite database (existing functionality)
-    try {
-      const analysisId = saveSQLiteAnalysis(sanitizedUrl, analysis);
-      console.log('Analysis saved to SQLite database with ID:', analysisId);
-    } catch (dbError) {
-      console.error('Failed to save analysis to SQLite database:', dbError);
-      // Don't fail the request if database save fails
-    }
-
-    // Save analysis to Firestore
-    try {
-      const urlObj = new URL(sanitizedUrl);
-      const hostname = urlObj.hostname.replace(/^www\./, '');
-      const logoUrl = getOptimizedLogo(hostname, 128);
-
-      await saveFirestoreAnalysis(domain, {
-        url: sanitizedUrl,
-        hostname,
-        logo_url: logoUrl,
-        overall_score: analysis.overall_score,
-        privacy_grade: analysis.privacy_grade,
-        risk_level: analysis.risk_level,
-        gdpr_compliance: analysis.regulatory_compliance?.gdpr_compliance || 'UNKNOWN',
-        ccpa_compliance: analysis.regulatory_compliance?.ccpa_compliance || 'UNKNOWN',
-        dpdp_act_compliance: analysis.regulatory_compliance?.dpdp_act_compliance,
-        analysis_data: {
-          overall_score: analysis.overall_score,
-          privacy_grade: analysis.privacy_grade,
-          risk_level: analysis.risk_level,
-          regulatory_compliance: analysis.regulatory_compliance,
-          categories: analysis.categories,
-          recommendations: analysis.actionable_recommendations?.immediate_actions || [],
-          key_findings: analysis.critical_findings?.high_risk_practices || [],
-          summary: analysis.executive_summary
-        },
-        content_hash: contentHash
-      });
-      console.log('Analysis saved to Firestore for domain:', domain);
-    } catch (firestoreError) {
-      errorHandler.log('Failed to save to Firestore', ErrorSeverity.HIGH,
-        firestoreError instanceof Error ? firestoreError : undefined,
-        { domain, url: sanitizedUrl }
-      );
-      // Don't fail the request if Firestore save fails
-    }
+    // Database saving disabled for MVP - no storage, just analyze and return
+    // try {
+    //   const analysisId = saveSQLiteAnalysis(sanitizedUrl, analysis);
+    //   console.log('Analysis saved to SQLite database with ID:', analysisId);
+    // } catch (dbError) {
+    //   console.error('Failed to save analysis to SQLite database:', dbError);
+    //   // Don't fail the request if database save fails
+    // }
+    //
+    // // Save analysis to Firestore
+    // try {
+    //   const urlObj = new URL(sanitizedUrl);
+    //   const hostname = urlObj.hostname.replace(/^www\./, '');
+    //   const logoUrl = getOptimizedLogo(hostname, 128);
+    //
+    //   await saveFirestoreAnalysis(domain, {
+    //     url: sanitizedUrl,
+    //     hostname,
+    //     logo_url: logoUrl,
+    //     overall_score: analysis.overall_score,
+    //     privacy_grade: analysis.privacy_grade,
+    //     risk_level: analysis.risk_level,
+    //     gdpr_compliance: analysis.regulatory_compliance?.gdpr_compliance || 'UNKNOWN',
+    //     ccpa_compliance: analysis.regulatory_compliance?.ccpa_compliance || 'UNKNOWN',
+    //     dpdp_act_compliance: analysis.regulatory_compliance?.dpdp_act_compliance,
+    //     analysis_data: {
+    //       overall_score: analysis.overall_score,
+    //       privacy_grade: analysis.privacy_grade,
+    //       risk_level: analysis.risk_level,
+    //       regulatory_compliance: analysis.regulatory_compliance,
+    //       categories: analysis.categories,
+    //       recommendations: analysis.actionable_recommendations?.immediate_actions || [],
+    //       key_findings: analysis.critical_findings?.high_risk_practices || [],
+    //       summary: analysis.executive_summary
+    //     },
+    //     content_hash: contentHash
+    //   });
+    //   console.log('Analysis saved to Firestore for domain:', domain);
+    // } catch (firestoreError) {
+    //   console.error('Failed to save to Firestore:', firestoreError);
+    //   // Don't fail the request if Firestore save fails
+    // }
 
     // Add metadata
     const result = {
