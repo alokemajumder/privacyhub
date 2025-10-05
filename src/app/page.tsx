@@ -26,15 +26,15 @@ export default function HomePage() {
               </h1>
               <p className="text-lg md:text-xl text-slate-600 mb-8 leading-relaxed">
                 Every day you use apps and visit websites that collect your personal information.
-                Do you know how they use it? Our free privacy analyzer helps you understand
+                Do you know how they use it? Our free privacy policy analyser helps you understand
                 what&rsquo;s really happening with your data.
               </p>
 
-              {/* Privacy Analyzer - Moved to top */}
+              {/* Privacy Policy Analyser - Moved to top */}
               <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 mb-8">
                 <div className="text-center mb-6">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">Free Privacy Checker</h3>
-                  <p className="text-sm text-slate-600">Enter any website or app privacy policy URL to get an instant analysis</p>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Privacy Policy Analyser</h3>
+                  <p className="text-sm text-slate-600">Enter any website or app privacy policy URL to get an instant AI-powered analysis</p>
                 </div>
                 <div id="analyzer">
                   <PrivacyAnalyzer />
