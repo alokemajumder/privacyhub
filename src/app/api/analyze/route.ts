@@ -31,8 +31,13 @@ function getFirecrawlClient() {
   return new FirecrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY });
 }
 
-// Puppeteer fallback scraper
+// Puppeteer fallback scraper (only works locally, not on Vercel)
 async function scrapeWithPuppeteer(url: string): Promise<string> {
+  // Check if we're running on Vercel
+  if (process.env.VERCEL) {
+    throw new Error('Puppeteer is not supported on Vercel. Please ensure FIRECRAWL_API_KEY is configured.');
+  }
+
   const browser = await puppeteer.launch({
     headless: true,
     args: [
@@ -49,14 +54,14 @@ async function scrapeWithPuppeteer(url: string): Promise<string> {
 
   try {
     const page = await browser.newPage();
-    
+
     // Set user agent to avoid bot detection
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
-    
+
     // Set reasonable timeout
-    await page.goto(url, { 
+    await page.goto(url, {
       waitUntil: 'domcontentloaded',
-      timeout: 30000 
+      timeout: 30000
     });
 
     // Wait a bit for dynamic content
@@ -71,7 +76,7 @@ async function scrapeWithPuppeteer(url: string): Promise<string> {
       // Try to find main content areas
       const selectors = [
         'main',
-        '[role="main"]', 
+        '[role="main"]',
         '.main-content',
         '.content',
         '.privacy-policy',
@@ -335,19 +340,27 @@ export async function POST(request: NextRequest) {
       try {
         content = await scrapeWithPuppeteer(sanitizedUrl);
         scraperUsed = 'puppeteer';
-        
+
         if (!content || content.length < 100) {
-          return NextResponse.json({ 
-            error: 'Could not extract sufficient content from the URL. Please verify the URL is accessible and contains a privacy policy.' 
+          return NextResponse.json({
+            error: 'Could not extract sufficient content from the URL. Please verify the URL is accessible and contains a privacy policy.'
           }, { status: 400 });
         }
-        
+
         console.log('Content extracted successfully with Puppeteer, length:', content.length);
-        
+
       } catch (puppeteerError) {
         console.error('Puppeteer fallback failed:', puppeteerError);
-        return NextResponse.json({ 
-          error: 'Failed to extract content from the URL. Please verify the URL is accessible and try again.' 
+
+        // Check if running on Vercel
+        if (process.env.VERCEL) {
+          return NextResponse.json({
+            error: 'Web scraping failed. Firecrawl API is required for production deployment. Please ensure FIRECRAWL_API_KEY is properly configured in your Vercel environment variables.'
+          }, { status: 500 });
+        }
+
+        return NextResponse.json({
+          error: 'Failed to extract content from the URL. Please verify the URL is accessible and try again.'
         }, { status: 400 });
       }
     }
