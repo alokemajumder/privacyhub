@@ -169,138 +169,62 @@ export function AnalysisDetailView({ analysis }: Props) {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
-        {/* Privacy Overview Summary - Clean Simple UI */}
+        {/* Privacy Overview Summary - Compact UI */}
         <div className="bg-white rounded-xl border-2 border-gray-200 shadow-lg overflow-hidden">
-          <div className="p-8 md:p-12">
-            {/* Main Score Display */}
-            <div className="text-center mb-8">
-              <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
-                Overall Privacy Score
-              </p>
-              <div className="mb-4">
-                <span className={`text-7xl md:text-8xl font-extrabold tracking-tight ${
+          <div className="p-6">
+            {/* Compact Score, Grade, and Risk in Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              {/* Score */}
+              <div className="text-center p-4 bg-gradient-to-br from-slate-50 to-white rounded-lg border">
+                <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Score</p>
+                <div className={`text-5xl font-bold ${
                   displayScore >= 7 ? 'text-green-600' :
                   displayScore >= 5 ? 'text-yellow-600' :
                   'text-red-600'
                 }`}>
-                  {displayScore.toFixed(1)}
-                </span>
-                <span className="text-3xl md:text-4xl text-gray-400 font-semibold ml-2">/10</span>
+                  {displayScore.toFixed(1)}<span className="text-2xl text-gray-400">/10</span>
+                </div>
               </div>
-              <p className="text-base md:text-lg text-gray-700 font-medium">
-                {displayScore >= 8 ? 'Excellent privacy protection' :
-                 displayScore >= 6.5 ? 'Good privacy standards' :
-                 displayScore >= 5 ? 'Fair privacy practices' :
-                 displayScore >= 3 ? 'Below average privacy' :
-                 'Poor privacy protection'}
-              </p>
-            </div>
 
-            {/* Progress Bar */}
-            <div className="mb-8">
-              <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
-                <div
-                  className={`h-full transition-all duration-700 ease-out ${
-                    displayScore >= 7 ? 'bg-green-500' :
-                    displayScore >= 5 ? 'bg-yellow-500' :
-                    'bg-red-500'
-                  }`}
-                  style={{ width: `${(displayScore / 10) * 100}%` }}
-                />
+              {/* Grade */}
+              <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg border">
+                <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Grade</p>
+                <div className={`text-5xl font-bold ${
+                  analysis.privacy_grade === 'A' ? 'text-green-600' :
+                  analysis.privacy_grade === 'B' ? 'text-blue-600' :
+                  analysis.privacy_grade === 'C' ? 'text-yellow-600' :
+                  analysis.privacy_grade === 'D' ? 'text-orange-600' :
+                  'text-red-600'
+                }`}>
+                  {analysis.privacy_grade || 'F'}
+                </div>
               </div>
-              <div className="flex justify-between mt-2 px-1">
-                <span className={`text-xs font-semibold ${displayScore < 3 ? 'text-red-600' : 'text-gray-500'}`}>
-                  0-3 Poor
-                </span>
-                <span className={`text-xs font-semibold ${displayScore >= 3 && displayScore < 5 ? 'text-orange-600' : 'text-gray-500'}`}>
-                  3-5 Fair
-                </span>
-                <span className={`text-xs font-semibold ${displayScore >= 5 && displayScore < 7 ? 'text-yellow-600' : 'text-gray-500'}`}>
-                  5-7 Good
-                </span>
-                <span className={`text-xs font-semibold ${displayScore >= 7 ? 'text-green-600' : 'text-gray-500'}`}>
-                  7-10 Excellent
-                </span>
+
+              {/* Risk Level */}
+              <div className={`text-center p-4 rounded-lg border ${
+                analysis.risk_level?.includes('LOW') ? 'bg-gradient-to-br from-green-50 to-emerald-50' :
+                analysis.risk_level?.includes('MODERATE') ? 'bg-gradient-to-br from-yellow-50 to-amber-50' :
+                'bg-gradient-to-br from-red-50 to-orange-50'
+              }`}>
+                <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Risk</p>
+                <div className={`text-xl font-bold ${
+                  analysis.risk_level?.includes('LOW') ? 'text-green-600' :
+                  analysis.risk_level?.includes('MODERATE') ? 'text-yellow-600' :
+                  'text-red-600'
+                }`}>
+                  {analysis.risk_level?.replace('_', ' ').replace('-', ' ') || 'Unknown'}
+                </div>
               </div>
             </div>
 
-            {/* Grade and Risk Level */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-              <HoverCard>
-                <HoverCardTrigger asChild>
-                  <button className="w-full p-6 rounded-lg border-2 bg-gradient-to-br from-blue-50 to-purple-50 hover:shadow-lg hover:border-blue-300 transition-all">
-                    <div className="text-center">
-                      <p className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-3">
-                        Privacy Grade
-                      </p>
-                      <div className={`text-6xl md:text-7xl font-black ${
-                        analysis.privacy_grade === 'A' ? 'text-green-600' :
-                        analysis.privacy_grade === 'B' ? 'text-blue-600' :
-                        analysis.privacy_grade === 'C' ? 'text-yellow-600' :
-                        analysis.privacy_grade === 'D' ? 'text-orange-600' :
-                        'text-red-600'
-                      }`}>
-                        {analysis.privacy_grade || 'F'}
-                      </div>
-                    </div>
-                  </button>
-                </HoverCardTrigger>
-                <HoverCardContent className="w-80">
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-semibold">Privacy Grade Explained</h4>
-                    <p className="text-sm text-gray-600">
-                      {analysis.privacy_grade === 'A' ? 'Excellent privacy practices with strong user protections and transparent policies.' :
-                       analysis.privacy_grade === 'B' ? 'Good privacy practices with clear policies and minor concerns.' :
-                       analysis.privacy_grade === 'C' ? 'Average privacy practices with some issues that need attention.' :
-                       analysis.privacy_grade === 'D' ? 'Poor privacy practices with significant concerns and weak protections.' :
-                       'Very poor privacy practices. Major concerns identified. Use with extreme caution.'}
-                    </p>
-                  </div>
-                </HoverCardContent>
-              </HoverCard>
-
-              <HoverCard>
-                <HoverCardTrigger asChild>
-                  <button className={`w-full p-6 rounded-lg border-2 hover:shadow-lg transition-all ${
-                    analysis.risk_level?.includes('LOW') ? 'bg-gradient-to-br from-green-50 to-emerald-50 hover:border-green-300' :
-                    analysis.risk_level?.includes('MODERATE') ? 'bg-gradient-to-br from-yellow-50 to-amber-50 hover:border-yellow-300' :
-                    'bg-gradient-to-br from-red-50 to-orange-50 hover:border-red-300'
-                  }`}>
-                    <div className="text-center">
-                      <p className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-3">
-                        Risk Level
-                      </p>
-                      <div className={`text-2xl md:text-3xl font-bold ${
-                        analysis.risk_level?.includes('LOW') ? 'text-green-600' :
-                        analysis.risk_level?.includes('MODERATE') ? 'text-yellow-600' :
-                        'text-red-600'
-                      }`}>
-                        {analysis.risk_level?.replace('_', ' ').replace('-', ' ') || 'Unknown'}
-                      </div>
-                    </div>
-                  </button>
-                </HoverCardTrigger>
-                <HoverCardContent className="w-80">
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-semibold">Risk Level Assessment</h4>
-                    <p className="text-sm text-gray-600">
-                      {analysis.risk_level?.includes('LOW') ? 'Low risk to your privacy. The website demonstrates good data protection practices.' :
-                       analysis.risk_level?.includes('MODERATE') ? 'Moderate risk detected. Some privacy concerns exist that you should be aware of.' :
-                       'High risk to your privacy. Significant concerns about data handling and user protection.'}
-                    </p>
-                  </div>
-                </HoverCardContent>
-              </HoverCard>
-            </div>
-
-            {/* Compliance Status */}
-            <div className="pt-6 border-t border-gray-200">
-              <p className="text-xs font-bold text-gray-600 uppercase tracking-wider text-center mb-4">
+            {/* Compact Compliance Status */}
+            <div className="pt-4 border-t border-gray-200">
+              <p className="text-xs font-semibold text-gray-500 uppercase text-center mb-3">
                 Regulatory Compliance
               </p>
               <div className="grid grid-cols-3 gap-3">
                 <div className="text-center">
-                  <div className={`w-14 h-14 mx-auto mb-2 rounded-full flex items-center justify-center text-xl font-bold ${
+                  <div className={`w-10 h-10 mx-auto mb-1 rounded-full flex items-center justify-center text-lg font-bold ${
                     analysis.gdpr_compliance === 'COMPLIANT' ? 'bg-green-100 text-green-600' :
                     analysis.gdpr_compliance === 'PARTIALLY_COMPLIANT' ? 'bg-yellow-100 text-yellow-600' :
                     'bg-red-100 text-red-600'
@@ -309,10 +233,9 @@ export function AnalysisDetailView({ analysis }: Props) {
                      analysis.gdpr_compliance === 'PARTIALLY_COMPLIANT' ? '~' : '✗'}
                   </div>
                   <p className="text-xs font-bold text-gray-700">GDPR</p>
-                  <p className="text-xs text-gray-500">EU</p>
                 </div>
                 <div className="text-center">
-                  <div className={`w-14 h-14 mx-auto mb-2 rounded-full flex items-center justify-center text-xl font-bold ${
+                  <div className={`w-10 h-10 mx-auto mb-1 rounded-full flex items-center justify-center text-lg font-bold ${
                     analysis.ccpa_compliance === 'COMPLIANT' ? 'bg-green-100 text-green-600' :
                     analysis.ccpa_compliance === 'PARTIALLY_COMPLIANT' ? 'bg-yellow-100 text-yellow-600' :
                     'bg-red-100 text-red-600'
@@ -321,10 +244,9 @@ export function AnalysisDetailView({ analysis }: Props) {
                      analysis.ccpa_compliance === 'PARTIALLY_COMPLIANT' ? '~' : '✗'}
                   </div>
                   <p className="text-xs font-bold text-gray-700">CCPA</p>
-                  <p className="text-xs text-gray-500">California</p>
                 </div>
                 <div className="text-center">
-                  <div className={`w-14 h-14 mx-auto mb-2 rounded-full flex items-center justify-center text-xl font-bold ${
+                  <div className={`w-10 h-10 mx-auto mb-1 rounded-full flex items-center justify-center text-lg font-bold ${
                     analysis.dpdp_act_compliance === 'COMPLIANT' ? 'bg-green-100 text-green-600' :
                     analysis.dpdp_act_compliance === 'PARTIALLY_COMPLIANT' ? 'bg-yellow-100 text-yellow-600' :
                     'bg-red-100 text-red-600'
@@ -332,8 +254,7 @@ export function AnalysisDetailView({ analysis }: Props) {
                     {analysis.dpdp_act_compliance === 'COMPLIANT' ? '✓' :
                      analysis.dpdp_act_compliance === 'PARTIALLY_COMPLIANT' ? '~' : '✗'}
                   </div>
-                  <p className="text-xs font-bold text-gray-700">DPDP Act</p>
-                  <p className="text-xs text-gray-500">India</p>
+                  <p className="text-xs font-bold text-gray-700">DPDP</p>
                 </div>
               </div>
             </div>
