@@ -2,18 +2,18 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
-import { 
-  Shield, 
-  ArrowLeft, 
-  Globe, 
-  AlertTriangle, 
-  CheckCircle, 
+import {
+  Shield,
+  ArrowLeft,
+  Globe,
+  AlertTriangle,
+  CheckCircle,
   XCircle,
   Info,
   ExternalLink,
@@ -25,6 +25,7 @@ import {
   Scale,
   HelpCircle
 } from 'lucide-react';
+import { getOptimizedLogo } from '@/lib/logo-service';
 
 interface AnalysisData {
   id: number;
@@ -64,6 +65,22 @@ export function AnalysisDetailView({ analysis }: Props) {
       month: 'long',
       day: 'numeric'
     });
+  };
+
+  const formatDateWithTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const dateStr = date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    const timeStr = date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+    return `${dateStr} at ${timeStr}`;
   };
 
   const formatHostname = (hostname: string) => {
@@ -126,12 +143,27 @@ export function AnalysisDetailView({ analysis }: Props) {
           </div>
           
           <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <Shield className="w-8 h-8 text-white" />
+            <div className="relative w-20 h-20 mx-auto mb-4">
+              <Image
+                src={getOptimizedLogo(analysis.hostname, 80)}
+                alt={`${formatHostname(analysis.hostname)} logo`}
+                width={80}
+                height={80}
+                className="rounded-2xl object-cover shadow-lg border-2 border-white"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const parent = target.parentElement;
+                  if (parent) {
+                    parent.innerHTML = '<div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg"><svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg></div>';
+                  }
+                }}
+                unoptimized
+              />
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">{formatHostname(analysis.hostname)}</h1>
             <p className="text-lg text-gray-600">Privacy Policy Analysis</p>
-            <p className="text-sm text-gray-500 mt-1">Analyzed on {formatDate(analysis.created_at)}</p>
+            <p className="text-sm text-gray-500 mt-1">Last checked on {formatDateWithTime(analysis.created_at)}</p>
           </div>
         </div>
       </div>
