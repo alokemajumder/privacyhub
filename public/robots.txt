@@ -1,0 +1,21 @@
+# robots.txt for PrivacyHub.in
+# Allow all search engines to crawl the site
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://privacyhub.in/sitemap.xml
+
+# Disallow crawling of API routes
+Disallow: /api/
+
+# Allow crawling of main pages
+Allow: /
+Allow: /methodology
+Allow: /about
+Allow: /support
+Allow: /digital-fingerprint
+
+# Crawl delay (optional)
+Crawl-delay: 1

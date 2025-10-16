@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(_request: NextRequest) {
+export function middleware(request: NextRequest) {
   const response = NextResponse.next();
+
+  // Log request for monitoring (optional - remove in production if not needed)
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`${request.method} ${request.url}`);
+  }
 
   // Security headers
   response.headers.set('X-DNS-Prefetch-Control', 'on');

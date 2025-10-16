@@ -16,6 +16,10 @@ import { PlaywrightCrawler } from '@crawlee/playwright';
 // import { analysisRateLimiter, getClientIp, createRateLimitHeaders } from '@/lib/rate-limiter';
 import { validateUrl } from '@/lib/input-validation';
 
+// Configure Vercel timeout (max 60 seconds on Pro plan, 10 seconds on Hobby)
+export const maxDuration = 60; // seconds
+export const dynamic = 'force-dynamic';
+
 // Initialize OpenAI client inside the route handler to avoid build-time issues
 function getOpenAIClient() {
   return new OpenAI({
@@ -32,88 +36,124 @@ function getFirecrawlClient() {
   return new FirecrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY });
 }
 
-// Crawlee PlaywrightCrawler fallback scraper
+// Simple fetch fallback when Playwright is not available
+async function scrapeWithFetch(url: string): Promise<string> {
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; PrivacyHubBot/1.0; +https://privacyhub.com)',
+      },
+      signal: AbortSignal.timeout(15000), // 15 second timeout
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const html = await response.text();
+
+    // Basic HTML parsing to extract text content
+    const textContent = html
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    return textContent;
+  } catch (error) {
+    console.error('Fetch scraping failed:', error);
+    throw error;
+  }
+}
+
+// Crawlee PlaywrightCrawler fallback scraper (may not work on Vercel)
 async function scrapeWithCrawlee(url: string): Promise<string> {
   let extractedContent = '';
 
-  const crawler = new PlaywrightCrawler({
-    // Limit to single request
-    maxRequestsPerCrawl: 1,
+  try {
+    const crawler = new PlaywrightCrawler({
+      // Limit to single request
+      maxRequestsPerCrawl: 1,
 
-    // Headless mode for production
-    headless: true,
+      // Headless mode for production
+      headless: true,
 
-    // Browser launch options for Vercel compatibility
-    launchContext: {
-      launchOptions: {
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-gpu',
-        ],
+      // Browser launch options for Vercel compatibility
+      launchContext: {
+        launchOptions: {
+          args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-gpu',
+          ],
+        },
       },
-    },
 
-    // Request handler
-    async requestHandler({ page, request }) {
-      console.log(`Crawling: ${request.url}`);
+      // Request handler
+      async requestHandler({ page, request }) {
+        console.log(`Crawling: ${request.url}`);
 
-      // Wait for page to load
-      await page.waitForLoadState('domcontentloaded');
+        // Wait for page to load
+        await page.waitForLoadState('domcontentloaded');
 
-      // Wait a bit for dynamic content
-      await page.waitForTimeout(2000);
+        // Wait a bit for dynamic content
+        await page.waitForTimeout(2000);
 
-      // Extract main content text
-      extractedContent = await page.evaluate(() => {
-        // Remove script and style elements
-        const elementsToRemove = document.querySelectorAll('script, style, nav, header, footer, aside, [role="navigation"], [role="banner"], [role="complementary"]');
-        elementsToRemove.forEach(el => el.remove());
+        // Extract main content text
+        extractedContent = await page.evaluate(() => {
+          // Remove script and style elements
+          const elementsToRemove = document.querySelectorAll('script, style, nav, header, footer, aside, [role="navigation"], [role="banner"], [role="complementary"]');
+          elementsToRemove.forEach(el => el.remove());
 
-        // Try to find main content areas
-        const selectors = [
-          'main',
-          '[role="main"]',
-          '.main-content',
-          '#main-content',
-          '.content',
-          '#content',
-          '.privacy-policy',
-          '.policy-content',
-          'article',
-          '.article-content',
-          '.post-content',
-          '.entry-content',
-          '.container',
-          'body'
-        ];
+          // Try to find main content areas
+          const selectors = [
+            'main',
+            '[role="main"]',
+            '.main-content',
+            '#main-content',
+            '.content',
+            '#content',
+            '.privacy-policy',
+            '.policy-content',
+            'article',
+            '.article-content',
+            '.post-content',
+            '.entry-content',
+            '.container',
+            'body'
+          ];
 
-        for (const selector of selectors) {
-          const element = document.querySelector(selector);
-          if (element && element.textContent && element.textContent.trim().length > 500) {
-            return element.textContent.trim();
+          for (const selector of selectors) {
+            const element = document.querySelector(selector);
+            if (element && element.textContent && element.textContent.trim().length > 500) {
+              return element.textContent.trim();
+            }
           }
-        }
 
-        // Fallback to body text
-        return document.body.textContent?.trim() || '';
-      });
-    },
+          // Fallback to body text
+          return document.body.textContent?.trim() || '';
+        });
+      },
 
-    // Error handler
-    failedRequestHandler({ request }) {
-      console.error(`Request ${request.url} failed multiple times`);
-    },
-  });
+      // Error handler
+      failedRequestHandler({ request }) {
+        console.error(`Request ${request.url} failed multiple times`);
+      },
+    });
 
-  // Run the crawler on the URL
-  await crawler.run([url]);
+    // Run the crawler on the URL
+    await crawler.run([url]);
 
-  // Clean up
-  await crawler.teardown();
+    // Clean up
+    await crawler.teardown();
 
-  return extractedContent;
+    return extractedContent;
+  } catch (error) {
+    console.error('Crawlee scraping failed:', error);
+    throw error;
+  }
 }
 
 const PRIVACY_ANALYSIS_PROMPT = `
@@ -344,9 +384,7 @@ export async function POST(request: NextRequest) {
         scraperUsed = 'crawlee';
 
         if (!content || content.length < 100) {
-          return NextResponse.json({
-            error: 'Could not extract sufficient content from the URL. Please verify the URL is accessible and contains a privacy policy.'
-          }, { status: 400 });
+          throw new Error('Crawlee returned insufficient content');
         }
 
         console.log('Content extracted successfully with Crawlee, length:', content.length);
@@ -354,9 +392,26 @@ export async function POST(request: NextRequest) {
       } catch (crawleeError) {
         console.error('Crawlee fallback failed:', crawleeError);
 
-        return NextResponse.json({
-          error: 'Failed to extract content from the URL. Please verify the URL is accessible and try again.'
-        }, { status: 400 });
+        // Final fallback: simple fetch
+        console.log('Falling back to simple fetch...');
+        try {
+          content = await scrapeWithFetch(sanitizedUrl);
+          scraperUsed = 'fetch';
+
+          if (!content || content.length < 100) {
+            return NextResponse.json({
+              error: 'Could not extract sufficient content from the URL. The page may be protected or use JavaScript rendering. Please try a different URL.'
+            }, { status: 400 });
+          }
+
+          console.log('Content extracted successfully with fetch, length:', content.length);
+        } catch (fetchError) {
+          console.error('All scraping methods failed:', fetchError);
+
+          return NextResponse.json({
+            error: 'Failed to extract content from the URL. Please verify the URL is accessible and try again.'
+          }, { status: 400 });
+        }
       }
     }
     
@@ -495,23 +550,50 @@ export async function POST(request: NextRequest) {
 
   } catch (error: unknown) {
     console.error('Analysis error:', error);
-    
+
     const errorMessage = error instanceof Error ? error.message : String(error);
-    
-    if (errorMessage?.includes('rate limit')) {
-      return NextResponse.json({ 
-        error: 'Rate limit exceeded. Please try again in a moment.' 
+
+    // Specific error handling
+    if (errorMessage?.includes('rate limit') || errorMessage?.includes('429')) {
+      return NextResponse.json({
+        error: 'Rate limit exceeded. Please try again in a moment.'
       }, { status: 429 });
     }
-    
-    if (errorMessage?.includes('API key')) {
-      return NextResponse.json({ 
-        error: 'API configuration error. Please contact support.' 
+
+    if (errorMessage?.includes('API key') || errorMessage?.includes('401') || errorMessage?.includes('403')) {
+      return NextResponse.json({
+        error: 'API configuration error. Please contact support.'
       }, { status: 500 });
     }
 
-    return NextResponse.json({ 
-      error: 'Analysis failed. Please try again or contact support if the issue persists.' 
+    if (errorMessage?.includes('timeout') || errorMessage?.includes('ETIMEDOUT')) {
+      return NextResponse.json({
+        error: 'Request timed out. The website may be slow or unresponsive. Please try again.'
+      }, { status: 504 });
+    }
+
+    if (errorMessage?.includes('ENOTFOUND') || errorMessage?.includes('ECONNREFUSED')) {
+      return NextResponse.json({
+        error: 'Could not connect to the website. Please check the URL and try again.'
+      }, { status: 400 });
+    }
+
+    if (errorMessage?.includes('AbortError')) {
+      return NextResponse.json({
+        error: 'Request was cancelled due to timeout. Please try again.'
+      }, { status: 408 });
+    }
+
+    // Log the full error for debugging
+    console.error('Unhandled error details:', {
+      message: errorMessage,
+      stack: error instanceof Error ? error.stack : undefined,
+      type: error instanceof Error ? error.constructor.name : typeof error
+    });
+
+    return NextResponse.json({
+      error: 'Analysis failed. Please try again or contact support if the issue persists.',
+      details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
     }, { status: 500 });
   }
 }
