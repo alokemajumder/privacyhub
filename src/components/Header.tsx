@@ -25,6 +25,7 @@ export function Header() {
     { name: 'Home', href: '/' },
     { name: 'Digital Fingerprint', href: '/digital-fingerprint' },
     { name: 'Methodology', href: '/methodology' },
+    { name: 'For Website Owners', href: '/for-website-owners' },
     { name: 'Support', href: '/support' },
     { name: 'About', href: '/about' },
   ];
