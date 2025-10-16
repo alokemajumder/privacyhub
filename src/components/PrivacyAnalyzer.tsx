@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { Turnstile } from '@marsidev/react-turnstile';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -55,10 +56,18 @@ export default function PrivacyAnalyzer() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState('');
   const [currentStep, setCurrentStep] = useState<AnalysisStep>('idle');
+  const [turnstileToken, setTurnstileToken] = useState<string>('');
+
+  const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
 
   const analyzePolicy = async () => {
     if (!url.trim()) {
       setError('Please enter a URL');
+      return;
+    }
+
+    if (!turnstileToken) {
+      setError('Please complete the security verification');
       return;
     }
 
@@ -78,7 +87,10 @@ export default function PrivacyAnalyzer() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ url: url.trim() }),
+        body: JSON.stringify({
+          url: url.trim(),
+          turnstileToken: turnstileToken
+        }),
       });
 
       if (!response.ok) {
@@ -109,6 +121,7 @@ export default function PrivacyAnalyzer() {
     setError('');
     setLoading(false);
     setCurrentStep('idle');
+    setTurnstileToken('');
   };
 
   const getGradeColor = (grade: string) => {
@@ -197,6 +210,20 @@ export default function PrivacyAnalyzer() {
                 )}
               </div>
             </div>
+
+            {/* Turnstile Security Verification */}
+            {TURNSTILE_SITE_KEY && (
+              <div className="flex justify-center">
+                <Turnstile
+                  siteKey={TURNSTILE_SITE_KEY}
+                  onSuccess={(token) => setTurnstileToken(token)}
+                  onError={() => setError('Security verification failed. Please refresh the page.')}
+                  onExpire={() => setTurnstileToken('')}
+                  theme="light"
+                  size="normal"
+                />
+              </div>
+            )}
 
             {error && (
               <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg text-sm">
