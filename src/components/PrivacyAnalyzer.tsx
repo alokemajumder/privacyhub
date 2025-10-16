@@ -11,7 +11,7 @@ import { ScoreGauge } from '@/components/ui/score-gauge';
 import { Heatmap } from '@/components/ui/heatmap';
 import { ScoreCard } from '@/components/ui/score-card';
 import { MethodologySection } from '@/components/MethodologySection';
-import { AlertCircle, CheckCircle, Search, ExternalLink, Shield, Lock, Eye, Users, FileText, Scale } from 'lucide-react';
+import { AlertCircle, CheckCircle, Search, ExternalLink, Shield, Lock, Eye, Users, FileText, Scale, Home, RotateCcw } from 'lucide-react';
 
 interface AnalysisResult {
   url: string;
@@ -87,6 +87,13 @@ export default function PrivacyAnalyzer() {
     }
   };
 
+  const resetAnalysis = () => {
+    setUrl('');
+    setResult(null);
+    setError('');
+    setLoading(false);
+  };
+
   const getGradeColor = (grade: string) => {
     if (['A+', 'A', 'A-'].includes(grade)) return 'text-green-600 bg-green-50';
     if (['B+', 'B', 'B-'].includes(grade)) return 'text-blue-600 bg-blue-50';
@@ -153,11 +160,11 @@ export default function PrivacyAnalyzer() {
               <Button
                 onClick={analyzePolicy}
                 disabled={loading || !url.trim()}
-                className="px-6"
+                className="px-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white border-0"
               >
                 {loading ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-background mr-2" />
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white mr-2" />
                     Analyzing...
                   </>
                 ) : (
@@ -167,6 +174,17 @@ export default function PrivacyAnalyzer() {
                   </>
                 )}
               </Button>
+              {(url || result) && (
+                <Button
+                  onClick={resetAnalysis}
+                  disabled={loading}
+                  variant="outline"
+                  className="px-6 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-600 hover:via-teal-600 hover:to-cyan-600 text-white border-0"
+                >
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  Reset
+                </Button>
+              )}
             </div>
 
             {error && (
@@ -202,13 +220,27 @@ export default function PrivacyAnalyzer() {
           <Card className="bg-gradient-to-br from-gray-50 to-gray-100 border-2">
             <CardContent className="p-8">
               {/* Header */}
-              <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-foreground mb-2">Privacy Analysis Results</h3>
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex-1" />
+                  <h3 className="text-2xl font-bold text-foreground">Privacy Analysis Results</h3>
+                  <div className="flex-1 flex justify-end">
+                    <Button
+                      onClick={() => window.location.href = '/'}
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-2"
+                    >
+                      <Home className="h-4 w-4" />
+                      Home
+                    </Button>
+                  </div>
+                </div>
                 <div className="flex items-center justify-center gap-2">
                   <span className="text-muted-foreground">Analysis for</span>
-                  <a 
-                    href={result.url} 
-                    target="_blank" 
+                  <a
+                    href={result.url}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:underline flex items-center gap-1 font-medium"
                   >
