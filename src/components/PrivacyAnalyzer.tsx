@@ -214,15 +214,28 @@ export default function PrivacyAnalyzer() {
 
             {/* Turnstile Security Verification */}
             {TURNSTILE_SITE_KEY && (
-              <div className="flex justify-center">
+              <div className="flex justify-center py-2">
                 <Turnstile
                   siteKey={TURNSTILE_SITE_KEY}
-                  onSuccess={(token) => setTurnstileToken(token)}
-                  onError={() => setError('Security verification failed. Please refresh the page.')}
-                  onExpire={() => setTurnstileToken('')}
+                  onSuccess={(token) => {
+                    console.log('Turnstile token received');
+                    setTurnstileToken(token);
+                  }}
+                  onError={(error) => {
+                    console.error('Turnstile error:', error);
+                    setError('Security verification failed. Please refresh the page.');
+                  }}
+                  onExpire={() => {
+                    console.log('Turnstile token expired');
+                    setTurnstileToken('');
+                  }}
+                  onLoad={() => {
+                    console.log('Turnstile widget loaded');
+                  }}
                   options={{
                     theme: 'light',
-                    size: 'normal'
+                    size: 'normal',
+                    appearance: 'always'
                   }}
                 />
               </div>
