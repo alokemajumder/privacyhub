@@ -343,6 +343,7 @@ export default function PrivacyAnalyzer() {
                     />
                   </div>
                 </div>
+              </div>
             </div>
           </CardContent>
         </Card>
