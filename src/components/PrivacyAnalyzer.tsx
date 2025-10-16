@@ -183,11 +183,12 @@ export default function PrivacyAnalyzer() {
       return;
     }
 
+    // TURNSTILE DISABLED - Keep code for future use
     // Only require Turnstile token if site key is configured AND bypass is not enabled
-    if (TURNSTILE_SITE_KEY && !turnstileToken && !turnstileBypass) {
-      setError('Please complete the security verification');
-      return;
-    }
+    // if (TURNSTILE_SITE_KEY && !turnstileToken && !turnstileBypass) {
+    //   setError('Please complete the security verification');
+    //   return;
+    // }
 
     setLoading(true);
     setError('');
