@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Turnstile } from '@marsidev/react-turnstile';
+import React, { useState, useRef } from 'react';
+import { Turnstile, TurnstileInstance } from '@marsidev/react-turnstile';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -57,6 +57,7 @@ export default function PrivacyAnalyzer() {
   const [error, setError] = useState('');
   const [currentStep, setCurrentStep] = useState<AnalysisStep>('idle');
   const [turnstileToken, setTurnstileToken] = useState<string>('');
+  const turnstileRef = useRef<TurnstileInstance>(null);
 
   const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
 
@@ -123,6 +124,10 @@ export default function PrivacyAnalyzer() {
     setLoading(false);
     setCurrentStep('idle');
     setTurnstileToken('');
+    // Reset Turnstile widget
+    if (turnstileRef.current) {
+      turnstileRef.current.reset();
+    }
   };
 
   const getGradeColor = (grade: string) => {
@@ -214,29 +219,25 @@ export default function PrivacyAnalyzer() {
 
             {/* Turnstile Security Verification */}
             {TURNSTILE_SITE_KEY && (
-              <div className="flex justify-center py-2">
+              <div className="flex flex-col items-center gap-2 py-4">
+                <div className="text-xs text-gray-600 font-medium">Security Verification</div>
                 <Turnstile
+                  ref={turnstileRef}
                   siteKey={TURNSTILE_SITE_KEY}
                   onSuccess={(token) => {
-                    console.log('Turnstile token received');
+                    console.log('[Turnstile] Token received successfully');
                     setTurnstileToken(token);
+                    setError(''); // Clear any previous errors
                   }}
-                  onError={(error) => {
-                    console.error('Turnstile error:', error);
-                    setError('Security verification failed. Please refresh the page.');
-                  }}
-                  onExpire={() => {
-                    console.log('Turnstile token expired');
+                  onError={(errorCode) => {
+                    console.error('[Turnstile] Error:', errorCode);
+                    setError('Security verification failed. Please refresh the page and try again.');
                     setTurnstileToken('');
                   }}
-                  onLoad={() => {
-                    console.log('Turnstile widget loaded');
-                  }}
-                  options={{
-                    theme: 'light',
-                    size: 'normal',
-                    appearance: 'always',
-                    execution: 'render'
+                  onExpire={() => {
+                    console.log('[Turnstile] Token expired');
+                    setTurnstileToken('');
+                    setError('Security verification expired. Please verify again.');
                   }}
                 />
               </div>
