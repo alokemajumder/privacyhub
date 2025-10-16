@@ -9,7 +9,8 @@ import { CircularProgress } from '@/components/ui/circular-progress';
 import { Heatmap } from '@/components/ui/heatmap';
 import { ScoreCard } from '@/components/ui/score-card';
 import { MethodologySection } from '@/components/MethodologySection';
-import { AlertCircle, CheckCircle, Search, ExternalLink, Shield, Lock, Eye, Users, FileText, Scale, Home, RotateCcw, Mail, MessageSquare, Info } from 'lucide-react';
+import { AlertCircle, CheckCircle, Search, ExternalLink, Shield, Lock, Eye, Users, FileText, Scale, Home, RotateCcw, MessageSquare } from 'lucide-react';
+import Link from 'next/link';
 
 interface AnalysisResult {
   url: string;
@@ -772,9 +773,9 @@ export default function PrivacyAnalyzer() {
                     className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
                     asChild
                   >
-                    <a href="/for-website-owners">
+                    <Link href="/for-website-owners">
                       Learn More & Contact Us →
-                    </a>
+                    </Link>
                   </Button>
                 </div>
               </div>
