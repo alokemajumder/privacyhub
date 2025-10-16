@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
-import { Turnstile, TurnstileInstance } from '@marsidev/react-turnstile';
+import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +11,28 @@ import { ScoreCard } from '@/components/ui/score-card';
 import { MethodologySection } from '@/components/MethodologySection';
 import { AlertCircle, CheckCircle, Search, ExternalLink, Shield, Lock, Eye, Users, FileText, Scale, Home, RotateCcw, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
+
+// Declare Turnstile types for TypeScript
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (container: string | HTMLElement, options: TurnstileOptions) => string;
+      reset: (widgetId: string) => void;
+      remove: (widgetId: string) => void;
+      getResponse: (widgetId: string) => string;
+    };
+  }
+}
+
+interface TurnstileOptions {
+  sitekey: string;
+  callback?: (token: string) => void;
+  'error-callback'?: (errorCode?: string) => void;
+  'expired-callback'?: () => void;
+  'timeout-callback'?: () => void;
+  theme?: 'light' | 'dark' | 'auto';
+  size?: 'normal' | 'compact';
+}
 
 interface AnalysisResult {
   url: string;
@@ -59,23 +80,83 @@ export default function PrivacyAnalyzer() {
   const [turnstileToken, setTurnstileToken] = useState<string>('');
   const [turnstileLoaded, setTurnstileLoaded] = useState(false);
   const [turnstileBypass, setTurnstileBypass] = useState(false);
-  const turnstileRef = useRef<TurnstileInstance>(null);
+  const turnstileWidgetId = useRef<string | null>(null);
+  const turnstileContainerRef = useRef<HTMLDivElement>(null);
 
   const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
 
-  // Fallback: Allow bypass if Turnstile doesn't load within 5 seconds
-  React.useEffect(() => {
-    if (TURNSTILE_SITE_KEY && !turnstileLoaded && !turnstileBypass) {
-      const timeout = setTimeout(() => {
-        if (!turnstileToken) {
-          console.warn('[Turnstile] Widget failed to load - enabling bypass mode');
+  // Initialize Turnstile widget using native API
+  useEffect(() => {
+    if (!TURNSTILE_SITE_KEY || !turnstileContainerRef.current) return;
+
+    // Wait for Turnstile script to load
+    const initTurnstile = () => {
+      if (window.turnstile && turnstileContainerRef.current) {
+        console.log('[Turnstile] Initializing widget with native API');
+
+        try {
+          turnstileWidgetId.current = window.turnstile.render(turnstileContainerRef.current, {
+            sitekey: TURNSTILE_SITE_KEY,
+            theme: 'light',
+            size: 'normal',
+            callback: (token: string) => {
+              console.log('[Turnstile] Success - token received');
+              setTurnstileToken(token);
+              setTurnstileLoaded(true);
+              setError('');
+            },
+            'error-callback': (errorCode?: string) => {
+              console.error('[Turnstile] Error:', errorCode);
+              setError('Security verification failed. Please refresh and try again.');
+              setTurnstileToken('');
+            },
+            'expired-callback': () => {
+              console.log('[Turnstile] Token expired');
+              setTurnstileToken('');
+              setError('Security verification expired. Please verify again.');
+            },
+            'timeout-callback': () => {
+              console.log('[Turnstile] Timeout');
+              setError('Security verification timed out. Please try again.');
+              setTurnstileToken('');
+            },
+          });
+
+          console.log('[Turnstile] Widget rendered with ID:', turnstileWidgetId.current);
+          setTurnstileLoaded(true);
+        } catch (err) {
+          console.error('[Turnstile] Failed to render:', err);
           setTurnstileBypass(true);
         }
-      }, 5000);
+      } else {
+        // Retry after 100ms if script not loaded yet
+        setTimeout(initTurnstile, 100);
+      }
+    };
 
-      return () => clearTimeout(timeout);
-    }
-  }, [TURNSTILE_SITE_KEY, turnstileLoaded, turnstileBypass, turnstileToken]);
+    // Start initialization
+    initTurnstile();
+
+    // Fallback: Enable bypass after 5 seconds if widget doesn't load
+    const fallbackTimeout = setTimeout(() => {
+      if (!turnstileToken && !turnstileLoaded) {
+        console.warn('[Turnstile] Widget failed to load within 5 seconds - enabling bypass');
+        setTurnstileBypass(true);
+      }
+    }, 5000);
+
+    return () => {
+      clearTimeout(fallbackTimeout);
+      // Cleanup widget on unmount
+      if (turnstileWidgetId.current && window.turnstile) {
+        try {
+          window.turnstile.remove(turnstileWidgetId.current);
+        } catch (err) {
+          console.error('[Turnstile] Cleanup error:', err);
+        }
+      }
+    };
+  }, [TURNSTILE_SITE_KEY, turnstileToken, turnstileLoaded]);
 
   const analyzePolicy = async () => {
     if (!url.trim()) {
@@ -140,11 +221,14 @@ export default function PrivacyAnalyzer() {
     setLoading(false);
     setCurrentStep('idle');
     setTurnstileToken('');
-    setTurnstileBypass(false);
-    setTurnstileLoaded(false);
-    // Reset Turnstile widget
-    if (turnstileRef.current) {
-      turnstileRef.current.reset();
+    // Reset Turnstile widget using native API
+    if (turnstileWidgetId.current && window.turnstile) {
+      try {
+        window.turnstile.reset(turnstileWidgetId.current);
+        console.log('[Turnstile] Widget reset');
+      } catch (err) {
+        console.error('[Turnstile] Reset error:', err);
+      }
     }
   };
 
@@ -219,26 +303,7 @@ export default function PrivacyAnalyzer() {
                     </div>
                     <div className="flex justify-center sm:justify-start">
                       {!turnstileBypass ? (
-                        <Turnstile
-                          ref={turnstileRef}
-                          siteKey={TURNSTILE_SITE_KEY}
-                          onSuccess={(token) => {
-                            console.log('[Turnstile] Token received successfully');
-                            setTurnstileToken(token);
-                            setTurnstileLoaded(true);
-                            setError('');
-                          }}
-                          onError={(errorCode) => {
-                            console.error('[Turnstile] Error:', errorCode);
-                            setError('Security verification failed. Please refresh the page and try again.');
-                            setTurnstileToken('');
-                          }}
-                          onExpire={() => {
-                            console.log('[Turnstile] Token expired');
-                            setTurnstileToken('');
-                            setError('Security verification expired. Please verify again.');
-                          }}
-                        />
+                        <div ref={turnstileContainerRef} className="turnstile-widget" />
                       ) : (
                         <div className="text-sm text-yellow-700 bg-yellow-50 px-4 py-2 rounded-md border border-yellow-200">
                           Security verification bypassed - widget failed to load
