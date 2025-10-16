@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Turnstile } from '@marsidev/react-turnstile';
+import React, { useState, useRef } from 'react';
+import { Turnstile, TurnstileInstance } from '@marsidev/react-turnstile';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -57,6 +57,7 @@ export default function PrivacyAnalyzer() {
   const [error, setError] = useState('');
   const [currentStep, setCurrentStep] = useState<AnalysisStep>('idle');
   const [turnstileToken, setTurnstileToken] = useState<string>('');
+  const turnstileRef = useRef<TurnstileInstance>(null);
 
   const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
 
@@ -123,6 +124,10 @@ export default function PrivacyAnalyzer() {
     setLoading(false);
     setCurrentStep('idle');
     setTurnstileToken('');
+    // Reset Turnstile widget
+    if (turnstileRef.current) {
+      turnstileRef.current.reset();
+    }
   };
 
   const getGradeColor = (grade: string) => {
@@ -167,79 +172,90 @@ export default function PrivacyAnalyzer() {
       <Card className="mb-6 sm:mb-8">
         <CardContent className="p-4 sm:p-6">
           <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="flex-1">
-                <Input
-                  type="url"
-                  placeholder="https://example.com/privacy"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && !loading && analyzePolicy()}
-                  disabled={loading}
-                  className="text-base h-11 sm:h-10"
-                />
-              </div>
-              <div className="flex gap-2 sm:gap-3">
-                <Button
-                  onClick={analyzePolicy}
-                  disabled={loading || !url.trim()}
-                  className="flex-1 sm:flex-none sm:px-6 h-11 sm:h-10 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white border-0"
-                >
-                  {loading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white mr-2" />
-                      <span className="hidden sm:inline">Analyzing...</span>
-                      <span className="sm:hidden">Wait...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Search className="h-4 w-4 sm:mr-2" />
-                      <span className="hidden sm:inline ml-2">Analyze</span>
-                    </>
-                  )}
-                </Button>
-                {(url || result) && (
-                  <Button
-                    onClick={resetAnalysis}
-                    disabled={loading}
-                    variant="outline"
-                    className="flex-1 sm:flex-none sm:px-6 h-11 sm:h-10 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-600 hover:via-teal-600 hover:to-cyan-600 text-white border-0"
-                  >
-                    <RotateCcw className="h-4 w-4 sm:mr-2" />
-                    <span className="hidden sm:inline ml-2">Reset</span>
-                  </Button>
-                )}
-              </div>
+            {/* URL Input */}
+            <div>
+              <label htmlFor="privacy-url" className="block text-sm font-semibold text-gray-700 mb-2">
+                Privacy Policy URL
+              </label>
+              <Input
+                id="privacy-url"
+                type="url"
+                placeholder="https://example.com/privacy-policy"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && !loading && analyzePolicy()}
+                disabled={loading}
+                className="text-base h-12 focus:ring-2 focus:ring-blue-500"
+              />
             </div>
 
             {/* Turnstile Security Verification */}
             {TURNSTILE_SITE_KEY && (
-              <div className="flex justify-center py-2">
-                <Turnstile
-                  siteKey={TURNSTILE_SITE_KEY}
-                  onSuccess={(token) => {
-                    console.log('Turnstile token received');
-                    setTurnstileToken(token);
-                  }}
-                  onError={(error) => {
-                    console.error('Turnstile error:', error);
-                    setError('Security verification failed. Please refresh the page.');
-                  }}
-                  onExpire={() => {
-                    console.log('Turnstile token expired');
-                    setTurnstileToken('');
-                  }}
-                  onLoad={() => {
-                    console.log('Turnstile widget loaded');
-                  }}
-                  options={{
-                    theme: 'light',
-                    size: 'normal',
-                    appearance: 'always'
-                  }}
-                />
+              <div className="bg-gradient-to-br from-gray-50 to-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <Shield className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 space-y-3">
+                    <div>
+                      <h4 className="text-sm font-bold text-gray-900">Security Verification</h4>
+                      <p className="text-xs text-gray-600 mt-1">Please complete the verification to analyze</p>
+                    </div>
+                    <div className="flex justify-center sm:justify-start">
+                      <Turnstile
+                        ref={turnstileRef}
+                        siteKey={TURNSTILE_SITE_KEY}
+                        onSuccess={(token) => {
+                          console.log('[Turnstile] Token received successfully');
+                          setTurnstileToken(token);
+                          setError(''); // Clear any previous errors
+                        }}
+                        onError={(errorCode) => {
+                          console.error('[Turnstile] Error:', errorCode);
+                          setError('Security verification failed. Please refresh the page and try again.');
+                          setTurnstileToken('');
+                        }}
+                        onExpire={() => {
+                          console.log('[Turnstile] Token expired');
+                          setTurnstileToken('');
+                          setError('Security verification expired. Please verify again.');
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <Button
+                onClick={analyzePolicy}
+                disabled={loading || !url.trim() || (TURNSTILE_SITE_KEY && !turnstileToken)}
+                className="flex-1 h-12 text-base font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white border-0 shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2" />
+                    <span>Analyzing...</span>
+                  </>
+                ) : (
+                  <>
+                    <Search className="h-5 w-5 mr-2" />
+                    <span>Analyze Privacy Policy</span>
+                  </>
+                )}
+              </Button>
+              {(url || result) && (
+                <Button
+                  onClick={resetAnalysis}
+                  disabled={loading}
+                  variant="outline"
+                  className="sm:w-auto h-12 text-base font-semibold border-2 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  <RotateCcw className="h-5 w-5 mr-2" />
+                  <span>Reset</span>
+                </Button>
+              )}
+            </div>
 
             {error && (
               <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg text-sm">
