@@ -10,7 +10,7 @@
 
 **AI-powered privacy policy analyzer helping users understand how websites handle their personal data with comprehensive GDPR, CCPA, and DPDP Act 2023 compliance analysis.**
 
-[🌐 Live Demo](https://privacyhub.in) · [📖 Methodology](https://privacyhub.in/methodology) · [🐛 Report Bug](https://github.com/alokemajumder/privacyhub/issues) · [✨ Request Feature](https://github.com/alokemajumder/privacyhub/issues)
+[🌐 Live Demo](https://privacyhub.in) · [📖 Methodology](https://privacyhub.in/methodology) · [🐛 Report Bug](https://github.com/privacypriority/privacyhub/issues) · [✨ Request Feature](https://github.com/privacypriority/privacyhub/issues)
 
 </div>
 
@@ -204,7 +204,7 @@ PrivacyHub uses a scientifically-grounded, evidence-based framework for privacy 
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/alokemajumder/privacyhub.git
+   git clone https://github.com/privacypriority/privacyhub.git
    cd privacyhub
    ```
 
@@ -397,8 +397,8 @@ We welcome contributions from the community! Here's how you can help:
 
 ### Ways to Contribute
 
-- 🐛 **Report Bugs**: [Open an issue](https://github.com/alokemajumder/privacyhub/issues/new)
-- ✨ **Request Features**: [Submit a feature request](https://github.com/alokemajumder/privacyhub/issues/new)
+- 🐛 **Report Bugs**: [Open an issue](https://github.com/privacypriority/privacyhub/issues/new)
+- ✨ **Request Features**: [Submit a feature request](https://github.com/privacypriority/privacyhub/issues/new)
 - 📝 **Improve Documentation**: Fix typos, add examples, clarify instructions
 - 💻 **Submit Code**: Fix bugs, add features, improve performance
 - 🎨 **Design**: Improve UI/UX, create graphics, enhance accessibility
@@ -497,7 +497,7 @@ pm2 start npm --name "privacyhub" -- start
 - [ ] Custom compliance frameworks
 - [ ] Enterprise features (teams, SSO)
 
-See [Issues](https://github.com/alokemajumder/privacyhub/issues) for detailed feature requests.
+See [Issues](https://github.com/privacypriority/privacyhub/issues) for detailed feature requests.
 
 ---
 
@@ -538,7 +538,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📬 Contact & Support
 
 - **Website**: [privacyhub.in](https://privacyhub.in)
-- **GitHub**: [Issues](https://github.com/alokemajumder/privacyhub/issues) | [Discussions](https://github.com/alokemajumder/privacyhub/discussions)
+- **GitHub**: [Issues](https://github.com/privacypriority/privacyhub/issues) | [Discussions](https://github.com/privacypriority/privacyhub/discussions)
 - **Methodology**: [View Analysis Framework](https://privacyhub.in/methodology)
 
 ---
@@ -547,7 +547,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 If you find this project useful, please consider giving it a star! It helps the project grow and reach more users who care about privacy.
 
-[![Star History Chart](https://api.star-history.com/svg?repos=alokemajumder/privacyhub&type=Date)](https://star-history.com/#alokemajumder/privacyhub&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=privacypriority/privacyhub&type=Date)](https://star-history.com/#privacypriority/privacyhub&Date)
 
 ---
 
