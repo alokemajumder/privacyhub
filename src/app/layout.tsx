@@ -105,6 +105,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
         <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
       </head>
       <body className={`${inter.variable} ${jetbrainsMono.variable} ${poppins.variable} font-sans antialiased min-h-screen bg-white`}>
         <GoogleAnalytics measurementId="G-Y6PVP4X0SN" />

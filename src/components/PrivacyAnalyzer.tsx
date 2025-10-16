@@ -235,7 +235,8 @@ export default function PrivacyAnalyzer() {
                   options={{
                     theme: 'light',
                     size: 'normal',
-                    appearance: 'always'
+                    appearance: 'always',
+                    execution: 'render'
                   }}
                 />
               </div>
