@@ -4,6 +4,8 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
+// Force rebuild: CSS cache invalidation
+
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
