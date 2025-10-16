@@ -229,7 +229,7 @@ export default function PrivacyAnalyzer() {
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <Button
                 onClick={analyzePolicy}
-                disabled={loading || !url.trim() || (TURNSTILE_SITE_KEY && !turnstileToken)}
+                disabled={loading || !url.trim() || (!!TURNSTILE_SITE_KEY && !turnstileToken)}
                 className="flex-1 h-12 text-base font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white border-0 shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
