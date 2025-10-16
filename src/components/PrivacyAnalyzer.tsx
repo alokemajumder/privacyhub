@@ -508,6 +508,33 @@ export default function PrivacyAnalyzer() {
             </CardContent>
           </Card>
 
+          {/* Important Disclaimer - Prominent Position */}
+          <Card className="border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-orange-50 shadow-lg">
+            <CardContent className="p-6">
+              <div className="flex items-start gap-3">
+                <div className="bg-amber-100 rounded-full p-3">
+                  <AlertCircle className="h-6 w-6 text-amber-600" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-xl font-black text-amber-900 mb-3 flex items-center gap-2">
+                    ⚠️ Important Disclaimer
+                  </h4>
+                  <div className="space-y-2 text-amber-900">
+                    <p className="text-base leading-relaxed">
+                      This analysis is provided for <strong className="font-bold">educational and awareness purposes only</strong>.
+                    </p>
+                    <p className="text-base leading-relaxed">
+                      The information presented should <strong className="font-bold">not be used as legal advice</strong> or for making legal decisions. Privacy laws and regulations are complex and vary by jurisdiction.
+                    </p>
+                    <p className="text-base leading-relaxed">
+                      For legal compliance matters, please consult with <strong className="font-bold">qualified legal professionals</strong> or privacy attorneys who can provide guidance specific to your situation and jurisdiction.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Category Scores Dashboard */}
           <div className="grid lg:grid-cols-2 gap-6">
             {/* Score Cards Grid */}
@@ -727,63 +754,28 @@ export default function PrivacyAnalyzer() {
           {/* Methodology Section */}
           <MethodologySection />
 
-          {/* Disclaimer */}
-          <Card className="border-amber-200 bg-amber-50">
-            <CardContent className="p-5">
+          {/* For Website Owners - Link to Dedicated Page */}
+          <Card className="border-2 border-blue-300 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg">
+            <CardContent className="p-6">
               <div className="flex items-start gap-3">
-                <Info className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="text-base font-bold text-amber-900 mb-2">Important Disclaimer</h4>
-                  <p className="text-sm text-amber-800 leading-relaxed">
-                    This analysis is provided for <strong>educational and awareness purposes only</strong>. The information presented should not be used as legal advice or for making legal decisions. Privacy laws and regulations are complex and vary by jurisdiction. For legal compliance matters, please consult with qualified legal professionals or privacy attorneys who can provide guidance specific to your situation and jurisdiction.
-                  </p>
+                <div className="bg-blue-100 rounded-full p-3">
+                  <MessageSquare className="h-6 w-6 text-blue-600" />
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Contact Section for Website Owners */}
-          <Card className="border-blue-200 bg-blue-50">
-            <CardContent className="p-5">
-              <div className="flex items-start gap-3">
-                <MessageSquare className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <h4 className="text-base font-bold text-blue-900 mb-2">For Website Owners & Organizations</h4>
-                  <p className="text-sm text-blue-800 leading-relaxed mb-3">
-                    If you are the owner, webmaster, or part of the team behind <strong>{new URL(result.url).hostname}</strong> and have observations, corrections, or feedback about this analysis, we&apos;d like to hear from you.
+                  <h4 className="text-xl font-black text-blue-900 mb-3">
+                    For Website Owners & Organizations
+                  </h4>
+                  <p className="text-base text-blue-800 leading-relaxed mb-4">
+                    If you are the owner, webmaster, or part of the team behind <strong>{new URL(result.url).hostname}</strong>, we welcome collaboration, feedback, and corrections.
                   </p>
-                  <div className="flex flex-wrap gap-3">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="bg-white hover:bg-blue-100 border-blue-300 text-blue-700"
-                      asChild
-                    >
-                      <a
-                        href={`mailto:contact@privacyhub.in?subject=Analysis Feedback for ${new URL(result.url).hostname}&body=Analysis URL: ${result.url}%0D%0ATimestamp: ${result.timestamp}%0D%0A%0D%0AMy observations/corrections:`}
-                        className="flex items-center gap-2"
-                      >
-                        <Mail className="h-4 w-4" />
-                        Contact Us
-                      </a>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="bg-white hover:bg-blue-100 border-blue-300 text-blue-700"
-                      asChild
-                    >
-                      <a
-                        href="https://github.com/privacypriority/privacyhub/issues/new?title=Analysis%20Feedback&labels=analysis-feedback"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2"
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                        Report on GitHub
-                      </a>
-                    </Button>
-                  </div>
+                  <Button
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                    asChild
+                  >
+                    <a href="/for-website-owners">
+                      Learn More & Contact Us →
+                    </a>
+                  </Button>
                 </div>
               </div>
             </CardContent>
