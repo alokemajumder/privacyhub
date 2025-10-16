@@ -289,85 +289,87 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'URL is required' }, { status: 400 });
     }
 
+    // TURNSTILE DISABLED - Keep code for future use
     // Verify Turnstile token (only if secret key is configured)
-    const turnstileSecretKey = process.env.TURNSTILE_SECRET_KEY;
-    if (turnstileSecretKey) {
-      if (!turnstileToken) {
-        console.error('[Turnstile] No token provided in request');
-        return NextResponse.json({
-          error: 'Security verification required. Please complete the security check.'
-        }, { status: 400 });
-      }
+    // const turnstileSecretKey = process.env.TURNSTILE_SECRET_KEY;
+    // if (turnstileSecretKey) {
+    //   if (!turnstileToken) {
+    //     console.error('[Turnstile] No token provided in request');
+    //     return NextResponse.json({
+    //       error: 'Security verification required. Please complete the security check.'
+    //     }, { status: 400 });
+    //   }
 
-      try {
-        console.log('[Turnstile] Validating token with Cloudflare...');
+    //   try {
+    //     console.log('[Turnstile] Validating token with Cloudflare...');
 
-        // Get client IP for enhanced fraud detection
-        const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
-                        request.headers.get('x-real-ip') ||
-                        'unknown';
+    //     // Get client IP for enhanced fraud detection
+    //     const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+    //                     request.headers.get('x-real-ip') ||
+    //                     'unknown';
 
-        const turnstileResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            secret: turnstileSecretKey,
-            response: turnstileToken,
-            remoteip: clientIp, // Optional but recommended for fraud detection
-          }),
-        });
+    //     const turnstileResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+    //       method: 'POST',
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify({
+    //         secret: turnstileSecretKey,
+    //         response: turnstileToken,
+    //         remoteip: clientIp, // Optional but recommended for fraud detection
+    //       }),
+    //     });
 
-        const turnstileResult = await turnstileResponse.json() as {
-          success: boolean;
-          'error-codes'?: string[];
-          challenge_ts?: string;
-          hostname?: string;
-          action?: string;
-          cdata?: string;
-        };
+    //     const turnstileResult = await turnstileResponse.json() as {
+    //       success: boolean;
+    //       'error-codes'?: string[];
+    //       challenge_ts?: string;
+    //       hostname?: string;
+    //       action?: string;
+    //       cdata?: string;
+    //     };
 
-        if (!turnstileResult.success) {
-          const errorCodes = turnstileResult['error-codes'] || [];
-          console.error('[Turnstile] Verification failed:', errorCodes);
+    //     if (!turnstileResult.success) {
+    //       const errorCodes = turnstileResult['error-codes'] || [];
+    //       console.error('[Turnstile] Verification failed:', errorCodes);
 
-          // Provide specific error messages based on error codes
-          let errorMessage = 'Security verification failed. Please try again.';
-          if (errorCodes.includes('timeout-or-duplicate')) {
-            errorMessage = 'Security token has expired or was already used. Please refresh and try again.';
-          } else if (errorCodes.includes('invalid-input-response')) {
-            errorMessage = 'Invalid security token. Please refresh the page and try again.';
-          } else if (errorCodes.includes('internal-error')) {
-            errorMessage = 'Security service temporarily unavailable. Please try again.';
-          }
+    //       // Provide specific error messages based on error codes
+    //       let errorMessage = 'Security verification failed. Please try again.';
+    //       if (errorCodes.includes('timeout-or-duplicate')) {
+    //         errorMessage = 'Security token has expired or was already used. Please refresh and try again.';
+    //       } else if (errorCodes.includes('invalid-input-response')) {
+    //         errorMessage = 'Invalid security token. Please refresh the page and try again.';
+    //       } else if (errorCodes.includes('internal-error')) {
+    //         errorMessage = 'Security service temporarily unavailable. Please try again.';
+    //       }
 
-          return NextResponse.json({ error: errorMessage }, { status: 403 });
-        }
+    //       return NextResponse.json({ error: errorMessage }, { status: 403 });
+    //     }
 
-        // Validate hostname matches your domain (security best practice)
-        const expectedHostnames = ['privacyhub.in', 'www.privacyhub.in', 'localhost'];
-        if (turnstileResult.hostname && !expectedHostnames.includes(turnstileResult.hostname)) {
-          console.error('[Turnstile] Hostname mismatch:', turnstileResult.hostname);
-          return NextResponse.json({
-            error: 'Security verification failed: invalid origin.'
-          }, { status: 403 });
-        }
+    //     // Validate hostname matches your domain (security best practice)
+    //     const expectedHostnames = ['privacyhub.in', 'www.privacyhub.in', 'localhost'];
+    //     if (turnstileResult.hostname && !expectedHostnames.includes(turnstileResult.hostname)) {
+    //       console.error('[Turnstile] Hostname mismatch:', turnstileResult.hostname);
+    //       return NextResponse.json({
+    //         error: 'Security verification failed: invalid origin.'
+    //       }, { status: 403 });
+    //     }
 
-        console.log('[Turnstile] Verification successful', {
-          hostname: turnstileResult.hostname,
-          challenge_ts: turnstileResult.challenge_ts,
-          clientIp: clientIp.substring(0, 10) + '...' // Log partial IP for privacy
-        });
-      } catch (turnstileError) {
-        console.error('[Turnstile] Verification error:', turnstileError);
-        return NextResponse.json({
-          error: 'Security verification error. Please try again.'
-        }, { status: 500 });
-      }
-    } else {
-      console.warn('[Turnstile] TURNSTILE_SECRET_KEY not configured - skipping verification (development mode)');
-    }
+    //     console.log('[Turnstile] Verification successful', {
+    //       hostname: turnstileResult.hostname,
+    //       challenge_ts: turnstileResult.challenge_ts,
+    //       clientIp: clientIp.substring(0, 10) + '...' // Log partial IP for privacy
+    //     });
+    //   } catch (turnstileError) {
+    //     console.error('[Turnstile] Verification error:', turnstileError);
+    //     return NextResponse.json({
+    //       error: 'Security verification error. Please try again.'
+    //     }, { status: 500 });
+    //   }
+    // } else {
+    //   console.warn('[Turnstile] TURNSTILE_SECRET_KEY not configured - skipping verification (development mode)');
+    // }
+    console.log('[Turnstile] Validation disabled - skipping verification');
 
     // Validate and sanitize URL
     const urlValidation = validateUrl(url);

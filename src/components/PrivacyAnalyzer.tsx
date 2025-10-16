@@ -129,17 +129,20 @@ export default function PrivacyAnalyzer() {
             },
             'error-callback': (errorCode?: string) => {
               console.error('[Turnstile] Error:', errorCode);
-              setError('Security verification failed. Please refresh and try again.');
+              // TURNSTILE DISABLED - Don't set error messages
+              // setError('Security verification failed. Please refresh and try again.');
               setTurnstileToken('');
             },
             'expired-callback': () => {
               console.log('[Turnstile] Token expired');
               setTurnstileToken('');
-              setError('Security verification expired. Please verify again.');
+              // TURNSTILE DISABLED - Don't set error messages
+              // setError('Security verification expired. Please verify again.');
             },
             'timeout-callback': () => {
               console.log('[Turnstile] Timeout');
-              setError('Security verification timed out. Please try again.');
+              // TURNSTILE DISABLED - Don't set error messages
+              // setError('Security verification timed out. Please try again.');
               setTurnstileToken('');
             },
           });
@@ -311,18 +314,19 @@ export default function PrivacyAnalyzer() {
               />
             </div>
 
-            {/* Turnstile Security Verification */}
-            {TURNSTILE_SITE_KEY && !turnstileBypass && (
+            {/* Turnstile Security Verification - DISABLED */}
+            {/* TURNSTILE DISABLED - Keep code for future use */}
+            {/* {TURNSTILE_SITE_KEY && !turnstileBypass && (
               <div className="flex justify-center">
                 <div ref={turnstileContainerRef} className="turnstile-widget" />
               </div>
-            )}
+            )} */}
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <Button
                 onClick={analyzePolicy}
-                disabled={loading || !url.trim() || (!!TURNSTILE_SITE_KEY && !turnstileToken && !turnstileBypass)}
+                disabled={loading || !url.trim()}
                 className="flex-1 h-12 text-base font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white border-0 shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
