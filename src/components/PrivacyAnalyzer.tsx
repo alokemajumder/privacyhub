@@ -10,7 +10,7 @@ import { CircularProgress } from '@/components/ui/circular-progress';
 import { Heatmap } from '@/components/ui/heatmap';
 import { ScoreCard } from '@/components/ui/score-card';
 import { MethodologySection } from '@/components/MethodologySection';
-import { AlertCircle, CheckCircle, Search, ExternalLink, Shield, Lock, Eye, Users, FileText, Scale, Home, RotateCcw } from 'lucide-react';
+import { AlertCircle, CheckCircle, Search, ExternalLink, Shield, Lock, Eye, Users, FileText, Scale, Home, RotateCcw, Mail, MessageSquare, Info } from 'lucide-react';
 
 interface AnalysisResult {
   url: string;
@@ -599,6 +599,68 @@ export default function PrivacyAnalyzer() {
 
           {/* Methodology Section */}
           <MethodologySection />
+
+          {/* Disclaimer */}
+          <Card className="border-amber-200 bg-amber-50">
+            <CardContent className="p-5">
+              <div className="flex items-start gap-3">
+                <Info className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-base font-bold text-amber-900 mb-2">Important Disclaimer</h4>
+                  <p className="text-sm text-amber-800 leading-relaxed">
+                    This analysis is provided for <strong>educational and awareness purposes only</strong>. The information presented should not be used as legal advice or for making legal decisions. Privacy laws and regulations are complex and vary by jurisdiction. For legal compliance matters, please consult with qualified legal professionals or privacy attorneys who can provide guidance specific to your situation and jurisdiction.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Contact Section for Website Owners */}
+          <Card className="border-blue-200 bg-blue-50">
+            <CardContent className="p-5">
+              <div className="flex items-start gap-3">
+                <MessageSquare className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <h4 className="text-base font-bold text-blue-900 mb-2">For Website Owners & Organizations</h4>
+                  <p className="text-sm text-blue-800 leading-relaxed mb-3">
+                    If you are the owner, webmaster, or part of the team behind <strong>{new URL(result.url).hostname}</strong> and have observations, corrections, or feedback about this analysis, we'd like to hear from you.
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="bg-white hover:bg-blue-100 border-blue-300 text-blue-700"
+                      asChild
+                    >
+                      <a
+                        href={`mailto:contact@privacyhub.in?subject=Analysis Feedback for ${new URL(result.url).hostname}&body=Analysis URL: ${result.url}%0D%0ATimestamp: ${result.timestamp}%0D%0A%0D%0AMy observations/corrections:`}
+                        className="flex items-center gap-2"
+                      >
+                        <Mail className="h-4 w-4" />
+                        Contact Us
+                      </a>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="bg-white hover:bg-blue-100 border-blue-300 text-blue-700"
+                      asChild
+                    >
+                      <a
+                        href="https://github.com/privacypriority/privacyhub/issues/new?title=Analysis%20Feedback&labels=analysis-feedback"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        Report on GitHub
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Analysis Metadata */}
           <Card>
