@@ -4,12 +4,13 @@
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.5.2-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8)](https://tailwindcss.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-**Professional AI-powered privacy policy analyser helping users understand how websites handle their personal data.**
+**AI-powered privacy policy analyzer helping users understand how websites handle their personal data with comprehensive GDPR, CCPA, and DPDP Act 2023 compliance analysis.**
 
-[🌐 Live Demo](https://privacyhub.in) · [📖 Documentation](DEPLOYMENT.md) · [🐛 Report Bug](https://github.com/alokemajumder/privacyhub/issues) · [✨ Request Feature](https://github.com/alokemajumder/privacyhub/issues)
+[🌐 Live Demo](https://privacyhub.in) · [📖 Methodology](https://privacyhub.in/methodology) · [🐛 Report Bug](https://github.com/privacypriority/privacyhub/issues) · [✨ Request Feature](https://github.com/privacypriority/privacyhub/issues)
 
 </div>
 
@@ -19,108 +20,175 @@
 
 - [About](#-about)
 - [Features](#-features)
+- [Analysis Methodology](#-analysis-methodology)
 - [Tech Stack](#-tech-stack)
 - [Getting Started](#-getting-started)
 - [Architecture](#-architecture)
+- [API Documentation](#-api-documentation)
 - [Contributing](#-contributing)
 - [Deployment](#-deployment)
 - [Roadmap](#-roadmap)
 - [License](#-license)
-- [Acknowledgments](#-acknowledgments)
 
 ---
 
 ## 🎯 About
 
-PrivacyHub is an open-source privacy policy analyser that empowers users to understand how websites and applications handle their personal data. Using AI-powered analysis, we provide comprehensive privacy assessments including GDPR, CCPA, and DPDP Act compliance checks.
+PrivacyHub is a production-ready, AI-powered privacy policy analyzer that empowers users to make informed decisions about their personal data. Using advanced AI models and comprehensive regulatory frameworks, we provide detailed privacy assessments with actionable recommendations.
 
 ### Why PrivacyHub?
 
-- 🔍 **Transparency**: Clear, jargon-free explanations of privacy policies
-- 🤖 **AI-Powered**: Advanced AI analysis using OpenRouter and DeepSeek
-- 📊 **Comprehensive Scoring**: Multi-dimensional privacy assessment
-- 🌍 **Regulatory Compliance**: GDPR, CCPA, and DPDP Act compliance checks
-- 🚀 **Community-Driven**: Open-source and seeking contributions
-- 💾 **Historical Data**: Track privacy policy changes over time
+- 🔍 **Evidence-Based Analysis**: Scientific methodology based on GDPR, CCPA, DPDP Act 2023, and industry standards
+- 🤖 **AI-Powered**: DeepSeek Chat model via OpenRouter for sophisticated policy analysis
+- 📊 **Comprehensive Scoring**: 6-category weighted assessment with 90+ privacy criteria
+- 🌍 **Multi-Regulatory**: GDPR (EU), CCPA (California), DPDP Act 2023 (India) compliance checks
+- 🎨 **Modern UX**: Intuitive dashboard with visual analytics and category breakdowns
+- 🚀 **Production-Ready**: Enterprise-grade error handling, fallback systems, and security measures
 
 ---
 
 ## ✨ Features
 
-### Core Features
+### Core Analysis Features
 
-- **🔐 Privacy Policy Analysis**
-  - AI-powered analysis of privacy policies
-  - GDPR, CCPA, and DPDP Act compliance scoring
-  - Risk level assessment (High, Moderate, Low)
-  - Privacy grade (A+ to F)
-  - Detailed category breakdowns
+- **🔐 Advanced Privacy Analysis**
+  - AI-powered comprehensive privacy policy evaluation
+  - Multi-regulatory compliance assessment (GDPR, CCPA, DPDP Act 2023)
+  - 6 weighted categories: Data Collection (30%), Data Sharing (25%), User Rights (20%), Security (15%), Compliance (7%), Transparency (3%)
+  - 5-tier risk classification (HIGH, MODERATE-HIGH, MODERATE, LOW, EXEMPLARY)
+  - Letter grades (A+ to F) for quick assessment
+  - Evidence-based findings with specific regulatory references
 
-- **📊 Analysis Dashboard**
-  - Visual score representation
-  - Regulatory compliance indicators
-  - Key findings and recommendations
+- **📊 Interactive Results Dashboard**
+  - Overall privacy score (1-10 scale) with circular progress visualization
+  - Real-time category breakdown with color-coded mini charts
+  - Privacy grade and risk level badges
   - Executive summary for stakeholders
+  - Critical findings highlighting high-risk practices
+  - Positive practices recognition
+  - Actionable recommendations (immediate, medium-term, best practices)
+  - Detailed regulatory compliance notes
 
-- **🗂️ Community Database**
-  - Browse previously analyzed policies
-  - Domain-specific analysis pages (`/domain.com`)
-  - Automatic caching (30-day validity)
-  - Content change detection with MD5 hashing
+- **🎨 Enhanced User Experience**
+  - Web3-style gradient buttons (blue-purple-pink for Analyze, emerald-teal-cyan for Reset)
+  - One-click Reset button to start new analysis
+  - Home button for easy navigation back from results
+  - Mobile-responsive design with optimized layouts
+  - Collapsible methodology section for transparency
+  - PWA-ready with custom icons and theme colors
 
-- **🔒 Enterprise-Grade Security**
-  - Rate limiting (5 requests/15min per IP)
-  - SSRF protection (blocks private IPs, localhost, metadata endpoints)
-  - Input validation and sanitization
-  - Security headers (HSTS, CSP, X-Frame-Options)
-  - XSS prevention
+### Technical Features
 
-- **⚡ Performance Optimizations**
-  - In-memory caching (60s for history)
-  - Firestore caching (30 days for analysis)
-  - Image optimization (AVIF/WebP)
-  - Static asset caching (1 year)
-  - First Load JS: ~130-166 kB
+- **⚡ 3-Tier Scraping System**
+  - Primary: Firecrawl API (markdown extraction)
+  - Fallback 1: Crawlee PlaywrightCrawler (JavaScript rendering)
+  - Fallback 2: Simple fetch (basic HTML parsing)
+  - Automatic retry with graceful degradation
+
+- **🔒 Production-Grade Reliability**
+  - 60-second API timeout for complex analyses
+  - Comprehensive error handling with specific timeout/network messages
+  - Global error boundaries (error.tsx, not-found.tsx, loading.tsx)
+  - Input validation and URL sanitization
+  - Security headers middleware (HSTS, CSP, X-Frame-Options)
+
+- **📱 SEO & Discoverability**
+  - Dynamic sitemap.xml generation
+  - Robots.txt for search engine indexing
+  - Open Graph and Twitter Card metadata
+  - Optimized meta descriptions and keywords
 
 ### Additional Features
 
-- Digital fingerprint checker
+- Comprehensive methodology page with detailed framework explanation
 - Privacy education resources
-- Methodology transparency
-- Mobile-responsive design
-- Dark mode support (coming soon)
+- Category-specific icons and visual indicators
+- Color-coded score bars for quick assessment
+- Regulatory framework references (90+ compliance criteria)
+- Real-time analysis progress indicators
+
+---
+
+## 📐 Analysis Methodology
+
+PrivacyHub uses a scientifically-grounded, evidence-based framework for privacy assessment:
+
+### Assessment Categories (Weighted)
+
+1. **Data Minimization & Collection (30%)**
+   - Collection scope, legal basis, purpose specification
+   - Sensitive data protections (GDPR Art. 9, DPDP Act Sec. 9)
+   - Children's data compliance (COPPA/GDPR-K/DPDP Act Sec. 9)
+
+2. **Third-Party Data Sharing (25%)**
+   - Sharing scope and commercial exploitation
+   - International transfers (GDPR Ch. V, DPDP Act Sec. 16)
+   - Processor agreements (GDPR Art. 28, DPDP Act Sec. 8)
+
+3. **Individual Rights & Controls (20%)**
+   - Access, rectification, erasure rights
+   - Data portability, objection mechanisms
+   - Grievance redressal (DPDP Act Sec. 32)
+
+4. **Security & Risk Management (15%)**
+   - Encryption standards (end-to-end, in-transit, at-rest)
+   - Incident response (72-hour GDPR/DPDP Act requirement)
+   - Data localization (DPDP Act compliance)
+
+5. **Regulatory Compliance (7%)**
+   - GDPR, CCPA, DPDP Act 2023 indicators
+   - DPO designation, Data Protection Board registration
+   - Sectoral compliance (HIPAA, FERPA, GLBA)
+
+6. **Transparency & Communication (3%)**
+   - Plain language usage (Flesch-Kincaid readability)
+   - Grievance officer details
+   - Proactive change notifications
+
+### Risk Classification
+
+- **EXEMPLARY (9-10)**: Privacy-by-design, exceeds regulatory minimums
+- **LOW RISK (8-9)**: Strong privacy framework with minor gaps
+- **MODERATE (6-7)**: Some protections present, areas for improvement
+- **MODERATE-HIGH (4-5)**: Multiple compliance gaps, user privacy compromised
+- **HIGH RISK (1-3)**: Significant violations likely, regulatory action probable
+
+[View Full Methodology](https://privacyhub.in/methodology)
 
 ---
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **Framework**: Next.js 15.5.2 (App Router)
+- **Framework**: Next.js 15.5.2 (App Router with Turbopack)
 - **Language**: TypeScript 5.0
 - **Styling**: Tailwind CSS 3.4
-- **UI Components**: shadcn/ui
+- **UI Components**: shadcn/ui (Radix UI primitives)
 - **Icons**: Lucide React
+- **Fonts**: Inter (sans-serif), JetBrains Mono (monospace)
 
-### Backend
-- **API Routes**: Next.js API Routes
-- **AI**: OpenRouter (DeepSeek Chat)
-- **Web Scraping**: Firecrawl + Puppeteer (fallback)
-- **Database**:
-  - Firebase Firestore (cloud)
-  - SQLite (local fallback)
+### Backend & AI
+- **API Routes**: Next.js API Routes (serverless functions)
+- **AI Model**: DeepSeek Chat via OpenRouter
+- **Web Scraping**:
+  - Firecrawl API (primary)
+  - Crawlee PlaywrightCrawler (fallback)
+  - Native fetch API (final fallback)
+- **Database**: Currently disabled (Firebase/Firestore ready for future use)
 
 ### Infrastructure
-- **Hosting**: Vercel
-- **Database**: Firebase Firestore
+- **Hosting**: Vercel (recommended) or self-hosted
 - **CDN**: Vercel Edge Network
 - **Analytics**: Vercel Analytics (optional)
+- **Deployment**: CI/CD via Vercel Git integration
 
 ### Security & Performance
-- Rate limiting with sliding window algorithm
-- Input validation and SSRF protection
-- In-memory caching with TTL
-- Error handling with exponential backoff retry
+- Input validation and URL sanitization
+- SSRF protection (blocks private IPs, localhost)
 - Security headers middleware
+- Error boundaries and fallback UI
+- PWA-ready with service worker support
+- Optimized images (AVIF/WebP)
 
 ---
 
@@ -129,15 +197,14 @@ PrivacyHub is an open-source privacy policy analyser that empowers users to unde
 ### Prerequisites
 
 - Node.js 18+ and npm
-- Firebase account (for Firestore)
-- OpenRouter API key
-- Firecrawl API key (optional)
+- OpenRouter API key (required)
+- Firecrawl API key (optional, recommended)
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/alokemajumder/privacyhub.git
+   git clone https://github.com/privacypriority/privacyhub.git
    cd privacyhub
    ```
 
@@ -151,50 +218,46 @@ PrivacyHub is an open-source privacy policy analyser that empowers users to unde
    cp .env.example .env.local
    ```
 
-   Edit `.env.local` and add your credentials:
+   Edit `.env.local` and add your API keys:
    ```env
-   # Firebase Client (Public)
-   NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
-   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
-   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.firebasestorage.app
-   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-   NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+   # Required - OpenRouter API for AI analysis
+   OPENROUTER_API=your_openrouter_api_key_here
 
-   # Firebase Admin (Sensitive)
-   FIREBASE_PROJECT_ID=your_project_id
-   FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your_project.iam.gserviceaccount.com
-   FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+   # Optional - Firecrawl API for better web scraping
+   FIRECRAWL_API_KEY=your_firecrawl_api_key_here
 
-   # API Keys (Sensitive)
-   OPENROUTER_API=your_openrouter_api_key
-   FIRECRAWL_API_KEY=your_firecrawl_api_key
+   # Note: Firebase/Firestore integration currently disabled
+   # Uncomment and configure if you want to enable caching
    ```
 
-4. **Set up Firebase**
-   ```bash
-   # Login to Firebase
-   firebase login
-
-   # Deploy Firestore rules and indexes
-   firebase deploy --only firestore:rules
-   firebase deploy --only firestore:indexes
-   ```
-
-5. **Run development server**
+4. **Run development server**
    ```bash
    npm run dev
    ```
 
-6. **Open your browser**
+5. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
 ### Building for Production
 
 ```bash
+# Build the application
 npm run build
+
+# Start production server
 npm start
 ```
+
+### Environment Variables
+
+See `.env.example` for a comprehensive list of available environment variables with detailed explanations.
+
+**Required:**
+- `OPENROUTER_API`: OpenRouter API key for AI analysis
+
+**Optional:**
+- `FIRECRAWL_API_KEY`: Firecrawl API key for enhanced scraping
+- Firebase credentials (if enabling Firestore caching)
 
 ---
 
@@ -205,63 +268,126 @@ npm start
 ```
 privacyhub/
 ├── src/
-│   ├── app/                    # Next.js App Router pages
-│   │   ├── [domain]/          # Dynamic domain routes
-│   │   ├── api/               # API endpoints
-│   │   │   ├── analyze/       # Privacy analysis endpoint
-│   │   │   └── history/       # Analysis history endpoint
-│   │   ├── layout.tsx         # Root layout with metadata
-│   │   └── page.tsx           # Homepage
-│   ├── components/            # React components
-│   │   ├── ui/                # shadcn/ui components
-│   │   ├── Header.tsx         # Navigation header
-│   │   ├── Footer.tsx         # Footer with links
-│   │   └── PrivacyAnalyzer.tsx # Main analysis component
-│   ├── lib/                   # Utility libraries
-│   │   ├── cache.ts           # In-memory caching
-│   │   ├── rate-limiter.ts    # Rate limiting
-│   │   ├── error-handler.ts   # Error handling with retry
-│   │   ├── input-validation.ts # Input sanitization
-│   │   ├── firestore-service.ts # Firestore operations
-│   │   ├── firebase-admin.ts  # Firebase Admin SDK
-│   │   └── logo-service.ts    # Logo fetching
-│   └── middleware.ts          # Security headers middleware
-├── public/                    # Static assets
-├── firestore.rules           # Firestore security rules
-├── firestore.indexes.json    # Firestore indexes
-├── firebase.json             # Firebase configuration
-└── next.config.ts            # Next.js configuration
+│   ├── app/                          # Next.js App Router
+│   │   ├── api/
+│   │   │   └── analyze/
+│   │   │       └── route.ts         # Privacy analysis API endpoint
+│   │   ├── methodology/
+│   │   │   └── page.tsx             # Methodology explanation page
+│   │   ├── error.tsx                # Global error boundary
+│   │   ├── not-found.tsx            # Custom 404 page
+│   │   ├── loading.tsx              # Loading state
+│   │   ├── layout.tsx               # Root layout with metadata
+│   │   ├── sitemap.ts               # Dynamic sitemap generation
+│   │   └── page.tsx                 # Homepage
+│   ├── components/
+│   │   ├── ui/                      # shadcn/ui components
+│   │   │   ├── circular-progress.tsx
+│   │   │   ├── heatmap.tsx
+│   │   │   ├── score-card.tsx
+│   │   │   └── ...
+│   │   ├── Header.tsx               # Navigation header
+│   │   ├── Footer.tsx               # Footer with links
+│   │   ├── PrivacyAnalyzer.tsx      # Main analyzer component
+│   │   └── MethodologySection.tsx   # Methodology display
+│   ├── lib/
+│   │   └── input-validation.ts      # URL validation and sanitization
+│   └── middleware.ts                # Security headers
+├── public/
+│   ├── favicon.ico                  # Favicon (all sizes)
+│   ├── robots.txt                   # Search engine directives
+│   └── site.webmanifest             # PWA manifest
+├── .env.example                     # Environment variable template
+├── next.config.ts                   # Next.js configuration
+├── tailwind.config.ts               # Tailwind CSS configuration
+├── vercel.json                      # Vercel deployment config
+└── package.json                     # Dependencies and scripts
 ```
 
 ### Data Flow
 
-1. **User submits URL** → Input validation → SSRF protection
-2. **Rate limiting check** → IP-based sliding window
-3. **Content check** → MD5 hash comparison → Firestore lookup
-4. **If cached** → Return cached analysis (if <30 days old)
-5. **If new/changed** → Firecrawl scraping → AI analysis → Save to Firestore
-6. **Return results** → Display with logo and compliance scores
+1. **User Input** → URL validation → SSRF protection
+2. **Scraping**:
+   - Try Firecrawl API (markdown extraction)
+   - Fallback to Crawlee (JavaScript rendering)
+   - Final fallback to fetch (basic HTML)
+3. **AI Analysis**:
+   - Send content to DeepSeek Chat via OpenRouter
+   - Structured JSON response with scores and findings
+4. **Results Display**:
+   - Parse and validate AI response
+   - Render interactive dashboard
+   - Show category breakdowns, compliance status, recommendations
 
-### Security Layers
+### API Endpoint
 
-1. **Input Validation** (`input-validation.ts`)
-   - URL validation and sanitization
-   - Private IP blocking
-   - Protocol restriction (HTTP/HTTPS only)
+**POST `/api/analyze`**
+- **Input**: `{ "url": "https://example.com/privacy" }`
+- **Output**: Comprehensive privacy analysis JSON
+- **Timeout**: 60 seconds (Vercel Pro)
+- **Error Handling**: Specific error messages for timeouts, network issues, invalid URLs
 
-2. **Rate Limiting** (`rate-limiter.ts`)
-   - IP-based tracking
-   - Sliding window algorithm
-   - Automatic cleanup
+---
 
-3. **Middleware** (`middleware.ts`)
-   - Security headers (HSTS, CSP, X-Frame-Options)
-   - Content Security Policy
-   - Referrer Policy
+## 📚 API Documentation
 
-4. **Firestore Rules** (`firestore.rules`)
-   - Public read access
-   - Server-only writes (Admin SDK)
+### Analyze Privacy Policy
+
+**Endpoint**: `POST /api/analyze`
+
+**Request Body**:
+```json
+{
+  "url": "https://example.com/privacy"
+}
+```
+
+**Response**:
+```json
+{
+  "url": "https://example.com/privacy",
+  "timestamp": "2025-10-16T10:00:00.000Z",
+  "content_length": 15420,
+  "scraper_used": "firecrawl",
+  "analysis": {
+    "overall_score": 8.0,
+    "risk_level": "LOW",
+    "privacy_grade": "A-",
+    "regulatory_compliance": {
+      "gdpr_compliance": "COMPLIANT",
+      "ccpa_compliance": "PARTIALLY_COMPLIANT",
+      "dpdp_act_compliance": "NOT_APPLICABLE",
+      "major_violations": []
+    },
+    "categories": {
+      "data_collection": {
+        "score": 8.5,
+        "reasoning": "...",
+        "regulatory_notes": "..."
+      },
+      // ... 5 more categories
+    },
+    "critical_findings": {
+      "high_risk_practices": [],
+      "regulatory_gaps": [],
+      "data_subject_impacts": []
+    },
+    "positive_practices": ["..."],
+    "actionable_recommendations": {
+      "immediate_actions": [],
+      "medium_term_improvements": ["..."],
+      "best_practice_adoption": ["..."]
+    },
+    "executive_summary": "..."
+  }
+}
+```
+
+**Error Responses**:
+- `400 Bad Request`: Invalid URL, insufficient content
+- `408 Request Timeout`: Request cancelled
+- `429 Too Many Requests`: Rate limit exceeded (if enabled)
+- `504 Gateway Timeout`: Website slow/unresponsive
 
 ---
 
@@ -271,8 +397,8 @@ We welcome contributions from the community! Here's how you can help:
 
 ### Ways to Contribute
 
-- 🐛 **Report Bugs**: [Open an issue](https://github.com/alokemajumder/privacyhub/issues/new?template=bug_report.md)
-- ✨ **Request Features**: [Submit a feature request](https://github.com/alokemajumder/privacyhub/issues/new?template=feature_request.md)
+- 🐛 **Report Bugs**: [Open an issue](https://github.com/privacypriority/privacyhub/issues/new)
+- ✨ **Request Features**: [Submit a feature request](https://github.com/privacypriority/privacyhub/issues/new)
 - 📝 **Improve Documentation**: Fix typos, add examples, clarify instructions
 - 💻 **Submit Code**: Fix bugs, add features, improve performance
 - 🎨 **Design**: Improve UI/UX, create graphics, enhance accessibility
@@ -280,24 +406,12 @@ We welcome contributions from the community! Here's how you can help:
 
 ### Development Workflow
 
-1. **Fork the repository**
-2. **Create a feature branch**
-   ```bash
-   git checkout -b feature/amazing-feature
-   ```
-3. **Make your changes**
-   - Write clean, documented code
-   - Follow existing code style
-   - Add tests if applicable
-4. **Commit your changes**
-   ```bash
-   git commit -m "feat: add amazing feature"
-   ```
-5. **Push to your fork**
-   ```bash
-   git push origin feature/amazing-feature
-   ```
-6. **Open a Pull Request**
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make your changes with clear, documented code
+4. Commit: `git commit -m "feat: add amazing feature"`
+5. Push: `git push origin feature/amazing-feature`
+6. Open a Pull Request
 
 ### Commit Convention
 
@@ -306,19 +420,9 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 - `feat:` New feature
 - `fix:` Bug fix
 - `docs:` Documentation changes
-- `style:` Code style changes (formatting)
 - `refactor:` Code refactoring
 - `perf:` Performance improvements
 - `test:` Test additions or changes
-- `chore:` Build process or auxiliary tool changes
-
-### Code Style
-
-- TypeScript for all new code
-- ESLint and Prettier for formatting
-- Meaningful variable and function names
-- Comments for complex logic
-- Component documentation with JSDoc
 
 ---
 
@@ -326,57 +430,74 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 ### Vercel (Recommended)
 
-1. **Connect to GitHub**
-   - Import repository in Vercel Dashboard
-   - Configure environment variables
+1. **Import Repository**
+   - Connect to GitHub in Vercel Dashboard
+   - Import the privacyhub repository
 
-2. **Add Environment Variables**
-   - See `.env.example` for required variables
-   - Mark sensitive variables as "Sensitive"
+2. **Configure Environment Variables**
+   - Add `OPENROUTER_API` (required)
+   - Add `FIRECRAWL_API_KEY` (optional)
+   - Mark as "Sensitive" in Vercel settings
 
 3. **Deploy**
    ```bash
    vercel --prod
    ```
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
+**Vercel Configuration** (`vercel.json`):
+- API route timeout: 60 seconds
+- CORS headers configured
+- Automatic HTTPS
 
 ### Self-Hosting
 
 Requirements:
 - Node.js 18+ server
-- Firebase Firestore database
+- Process manager (PM2 recommended)
 - Reverse proxy (nginx/Apache)
 - SSL certificate
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for self-hosting guide.
+```bash
+# Install PM2
+npm install -g pm2
+
+# Build application
+npm run build
+
+# Start with PM2
+pm2 start npm --name "privacyhub" -- start
+
+# Configure nginx reverse proxy
+# Point to localhost:3000
+```
 
 ---
 
 ## 🗺️ Roadmap
 
-### Version 1.1 (Q1 2025)
+### Version 1.1 (Current - Q4 2024)
+- [x] Category breakdown visualization
+- [x] Web3-style gradient UI enhancements
+- [x] Navigation improvements (Home, Reset buttons)
+- [x] DPDP Act 2023 integration
+- [x] Enhanced error handling
+- [ ] Database/caching re-enablement (optional)
+
+### Version 1.2 (Q1 2025)
 - [ ] Multi-language support (Hindi, Spanish, French)
 - [ ] Privacy policy comparison tool
-- [ ] Email alerts for policy changes
 - [ ] Export analysis as PDF
 - [ ] Browser extension
+- [ ] Historical policy tracking
 
-### Version 1.2 (Q2 2025)
+### Version 2.0 (Q2 2025)
 - [ ] Mobile app (React Native)
 - [ ] Advanced filtering and search
-- [ ] Privacy score trends over time
 - [ ] API for third-party integration
-- [ ] Collaborative annotations
-
-### Version 2.0 (Q3 2025)
-- [ ] AI-powered privacy recommendations
-- [ ] Automated privacy policy generation
-- [ ] Enterprise features (teams, SSO)
 - [ ] Custom compliance frameworks
-- [ ] White-label solution
+- [ ] Enterprise features (teams, SSO)
 
-See [Issues](https://github.com/alokemajumder/privacyhub/issues) for detailed feature requests and discussions.
+See [Issues](https://github.com/privacypriority/privacyhub/issues) for detailed feature requests.
 
 ---
 
@@ -391,37 +512,34 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ### Built With
 
 - [Next.js](https://nextjs.org/) - React framework
-- [Firebase](https://firebase.google.com/) - Cloud database
 - [OpenRouter](https://openrouter.ai/) - AI API gateway
+- [DeepSeek](https://www.deepseek.com/) - AI model
 - [Firecrawl](https://firecrawl.dev/) - Web scraping
+- [Crawlee](https://crawlee.dev/) - Web crawling framework
 - [shadcn/ui](https://ui.shadcn.com/) - UI components
 - [Tailwind CSS](https://tailwindcss.com/) - CSS framework
+- [Lucide](https://lucide.dev/) - Icon library
 - [Vercel](https://vercel.com/) - Hosting platform
+
+### Regulatory Frameworks
+
+- [GDPR](https://gdpr.eu/) - General Data Protection Regulation (EU)
+- [CCPA](https://oag.ca.gov/privacy/ccpa) - California Consumer Privacy Act
+- [DPDP Act 2023](https://www.meity.gov.in/writereaddata/files/Digital%20Personal%20Data%20Protection%20Act%202023.pdf) - Digital Personal Data Protection Act (India)
 
 ### Inspired By
 
 - [ToS;DR](https://tosdr.org/) - Terms of Service; Didn't Read
 - [Privacy Guides](https://www.privacyguides.org/) - Privacy tools and services
-- [GDPR.eu](https://gdpr.eu/) - GDPR compliance resources
-
-### Contributors
-
-Thanks to all our contributors! 🎉
-
-<!-- ALL-CONTRIBUTORS-LIST:START -->
-<!-- This section is auto-generated. Please maintain this format -->
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
-Want to be listed here? [Start contributing!](#-contributing)
+- Privacy research and academic publications
 
 ---
 
 ## 📬 Contact & Support
 
 - **Website**: [privacyhub.in](https://privacyhub.in)
-- **Issues**: [GitHub Issues](https://github.com/alokemajumder/privacyhub/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/alokemajumder/privacyhub/discussions)
-- **Twitter**: [@PrivacyHubIn](https://twitter.com/PrivacyHubIn) *(if available)*
+- **GitHub**: [Issues](https://github.com/privacypriority/privacyhub/issues) | [Discussions](https://github.com/privacypriority/privacyhub/discussions)
+- **Methodology**: [View Analysis Framework](https://privacyhub.in/methodology)
 
 ---
 
@@ -429,7 +547,7 @@ Want to be listed here? [Start contributing!](#-contributing)
 
 If you find this project useful, please consider giving it a star! It helps the project grow and reach more users who care about privacy.
 
-[![Star History Chart](https://api.star-history.com/svg?repos=alokemajumder/privacyhub&type=Date)](https://star-history.com/#alokemajumder/privacyhub&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=privacypriority/privacyhub&type=Date)](https://star-history.com/#privacypriority/privacyhub&Date)
 
 ---
 
