@@ -84,11 +84,24 @@ export default function PrivacyAnalyzer() {
   const turnstileWidgetId = useRef<string | null>(null);
   const turnstileContainerRef = useRef<HTMLDivElement>(null);
 
-  const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
+  // Get Turnstile site key - must be accessed on client side for runtime env vars
+  const [TURNSTILE_SITE_KEY, setTURNSTILE_SITE_KEY] = useState<string>('');
+
+  // Initialize Turnstile site key from environment
+  useEffect(() => {
+    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
+    setTURNSTILE_SITE_KEY(siteKey);
+    console.log('[Turnstile] Site key loaded:', siteKey ? 'Present' : 'Missing');
+  }, []);
 
   // Initialize Turnstile widget using native API
   useEffect(() => {
-    if (!TURNSTILE_SITE_KEY || !turnstileContainerRef.current) return;
+    if (!TURNSTILE_SITE_KEY || !turnstileContainerRef.current) {
+      if (!TURNSTILE_SITE_KEY) {
+        console.warn('[Turnstile] No site key configured');
+      }
+      return;
+    }
 
     let retryCount = 0;
     const MAX_RETRIES = 50; // 50 * 100ms = 5 seconds max
