@@ -219,8 +219,10 @@ export default function PrivacyAnalyzer() {
                   onSuccess={(token) => setTurnstileToken(token)}
                   onError={() => setError('Security verification failed. Please refresh the page.')}
                   onExpire={() => setTurnstileToken('')}
-                  theme="light"
-                  size="normal"
+                  options={{
+                    theme: 'light',
+                    size: 'normal'
+                  }}
                 />
               </div>
             )}
