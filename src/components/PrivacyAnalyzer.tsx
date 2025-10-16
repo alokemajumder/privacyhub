@@ -152,15 +152,6 @@ export default function PrivacyAnalyzer() {
       <Card className="mb-6 sm:mb-8">
         <CardContent className="p-4 sm:p-6">
           <div className="space-y-4">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-2">
-                Analyze Privacy Policy
-              </h2>
-              <p className="text-sm sm:text-base text-muted-foreground">
-                Enter a website URL to get detailed privacy policy analysis and scoring
-              </p>
-            </div>
-
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="flex-1">
                 <Input
