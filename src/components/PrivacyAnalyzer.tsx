@@ -66,7 +66,8 @@ export default function PrivacyAnalyzer() {
       return;
     }
 
-    if (!turnstileToken) {
+    // Only require Turnstile token if site key is configured
+    if (TURNSTILE_SITE_KEY && !turnstileToken) {
       setError('Please complete the security verification');
       return;
     }
