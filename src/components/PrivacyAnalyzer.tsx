@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
-import { Turnstile, TurnstileInstance } from '@marsidev/react-turnstile';
+import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +11,30 @@ import { ScoreCard } from '@/components/ui/score-card';
 import { MethodologySection } from '@/components/MethodologySection';
 import { AlertCircle, CheckCircle, Search, ExternalLink, Shield, Lock, Eye, Users, FileText, Scale, Home, RotateCcw, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
+
+// Declare Turnstile types for TypeScript
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (container: string | HTMLElement, options: TurnstileOptions) => string;
+      reset: (widgetId: string) => void;
+      remove: (widgetId: string) => void;
+      getResponse: (widgetId: string) => string;
+    };
+  }
+}
+
+interface TurnstileOptions {
+  sitekey: string;
+  callback?: (token: string) => void;
+  'error-callback'?: (errorCode?: string) => void;
+  'expired-callback'?: () => void;
+  'timeout-callback'?: () => void;
+  theme?: 'light' | 'dark' | 'auto';
+  size?: 'normal' | 'compact' | 'flexible';
+  appearance?: 'always' | 'execute' | 'interaction-only';
+  execution?: 'render' | 'execute';
+}
 
 interface AnalysisResult {
   url: string;
@@ -57,9 +80,85 @@ export default function PrivacyAnalyzer() {
   const [error, setError] = useState('');
   const [currentStep, setCurrentStep] = useState<AnalysisStep>('idle');
   const [turnstileToken, setTurnstileToken] = useState<string>('');
-  const turnstileRef = useRef<TurnstileInstance>(null);
+  const [turnstileBypass, setTurnstileBypass] = useState(false);
+  const turnstileWidgetId = useRef<string | null>(null);
+  const turnstileContainerRef = useRef<HTMLDivElement>(null);
 
   const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
+
+  // Initialize Turnstile widget using native API
+  useEffect(() => {
+    if (!TURNSTILE_SITE_KEY || !turnstileContainerRef.current) return;
+
+    let retryCount = 0;
+    const MAX_RETRIES = 50; // 50 * 100ms = 5 seconds max
+
+    // Wait for Turnstile script to load
+    const initTurnstile = () => {
+      if (window.turnstile && turnstileContainerRef.current) {
+        console.log('[Turnstile] Initializing widget with native API');
+
+        try {
+          turnstileWidgetId.current = window.turnstile.render(turnstileContainerRef.current, {
+            sitekey: TURNSTILE_SITE_KEY,
+            theme: 'light',
+            size: 'normal',
+            appearance: 'always', // Force widget to always be visible
+            execution: 'render', // Execute challenge immediately on render
+            callback: (token: string) => {
+              console.log('[Turnstile] Success - token received');
+              setTurnstileToken(token);
+              setError('');
+            },
+            'error-callback': (errorCode?: string) => {
+              console.error('[Turnstile] Error:', errorCode);
+              setError('Security verification failed. Please refresh and try again.');
+              setTurnstileToken('');
+            },
+            'expired-callback': () => {
+              console.log('[Turnstile] Token expired');
+              setTurnstileToken('');
+              setError('Security verification expired. Please verify again.');
+            },
+            'timeout-callback': () => {
+              console.log('[Turnstile] Timeout');
+              setError('Security verification timed out. Please try again.');
+              setTurnstileToken('');
+            },
+          });
+
+          console.log('[Turnstile] Widget rendered with ID:', turnstileWidgetId.current);
+        } catch (err) {
+          console.error('[Turnstile] Failed to render:', err);
+          setTurnstileBypass(true);
+        }
+      } else {
+        // Retry after 100ms if script not loaded yet
+        retryCount++;
+        if (retryCount < MAX_RETRIES) {
+          setTimeout(initTurnstile, 100);
+        } else {
+          console.warn('[Turnstile] Script failed to load after 5 seconds - enabling bypass');
+          setTurnstileBypass(true);
+        }
+      }
+    };
+
+    // Start initialization
+    initTurnstile();
+
+    return () => {
+      // Cleanup widget on unmount
+      if (turnstileWidgetId.current && window.turnstile) {
+        try {
+          window.turnstile.remove(turnstileWidgetId.current);
+          console.log('[Turnstile] Widget removed');
+        } catch (err) {
+          console.error('[Turnstile] Cleanup error:', err);
+        }
+      }
+    };
+  }, [TURNSTILE_SITE_KEY]); // Only depend on TURNSTILE_SITE_KEY - prevents re-renders
 
   const analyzePolicy = async () => {
     if (!url.trim()) {
@@ -67,8 +166,8 @@ export default function PrivacyAnalyzer() {
       return;
     }
 
-    // Only require Turnstile token if site key is configured
-    if (TURNSTILE_SITE_KEY && !turnstileToken) {
+    // Only require Turnstile token if site key is configured AND bypass is not enabled
+    if (TURNSTILE_SITE_KEY && !turnstileToken && !turnstileBypass) {
       setError('Please complete the security verification');
       return;
     }
@@ -124,9 +223,14 @@ export default function PrivacyAnalyzer() {
     setLoading(false);
     setCurrentStep('idle');
     setTurnstileToken('');
-    // Reset Turnstile widget
-    if (turnstileRef.current) {
-      turnstileRef.current.reset();
+    // Reset Turnstile widget using native API
+    if (turnstileWidgetId.current && window.turnstile) {
+      try {
+        window.turnstile.reset(turnstileWidgetId.current);
+        console.log('[Turnstile] Widget reset');
+      } catch (err) {
+        console.error('[Turnstile] Reset error:', err);
+      }
     }
   };
 
@@ -200,25 +304,13 @@ export default function PrivacyAnalyzer() {
                       <p className="text-xs text-gray-600 mt-1">Please complete the verification to analyze</p>
                     </div>
                     <div className="flex justify-center sm:justify-start">
-                      <Turnstile
-                        ref={turnstileRef}
-                        siteKey={TURNSTILE_SITE_KEY}
-                        onSuccess={(token) => {
-                          console.log('[Turnstile] Token received successfully');
-                          setTurnstileToken(token);
-                          setError(''); // Clear any previous errors
-                        }}
-                        onError={(errorCode) => {
-                          console.error('[Turnstile] Error:', errorCode);
-                          setError('Security verification failed. Please refresh the page and try again.');
-                          setTurnstileToken('');
-                        }}
-                        onExpire={() => {
-                          console.log('[Turnstile] Token expired');
-                          setTurnstileToken('');
-                          setError('Security verification expired. Please verify again.');
-                        }}
-                      />
+                      {!turnstileBypass ? (
+                        <div ref={turnstileContainerRef} className="turnstile-widget" />
+                      ) : (
+                        <div className="text-sm text-yellow-700 bg-yellow-50 px-4 py-2 rounded-md border border-yellow-200">
+                          Security verification bypassed - widget failed to load
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -229,7 +321,7 @@ export default function PrivacyAnalyzer() {
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <Button
                 onClick={analyzePolicy}
-                disabled={loading || !url.trim() || (!!TURNSTILE_SITE_KEY && !turnstileToken)}
+                disabled={loading || !url.trim() || (!!TURNSTILE_SITE_KEY && !turnstileToken && !turnstileBypass)}
                 className="flex-1 h-12 text-base font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white border-0 shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (

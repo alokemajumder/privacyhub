@@ -302,6 +302,11 @@ export async function POST(request: NextRequest) {
       try {
         console.log('[Turnstile] Validating token with Cloudflare...');
 
+        // Get client IP for enhanced fraud detection
+        const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+                        request.headers.get('x-real-ip') ||
+                        'unknown';
+
         const turnstileResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
           method: 'POST',
           headers: {
@@ -310,6 +315,7 @@ export async function POST(request: NextRequest) {
           body: JSON.stringify({
             secret: turnstileSecretKey,
             response: turnstileToken,
+            remoteip: clientIp, // Optional but recommended for fraud detection
           }),
         });
 
@@ -318,6 +324,8 @@ export async function POST(request: NextRequest) {
           'error-codes'?: string[];
           challenge_ts?: string;
           hostname?: string;
+          action?: string;
+          cdata?: string;
         };
 
         if (!turnstileResult.success) {
@@ -330,14 +338,26 @@ export async function POST(request: NextRequest) {
             errorMessage = 'Security token has expired or was already used. Please refresh and try again.';
           } else if (errorCodes.includes('invalid-input-response')) {
             errorMessage = 'Invalid security token. Please refresh the page and try again.';
+          } else if (errorCodes.includes('internal-error')) {
+            errorMessage = 'Security service temporarily unavailable. Please try again.';
           }
 
           return NextResponse.json({ error: errorMessage }, { status: 403 });
         }
 
+        // Validate hostname matches your domain (security best practice)
+        const expectedHostnames = ['privacyhub.in', 'www.privacyhub.in', 'localhost'];
+        if (turnstileResult.hostname && !expectedHostnames.includes(turnstileResult.hostname)) {
+          console.error('[Turnstile] Hostname mismatch:', turnstileResult.hostname);
+          return NextResponse.json({
+            error: 'Security verification failed: invalid origin.'
+          }, { status: 403 });
+        }
+
         console.log('[Turnstile] Verification successful', {
           hostname: turnstileResult.hostname,
-          challenge_ts: turnstileResult.challenge_ts
+          challenge_ts: turnstileResult.challenge_ts,
+          clientIp: clientIp.substring(0, 10) + '...' // Log partial IP for privacy
         });
       } catch (turnstileError) {
         console.error('[Turnstile] Verification error:', turnstileError);
