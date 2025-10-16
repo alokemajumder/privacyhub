@@ -80,7 +80,6 @@ export default function PrivacyAnalyzer() {
   const [error, setError] = useState('');
   const [currentStep, setCurrentStep] = useState<AnalysisStep>('idle');
   const [turnstileToken, setTurnstileToken] = useState<string>('');
-  const [turnstileLoaded, setTurnstileLoaded] = useState(false);
   const [turnstileBypass, setTurnstileBypass] = useState(false);
   const turnstileWidgetId = useRef<string | null>(null);
   const turnstileContainerRef = useRef<HTMLDivElement>(null);
@@ -109,7 +108,6 @@ export default function PrivacyAnalyzer() {
             callback: (token: string) => {
               console.log('[Turnstile] Success - token received');
               setTurnstileToken(token);
-              setTurnstileLoaded(true);
               setError('');
             },
             'error-callback': (errorCode?: string) => {
@@ -130,7 +128,6 @@ export default function PrivacyAnalyzer() {
           });
 
           console.log('[Turnstile] Widget rendered with ID:', turnstileWidgetId.current);
-          setTurnstileLoaded(true);
         } catch (err) {
           console.error('[Turnstile] Failed to render:', err);
           setTurnstileBypass(true);
