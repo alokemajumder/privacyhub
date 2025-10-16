@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { CircularProgress } from '@/components/ui/circular-progress';
 import { Heatmap } from '@/components/ui/heatmap';
@@ -791,7 +790,7 @@ export default function PrivacyAnalyzer() {
                 <div className="flex-1">
                   <h4 className="text-base font-bold text-blue-900 mb-2">For Website Owners & Organizations</h4>
                   <p className="text-sm text-blue-800 leading-relaxed mb-3">
-                    If you are the owner, webmaster, or part of the team behind <strong>{new URL(result.url).hostname}</strong> and have observations, corrections, or feedback about this analysis, we'd like to hear from you.
+                    If you are the owner, webmaster, or part of the team behind <strong>{new URL(result.url).hostname}</strong> and have observations, corrections, or feedback about this analysis, we&apos;d like to hear from you.
                   </p>
                   <div className="flex flex-wrap gap-3">
                     <Button
