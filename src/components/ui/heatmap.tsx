@@ -71,28 +71,43 @@ export function Heatmap({ data, className = '' }: HeatmapProps) {
       </div>
       
       {/* Legend */}
-      <div className="mt-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
-        <div className="text-xs font-semibold text-gray-700 mb-3">Score Range</div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <div className="w-3 h-3 sm:w-3.5 sm:h-3.5 bg-red-500 rounded flex-shrink-0"></div>
-            <span className="text-xs whitespace-nowrap">1-2 High Risk</span>
+      <div className="mt-4 p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border border-gray-200">
+        <div className="text-xs font-bold text-gray-700 mb-3 uppercase tracking-wide">Score Range</div>
+        <div className="flex flex-wrap gap-3">
+          <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-md border border-gray-200 shadow-sm">
+            <div className="w-4 h-4 bg-red-500 rounded-sm flex-shrink-0"></div>
+            <div className="flex flex-col">
+              <span className="text-xs font-bold text-gray-900">1-2</span>
+              <span className="text-[10px] text-gray-600">High Risk</span>
+            </div>
           </div>
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <div className="w-3 h-3 sm:w-3.5 sm:h-3.5 bg-orange-500 rounded flex-shrink-0"></div>
-            <span className="text-xs whitespace-nowrap">3-4 Mod-High</span>
+          <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-md border border-gray-200 shadow-sm">
+            <div className="w-4 h-4 bg-orange-500 rounded-sm flex-shrink-0"></div>
+            <div className="flex flex-col">
+              <span className="text-xs font-bold text-gray-900">3-4</span>
+              <span className="text-[10px] text-gray-600">Mod-High</span>
+            </div>
           </div>
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <div className="w-3 h-3 sm:w-3.5 sm:h-3.5 bg-yellow-500 rounded flex-shrink-0"></div>
-            <span className="text-xs whitespace-nowrap">5-6 Moderate</span>
+          <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-md border border-gray-200 shadow-sm">
+            <div className="w-4 h-4 bg-yellow-500 rounded-sm flex-shrink-0"></div>
+            <div className="flex flex-col">
+              <span className="text-xs font-bold text-gray-900">5-6</span>
+              <span className="text-[10px] text-gray-600">Moderate</span>
+            </div>
           </div>
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <div className="w-3 h-3 sm:w-3.5 sm:h-3.5 bg-blue-500 rounded flex-shrink-0"></div>
-            <span className="text-xs whitespace-nowrap">7-8 Low Risk</span>
+          <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-md border border-gray-200 shadow-sm">
+            <div className="w-4 h-4 bg-blue-500 rounded-sm flex-shrink-0"></div>
+            <div className="flex flex-col">
+              <span className="text-xs font-bold text-gray-900">7-8</span>
+              <span className="text-[10px] text-gray-600">Low Risk</span>
+            </div>
           </div>
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <div className="w-3 h-3 sm:w-3.5 sm:h-3.5 bg-green-500 rounded flex-shrink-0"></div>
-            <span className="text-xs whitespace-nowrap">9-10 Exemplary</span>
+          <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-md border border-gray-200 shadow-sm">
+            <div className="w-4 h-4 bg-green-500 rounded-sm flex-shrink-0"></div>
+            <div className="flex flex-col">
+              <span className="text-xs font-bold text-gray-900">9-10</span>
+              <span className="text-[10px] text-gray-600">Exemplary</span>
+            </div>
           </div>
         </div>
       </div>
