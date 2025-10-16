@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { CircularProgress } from '@/components/ui/circular-progress';
-import { ScoreGauge } from '@/components/ui/score-gauge';
 import { Heatmap } from '@/components/ui/heatmap';
 import { ScoreCard } from '@/components/ui/score-card';
 import { MethodologySection } from '@/components/MethodologySection';
@@ -271,14 +270,44 @@ export default function PrivacyAnalyzer() {
                   <div className="text-sm text-gray-600 mt-3 font-medium">Overall Score</div>
                 </div>
 
-                {/* Score Gauge */}
-                <div className="flex flex-col items-center justify-center py-4">
-                  <div className="w-full flex justify-center">
-                    <ScoreGauge
-                      score={result.analysis.overall_score}
-                      size="lg"
-                      label="Privacy Protection Level"
-                    />
+                {/* Category Breakdown Mini Chart */}
+                <div className="flex flex-col items-center justify-center py-4 px-2">
+                  <div className="w-full">
+                    <div className="text-xs text-gray-600 font-semibold mb-3 text-center">Category Scores</div>
+                    <div className="space-y-2">
+                      {Object.entries(result.analysis.categories).slice(0, 6).map(([key, category]) => {
+                        const categoryNames: Record<string, string> = {
+                          'data_collection': 'Data Collection',
+                          'data_sharing': 'Data Sharing',
+                          'user_rights': 'User Rights',
+                          'security_measures': 'Security',
+                          'compliance_framework': 'Compliance',
+                          'transparency': 'Transparency'
+                        };
+
+                        return (
+                          <div key={key} className="flex items-center gap-2">
+                            <div className="text-xs text-gray-600 w-20 truncate text-right">
+                              {categoryNames[key] || key}
+                            </div>
+                            <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all ${
+                                  category.score >= 8 ? 'bg-green-500' :
+                                  category.score >= 6 ? 'bg-blue-500' :
+                                  category.score >= 4 ? 'bg-yellow-500' :
+                                  'bg-red-500'
+                                }`}
+                                style={{ width: `${category.score * 10}%` }}
+                              />
+                            </div>
+                            <div className={`text-xs font-semibold w-6 ${getScoreColor(category.score)}`}>
+                              {category.score.toFixed(1)}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
 
