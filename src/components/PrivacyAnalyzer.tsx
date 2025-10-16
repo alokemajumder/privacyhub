@@ -91,7 +91,12 @@ export default function PrivacyAnalyzer() {
   useEffect(() => {
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
     setTURNSTILE_SITE_KEY(siteKey);
-    console.log('[Turnstile] Site key loaded:', siteKey ? 'Present' : 'Missing');
+    console.log('[Turnstile] Environment check:', {
+      hasKey: !!siteKey,
+      keyLength: siteKey?.length || 0,
+      keyPrefix: siteKey ? siteKey.substring(0, 8) + '...' : 'none',
+      allEnvKeys: Object.keys(process.env).filter(k => k.includes('TURNSTILE'))
+    });
   }, []);
 
   // Initialize Turnstile widget using native API
@@ -116,8 +121,7 @@ export default function PrivacyAnalyzer() {
             sitekey: TURNSTILE_SITE_KEY,
             theme: 'light',
             size: 'normal',
-            appearance: 'always', // Force widget to always be visible
-            execution: 'render', // Execute challenge immediately on render
+            appearance: 'interaction-only', // Non-interactive mode
             callback: (token: string) => {
               console.log('[Turnstile] Success - token received');
               setTurnstileToken(token);
@@ -307,26 +311,9 @@ export default function PrivacyAnalyzer() {
             </div>
 
             {/* Turnstile Security Verification */}
-            {TURNSTILE_SITE_KEY && (
-              <div className="bg-gradient-to-br from-gray-50 to-blue-50 border-2 border-blue-200 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <Shield className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <div className="flex-1 space-y-3">
-                    <div>
-                      <h4 className="text-sm font-bold text-gray-900">Security Verification</h4>
-                      <p className="text-xs text-gray-600 mt-1">Please complete the verification to analyze</p>
-                    </div>
-                    <div className="flex justify-center sm:justify-start">
-                      {!turnstileBypass ? (
-                        <div ref={turnstileContainerRef} className="turnstile-widget" />
-                      ) : (
-                        <div className="text-sm text-yellow-700 bg-yellow-50 px-4 py-2 rounded-md border border-yellow-200">
-                          Security verification bypassed - widget failed to load
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
+            {TURNSTILE_SITE_KEY && !turnstileBypass && (
+              <div className="flex justify-center">
+                <div ref={turnstileContainerRef} className="turnstile-widget" />
               </div>
             )}
 
