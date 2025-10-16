@@ -228,7 +228,7 @@ export default function DigitalFingerprintPage() {
             <div className="mt-8 p-6 bg-white/10 rounded-xl border border-white/20">
               <p className="text-sm text-gray-300 leading-relaxed">
                 <strong className="text-white">Research shows:</strong> Browser fingerprinting can identify individual users with 99% accuracy.
-                A 2020 study found that 83% of top websites use some form of fingerprinting technology. Even "privacy-focused" browsers
+                A 2020 study found that 83% of top websites use some form of fingerprinting technology. Even &quot;privacy-focused&quot; browsers
                 can be fingerprinted with surprising accuracy.
               </p>
             </div>
