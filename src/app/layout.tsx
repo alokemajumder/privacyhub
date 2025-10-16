@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono, Poppins } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 
 // Force rebuild: CSS cache invalidation
 
@@ -106,6 +107,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body className={`${inter.variable} ${jetbrainsMono.variable} ${poppins.variable} font-sans antialiased min-h-screen bg-white`}>
+        <GoogleAnalytics measurementId="G-Y6PVP4X0SN" />
         <Header />
         <main>{children}</main>
         <Footer />
