@@ -219,9 +219,9 @@ export default function PrivacyAnalyzer() {
               </div>
 
               {/* Main Score Visualization */}
-              <div className="grid md:grid-cols-3 gap-8 mb-8">
+              <div className="grid md:grid-cols-3 gap-8 mb-8 min-h-[220px]">
                 {/* Circular Progress */}
-                <div className="flex flex-col items-center justify-center">
+                <div className="flex flex-col items-center justify-center py-4">
                   <div className="relative w-[160px] h-[160px]">
                     <CircularProgress
                       value={result.analysis.overall_score * 10}
@@ -240,16 +240,18 @@ export default function PrivacyAnalyzer() {
                 </div>
 
                 {/* Score Gauge */}
-                <div className="flex flex-col items-center justify-center">
-                  <ScoreGauge
-                    score={result.analysis.overall_score}
-                    size="lg"
-                    label="Privacy Protection Level"
-                  />
+                <div className="flex flex-col items-center justify-center py-4">
+                  <div className="w-full flex justify-center">
+                    <ScoreGauge
+                      score={result.analysis.overall_score}
+                      size="lg"
+                      label="Privacy Protection Level"
+                    />
+                  </div>
                 </div>
 
                 {/* Grade and Risk Level */}
-                <div className="flex flex-col items-center justify-center space-y-4">
+                <div className="flex flex-col items-center justify-center space-y-4 py-4">
                   <div className="text-center">
                     <Badge className={`text-3xl px-6 py-3 ${getGradeColor(result.analysis.privacy_grade)}`}>
                       {result.analysis.privacy_grade}
