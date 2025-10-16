@@ -14,78 +14,85 @@ export function MethodologySection() {
       name: 'Data Minimization & Collection',
       weight: 30,
       icon: <Shield className="h-5 w-5" />,
-      description: 'Evaluates data collection scope, legal basis clarity, purpose specification, and sensitive data handling',
+      description: 'Evaluates data collection scope, legal basis clarity, purpose specification, and sensitive data handling per GDPR, CCPA, and DPDP Act 2023',
       criteria: [
         'Collection limited to necessary data for stated purposes',
-        'Clear lawful basis identification (GDPR Art. 6)',
+        'Clear lawful basis identification (GDPR Art. 6, DPDP Act Sec. 6)',
         'Specific vs. vague purpose statements',
-        'Special category data protections (GDPR Art. 9)',
-        'Children\'s data compliance (COPPA/GDPR-K)'
+        'Special category data protections (GDPR Art. 9, DPDP Act Sec. 9)',
+        'Children\'s data compliance (COPPA/GDPR-K/DPDP Act Sec. 9)',
+        'Notice and consent mechanisms per DPDP Act requirements'
       ]
     },
     {
       name: 'Third-Party Data Sharing',
       weight: 25,
       icon: <Users className="h-5 w-5" />,
-      description: 'Assesses data controller/processor relationships and international transfer mechanisms',
+      description: 'Assesses data controller/processor relationships and international transfer mechanisms per GDPR Chapter V and DPDP Act requirements',
       criteria: [
         'Sharing scope and commercial exploitation',
-        'International transfer compliance (SCCs/BCRs)',
-        'Data processor agreements (GDPR Art. 28)',
+        'International transfer compliance (SCCs/BCRs, DPDP Act Sec. 16)',
+        'Data processor agreements (GDPR Art. 28, DPDP Act Sec. 8)',
         'Granular consent mechanisms',
-        'User awareness of data monetization'
+        'User awareness of data monetization',
+        'Cross-border transfer compliance with DPDP Act restricted countries'
       ]
     },
     {
       name: 'Individual Rights & Controls',
       weight: 20,
       icon: <Scale className="h-5 w-5" />,
-      description: 'Evaluates GDPR Chapter III rights implementation and user control mechanisms',
+      description: 'Evaluates GDPR Chapter III and DPDP Act Chapter IV rights implementation and user control mechanisms',
       criteria: [
-        'Data access rights (GDPR Art. 15)',
-        'Rectification processes (GDPR Art. 16)',
-        'Right to be forgotten (GDPR Art. 17)',
+        'Data access rights (GDPR Art. 15, DPDP Act Sec. 11)',
+        'Rectification processes (GDPR Art. 16, DPDP Act Sec. 12)',
+        'Right to be forgotten/deletion (GDPR Art. 17, DPDP Act Sec. 12)',
         'Data portability (GDPR Art. 20)',
-        'Objection and opt-out mechanisms'
+        'Objection and opt-out mechanisms',
+        'Withdrawal of consent (DPDP Act Sec. 7)',
+        'Grievance redressal mechanisms (DPDP Act Sec. 32)'
       ]
     },
     {
       name: 'Security & Risk Management',
       weight: 15,
       icon: <Lock className="h-5 w-5" />,
-      description: 'Technical and organizational measures assessment per GDPR Art. 32',
+      description: 'Technical and organizational measures assessment per GDPR Art. 32 and DPDP Act Sec. 8',
       criteria: [
-        'Encryption standards (end-to-end, at-rest)',
-        'Access controls and authentication',
-        'Incident response (72-hour GDPR requirement)',
+        'Encryption standards (end-to-end, in-transit, at-rest)',
+        'Access controls and multi-factor authentication',
+        'Incident response (72-hour GDPR/DPDP Act requirement)',
         'Privacy impact assessments',
-        'Data retention and deletion schedules'
+        'Data retention and deletion schedules',
+        'Data localization compliance (DPDP Act)'
       ]
     },
     {
       name: 'Regulatory Compliance',
       weight: 7,
       icon: <FileText className="h-5 w-5" />,
-      description: 'Multi-jurisdictional compliance evaluation across privacy frameworks',
+      description: 'Multi-jurisdictional compliance evaluation across global privacy frameworks',
       criteria: [
-        'GDPR compliance indicators',
-        'CCPA compliance markers',
+        'GDPR compliance indicators (EU users)',
+        'CCPA compliance markers (California residents)',
+        'DPDP Act 2023 compliance (Indian users)',
         'Sectoral compliance (HIPAA, FERPA, GLBA)',
-        'Privacy officer designation',
-        'DPO appointment evidence'
+        'Privacy officer/DPO designation',
+        'Data Protection Board registration (DPDP Act Sec. 25)'
       ]
     },
     {
       name: 'Transparency & Communication',
       weight: 3,
       icon: <Eye className="h-5 w-5" />,
-      description: 'Information quality and accessibility assessment',
+      description: 'Information quality and accessibility assessment including DPDP Act transparency requirements',
       criteria: [
-        'Plain language usage (readability scores)',
+        'Plain language usage (Flesch-Kincaid readability)',
         'Layered notices and mobile optimization',
         'Proactive change notifications',
-        'Dedicated privacy contact information',
-        'Policy accessibility features'
+        'Dedicated privacy contact/DPO information',
+        'Grievance officer details (DPDP Act requirement)',
+        'Vernacular language support'
       ]
     }
   ];
@@ -220,6 +227,7 @@ export function MethodologySection() {
                   <ul className="space-y-1 text-blue-700">
                     <li>• GDPR (General Data Protection Regulation)</li>
                     <li>• CCPA (California Consumer Privacy Act)</li>
+                    <li>• DPDP Act 2023 (Digital Personal Data Protection Act, India)</li>
                     <li>• PIPEDA (Personal Information Protection Act)</li>
                     <li>• COPPA (Children&apos;s Online Privacy Protection Act)</li>
                   </ul>
