@@ -282,11 +282,48 @@ export async function POST(request: NextRequest) {
     //   );
     // }
 
-    const { url } = await request.json();
+    const { url, turnstileToken } = await request.json();
 
     if (!url) {
       console.error('No URL provided in request');
       return NextResponse.json({ error: 'URL is required' }, { status: 400 });
+    }
+
+    // Verify Turnstile token
+    if (!turnstileToken) {
+      console.error('No Turnstile token provided');
+      return NextResponse.json({ error: 'Security verification required' }, { status: 400 });
+    }
+
+    // Validate Turnstile token with Cloudflare
+    const turnstileSecretKey = process.env.TURNSTILE_SECRET_KEY;
+    if (turnstileSecretKey) {
+      try {
+        const turnstileResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            secret: turnstileSecretKey,
+            response: turnstileToken,
+          }),
+        });
+
+        const turnstileResult = await turnstileResponse.json() as { success: boolean; 'error-codes'?: string[] };
+
+        if (!turnstileResult.success) {
+          console.error('Turnstile verification failed:', turnstileResult['error-codes']);
+          return NextResponse.json({ error: 'Security verification failed. Please try again.' }, { status: 403 });
+        }
+
+        console.log('Turnstile verification successful');
+      } catch (turnstileError) {
+        console.error('Turnstile verification error:', turnstileError);
+        return NextResponse.json({ error: 'Security verification error. Please try again.' }, { status: 500 });
+      }
+    } else {
+      console.warn('TURNSTILE_SECRET_KEY not configured - skipping Turnstile verification');
     }
 
     // Validate and sanitize URL
