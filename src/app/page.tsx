@@ -146,11 +146,11 @@ export default function HomePage() {
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-900 text-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white">
               Take Control of Your Digital Privacy
             </h2>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto mb-10">
-              Small changes can make a big difference. Here are simple tools and tips 
+            <p className="text-lg text-slate-200 max-w-3xl mx-auto mb-10">
+              Small changes can make a big difference. Here are simple tools and tips
               to protect your privacy online.
             </p>
           </div>

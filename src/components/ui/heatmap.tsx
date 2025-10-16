@@ -71,28 +71,28 @@ export function Heatmap({ data, className = '' }: HeatmapProps) {
       </div>
       
       {/* Legend */}
-      <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-        <div className="text-xs font-medium text-gray-600 mb-2">Score Range</div>
-        <div className="flex items-center justify-between text-xs">
-          <div className="flex items-center space-x-1">
-            <div className="w-3 h-3 bg-red-500 rounded"></div>
-            <span>1-2 High Risk</span>
+      <div className="mt-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
+        <div className="text-xs font-semibold text-gray-700 mb-3">Score Range</div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="w-3 h-3 sm:w-3.5 sm:h-3.5 bg-red-500 rounded flex-shrink-0"></div>
+            <span className="text-xs whitespace-nowrap">1-2 High Risk</span>
           </div>
-          <div className="flex items-center space-x-1">
-            <div className="w-3 h-3 bg-orange-500 rounded"></div>
-            <span>3-4 Moderate-High</span>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="w-3 h-3 sm:w-3.5 sm:h-3.5 bg-orange-500 rounded flex-shrink-0"></div>
+            <span className="text-xs whitespace-nowrap">3-4 Mod-High</span>
           </div>
-          <div className="flex items-center space-x-1">
-            <div className="w-3 h-3 bg-yellow-500 rounded"></div>
-            <span>5-6 Moderate</span>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="w-3 h-3 sm:w-3.5 sm:h-3.5 bg-yellow-500 rounded flex-shrink-0"></div>
+            <span className="text-xs whitespace-nowrap">5-6 Moderate</span>
           </div>
-          <div className="flex items-center space-x-1">
-            <div className="w-3 h-3 bg-blue-500 rounded"></div>
-            <span>7-8 Low Risk</span>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="w-3 h-3 sm:w-3.5 sm:h-3.5 bg-blue-500 rounded flex-shrink-0"></div>
+            <span className="text-xs whitespace-nowrap">7-8 Low Risk</span>
           </div>
-          <div className="flex items-center space-x-1">
-            <div className="w-3 h-3 bg-green-500 rounded"></div>
-            <span>9-10 Exemplary</span>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="w-3 h-3 sm:w-3.5 sm:h-3.5 bg-green-500 rounded flex-shrink-0"></div>
+            <span className="text-xs whitespace-nowrap">9-10 Exemplary</span>
           </div>
         </div>
       </div>
