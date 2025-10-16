@@ -31,7 +31,9 @@ interface TurnstileOptions {
   'expired-callback'?: () => void;
   'timeout-callback'?: () => void;
   theme?: 'light' | 'dark' | 'auto';
-  size?: 'normal' | 'compact';
+  size?: 'normal' | 'compact' | 'flexible';
+  appearance?: 'always' | 'execute' | 'interaction-only';
+  execution?: 'render' | 'execute';
 }
 
 interface AnalysisResult {
@@ -89,6 +91,9 @@ export default function PrivacyAnalyzer() {
   useEffect(() => {
     if (!TURNSTILE_SITE_KEY || !turnstileContainerRef.current) return;
 
+    let retryCount = 0;
+    const MAX_RETRIES = 50; // 50 * 100ms = 5 seconds max
+
     // Wait for Turnstile script to load
     const initTurnstile = () => {
       if (window.turnstile && turnstileContainerRef.current) {
@@ -99,6 +104,8 @@ export default function PrivacyAnalyzer() {
             sitekey: TURNSTILE_SITE_KEY,
             theme: 'light',
             size: 'normal',
+            appearance: 'always', // Force widget to always be visible
+            execution: 'render', // Execute challenge immediately on render
             callback: (token: string) => {
               console.log('[Turnstile] Success - token received');
               setTurnstileToken(token);
@@ -130,33 +137,31 @@ export default function PrivacyAnalyzer() {
         }
       } else {
         // Retry after 100ms if script not loaded yet
-        setTimeout(initTurnstile, 100);
+        retryCount++;
+        if (retryCount < MAX_RETRIES) {
+          setTimeout(initTurnstile, 100);
+        } else {
+          console.warn('[Turnstile] Script failed to load after 5 seconds - enabling bypass');
+          setTurnstileBypass(true);
+        }
       }
     };
 
     // Start initialization
     initTurnstile();
 
-    // Fallback: Enable bypass after 5 seconds if widget doesn't load
-    const fallbackTimeout = setTimeout(() => {
-      if (!turnstileToken && !turnstileLoaded) {
-        console.warn('[Turnstile] Widget failed to load within 5 seconds - enabling bypass');
-        setTurnstileBypass(true);
-      }
-    }, 5000);
-
     return () => {
-      clearTimeout(fallbackTimeout);
       // Cleanup widget on unmount
       if (turnstileWidgetId.current && window.turnstile) {
         try {
           window.turnstile.remove(turnstileWidgetId.current);
+          console.log('[Turnstile] Widget removed');
         } catch (err) {
           console.error('[Turnstile] Cleanup error:', err);
         }
       }
     };
-  }, [TURNSTILE_SITE_KEY, turnstileToken, turnstileLoaded]);
+  }, [TURNSTILE_SITE_KEY]); // Only depend on TURNSTILE_SITE_KEY - prevents re-renders
 
   const analyzePolicy = async () => {
     if (!url.trim()) {
