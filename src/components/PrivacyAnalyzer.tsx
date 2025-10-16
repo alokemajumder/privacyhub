@@ -220,7 +220,7 @@ export default function PrivacyAnalyzer() {
       {loading && (
         <Card className="bg-gradient-to-br from-blue-50 via-white to-purple-50 border-2 border-blue-100 shadow-xl">
           <CardContent className="p-4 sm:p-6 md:p-8">
-            <div className="space-y-4 sm:space-y-6">
+            <div className="space-y-6">
               {/* Header */}
               <div className="text-center">
                 <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
@@ -231,150 +231,118 @@ export default function PrivacyAnalyzer() {
                 </p>
               </div>
 
-              {/* Step-by-Step Progress */}
-              <div className="space-y-3 sm:space-y-4">
-                {/* Step 1: Fetching */}
-                <div className={`flex items-start gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg transition-all ${
-                  currentStep === 'fetching' ? 'bg-blue-100 border-2 border-blue-400' :
-                  ['reading', 'analyzing', 'preparing', 'complete'].includes(currentStep) ? 'bg-green-50 border border-green-200' :
-                  'bg-gray-50 border border-gray-200'
-                }`}>
-                  <div className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ${
-                    currentStep === 'fetching' ? 'bg-blue-500 animate-pulse' :
-                    ['reading', 'analyzing', 'preparing', 'complete'].includes(currentStep) ? 'bg-green-500' :
-                    'bg-gray-300'
-                  }`}>
-                    {['reading', 'analyzing', 'preparing', 'complete'].includes(currentStep) ? (
-                      <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-                    ) : currentStep === 'fetching' ? (
-                      <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-transparent" />
-                    ) : (
-                      <span className="text-white font-bold text-xs sm:text-sm">1</span>
-                    )}
+              {/* Horizontal Steps and Progress */}
+              <div className="space-y-4">
+                {/* Steps Timeline - Horizontal */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {/* Step 1 */}
+                  <div className="flex flex-col items-center text-center">
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-2 transition-all ${
+                      currentStep === 'fetching' ? 'bg-blue-500 animate-pulse ring-4 ring-blue-200' :
+                      ['reading', 'analyzing', 'preparing', 'complete'].includes(currentStep) ? 'bg-green-500' :
+                      'bg-gray-300'
+                    }`}>
+                      {['reading', 'analyzing', 'preparing', 'complete'].includes(currentStep) ? (
+                        <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                      ) : currentStep === 'fetching' ? (
+                        <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-2 border-white border-t-transparent" />
+                      ) : (
+                        <span className="text-white font-bold text-sm">1</span>
+                      )}
+                    </div>
+                    <p className="text-xs sm:text-sm font-semibold text-gray-800">Fetching</p>
+                    <p className="text-xs text-gray-600 hidden sm:block">Policy URL</p>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-gray-800 mb-1 text-sm sm:text-base">Fetching Privacy Policy</h4>
-                    <p className="text-xs sm:text-sm text-gray-600 leading-tight">
-                      {currentStep === 'fetching' ? 'Accessing the privacy policy URL...' :
-                       ['reading', 'analyzing', 'preparing', 'complete'].includes(currentStep) ? 'Privacy policy found and retrieved' :
-                       'Waiting to fetch...'}
-                    </p>
+
+                  {/* Step 2 */}
+                  <div className="flex flex-col items-center text-center">
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-2 transition-all ${
+                      currentStep === 'reading' ? 'bg-blue-500 animate-pulse ring-4 ring-blue-200' :
+                      ['analyzing', 'preparing', 'complete'].includes(currentStep) ? 'bg-green-500' :
+                      'bg-gray-300'
+                    }`}>
+                      {['analyzing', 'preparing', 'complete'].includes(currentStep) ? (
+                        <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                      ) : currentStep === 'reading' ? (
+                        <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-2 border-white border-t-transparent" />
+                      ) : (
+                        <span className="text-white font-bold text-sm">2</span>
+                      )}
+                    </div>
+                    <p className="text-xs sm:text-sm font-semibold text-gray-800">Reading</p>
+                    <p className="text-xs text-gray-600 hidden sm:block">Parsing</p>
+                  </div>
+
+                  {/* Step 3 */}
+                  <div className="flex flex-col items-center text-center">
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-2 transition-all ${
+                      currentStep === 'analyzing' ? 'bg-blue-500 animate-pulse ring-4 ring-blue-200' :
+                      ['preparing', 'complete'].includes(currentStep) ? 'bg-green-500' :
+                      'bg-gray-300'
+                    }`}>
+                      {['preparing', 'complete'].includes(currentStep) ? (
+                        <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                      ) : currentStep === 'analyzing' ? (
+                        <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-2 border-white border-t-transparent" />
+                      ) : (
+                        <span className="text-white font-bold text-sm">3</span>
+                      )}
+                    </div>
+                    <p className="text-xs sm:text-sm font-semibold text-gray-800">Analyzing</p>
+                    <p className="text-xs text-gray-600 hidden sm:block">AI Review</p>
+                  </div>
+
+                  {/* Step 4 */}
+                  <div className="flex flex-col items-center text-center">
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-2 transition-all ${
+                      currentStep === 'preparing' ? 'bg-blue-500 animate-pulse ring-4 ring-blue-200' :
+                      currentStep === 'complete' ? 'bg-green-500' :
+                      'bg-gray-300'
+                    }`}>
+                      {currentStep === 'complete' ? (
+                        <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                      ) : currentStep === 'preparing' ? (
+                        <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-2 border-white border-t-transparent" />
+                      ) : (
+                        <span className="text-white font-bold text-sm">4</span>
+                      )}
+                    </div>
+                    <p className="text-xs sm:text-sm font-semibold text-gray-800">Preparing</p>
+                    <p className="text-xs text-gray-600 hidden sm:block">Results</p>
                   </div>
                 </div>
 
-                {/* Step 2: Reading */}
-                <div className={`flex items-start gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg transition-all ${
-                  currentStep === 'reading' ? 'bg-blue-100 border-2 border-blue-400' :
-                  ['analyzing', 'preparing', 'complete'].includes(currentStep) ? 'bg-green-50 border border-green-200' :
-                  'bg-gray-50 border border-gray-200'
-                }`}>
-                  <div className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ${
-                    currentStep === 'reading' ? 'bg-blue-500 animate-pulse' :
-                    ['analyzing', 'preparing', 'complete'].includes(currentStep) ? 'bg-green-500' :
-                    'bg-gray-300'
-                  }`}>
-                    {['analyzing', 'preparing', 'complete'].includes(currentStep) ? (
-                      <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-                    ) : currentStep === 'reading' ? (
-                      <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-transparent" />
-                    ) : (
-                      <span className="text-white font-bold text-xs sm:text-sm">2</span>
-                    )}
+                {/* Progress Bar */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-xs sm:text-sm font-medium text-gray-700">
+                    <span>
+                      {currentStep === 'fetching' ? 'Fetching privacy policy...' :
+                       currentStep === 'reading' ? 'Reading and parsing content...' :
+                       currentStep === 'analyzing' ? 'AI analyzing privacy practices...' :
+                       currentStep === 'preparing' ? 'Preparing results...' :
+                       currentStep === 'complete' ? 'Analysis complete!' : 'Starting...'}
+                    </span>
+                    <span className="font-bold">
+                      {currentStep === 'fetching' ? '25%' :
+                       currentStep === 'reading' ? '50%' :
+                       currentStep === 'analyzing' ? '75%' :
+                       currentStep === 'preparing' ? '90%' :
+                       currentStep === 'complete' ? '100%' : '0%'}
+                    </span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-gray-800 mb-1 text-sm sm:text-base">Reading & Parsing Content</h4>
-                    <p className="text-xs sm:text-sm text-gray-600 leading-tight">
-                      {currentStep === 'reading' ? 'Extracting and parsing the privacy policy text...' :
-                       ['analyzing', 'preparing', 'complete'].includes(currentStep) ? 'Content successfully parsed' :
-                       'Waiting for content...'}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Step 3: Analyzing */}
-                <div className={`flex items-start gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg transition-all ${
-                  currentStep === 'analyzing' ? 'bg-blue-100 border-2 border-blue-400' :
-                  ['preparing', 'complete'].includes(currentStep) ? 'bg-green-50 border border-green-200' :
-                  'bg-gray-50 border border-gray-200'
-                }`}>
-                  <div className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ${
-                    currentStep === 'analyzing' ? 'bg-blue-500 animate-pulse' :
-                    ['preparing', 'complete'].includes(currentStep) ? 'bg-green-500' :
-                    'bg-gray-300'
-                  }`}>
-                    {['preparing', 'complete'].includes(currentStep) ? (
-                      <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-                    ) : currentStep === 'analyzing' ? (
-                      <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-transparent" />
-                    ) : (
-                      <span className="text-white font-bold text-xs sm:text-sm">3</span>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-gray-800 mb-1 text-sm sm:text-base">AI-Powered Analysis</h4>
-                    <p className="text-xs sm:text-sm text-gray-600 leading-tight">
-                      {currentStep === 'analyzing' ? 'Analyzing privacy practices, compliance, and risks using AI...' :
-                       ['preparing', 'complete'].includes(currentStep) ? 'Analysis complete with findings' :
-                       'Waiting for analysis...'}
-                    </p>
+                  <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-500 ease-out"
+                      style={{
+                        width: currentStep === 'fetching' ? '25%' :
+                               currentStep === 'reading' ? '50%' :
+                               currentStep === 'analyzing' ? '75%' :
+                               currentStep === 'preparing' ? '90%' :
+                               currentStep === 'complete' ? '100%' : '0%'
+                      }}
+                    />
                   </div>
                 </div>
-
-                {/* Step 4: Preparing */}
-                <div className={`flex items-start gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg transition-all ${
-                  currentStep === 'preparing' ? 'bg-blue-100 border-2 border-blue-400' :
-                  currentStep === 'complete' ? 'bg-green-50 border border-green-200' :
-                  'bg-gray-50 border border-gray-200'
-                }`}>
-                  <div className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ${
-                    currentStep === 'preparing' ? 'bg-blue-500 animate-pulse' :
-                    currentStep === 'complete' ? 'bg-green-500' :
-                    'bg-gray-300'
-                  }`}>
-                    {currentStep === 'complete' ? (
-                      <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-                    ) : currentStep === 'preparing' ? (
-                      <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-transparent" />
-                    ) : (
-                      <span className="text-white font-bold text-xs sm:text-sm">4</span>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-gray-800 mb-1 text-sm sm:text-base">Preparing Results</h4>
-                    <p className="text-xs sm:text-sm text-gray-600 leading-tight">
-                      {currentStep === 'preparing' ? 'Generating scores, grades, and recommendations...' :
-                       currentStep === 'complete' ? 'Results ready to display' :
-                       'Waiting to prepare results...'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Progress Bar */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm font-medium text-gray-700">
-                  <span>Overall Progress</span>
-                  <span>
-                    {currentStep === 'fetching' ? '25%' :
-                     currentStep === 'reading' ? '50%' :
-                     currentStep === 'analyzing' ? '75%' :
-                     currentStep === 'preparing' ? '90%' :
-                     currentStep === 'complete' ? '100%' : '0%'}
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-500 ease-out"
-                    style={{
-                      width: currentStep === 'fetching' ? '25%' :
-                             currentStep === 'reading' ? '50%' :
-                             currentStep === 'analyzing' ? '75%' :
-                             currentStep === 'preparing' ? '90%' :
-                             currentStep === 'complete' ? '100%' : '0%'
-                    }}
-                  />
-                </div>
-              </div>
             </div>
           </CardContent>
         </Card>
