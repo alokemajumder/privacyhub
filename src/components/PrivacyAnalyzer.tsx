@@ -21,6 +21,7 @@ interface AnalysisResult {
     regulatory_compliance: {
       gdpr_compliance: string;
       ccpa_compliance: string;
+      dpdp_act_compliance?: string;
       major_violations: string[];
     };
     categories: {
@@ -340,12 +341,12 @@ export default function PrivacyAnalyzer() {
               </div>
 
               {/* Compliance Status */}
-              <div className="grid md:grid-cols-2 gap-3">
+              <div className="grid md:grid-cols-3 gap-3">
                 <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Scale className="h-4 w-4 text-blue-600" />
-                      <span className="font-semibold text-sm">GDPR Compliance</span>
+                      <span className="font-semibold text-sm">GDPR</span>
                     </div>
                     <Badge className={`px-2.5 py-0.5 text-xs font-bold ${getComplianceColor(result.analysis.regulatory_compliance.gdpr_compliance)}`}>
                       {result.analysis.regulatory_compliance.gdpr_compliance.replace('_', ' ')}
@@ -353,19 +354,29 @@ export default function PrivacyAnalyzer() {
                   </div>
                 </div>
 
-                {result.analysis.regulatory_compliance.ccpa_compliance !== 'NOT_APPLICABLE' && (
-                  <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Shield className="h-4 w-4 text-purple-600" />
-                        <span className="font-semibold text-sm">CCPA Compliance</span>
-                      </div>
-                      <Badge className={`px-2.5 py-0.5 text-xs font-bold ${getComplianceColor(result.analysis.regulatory_compliance.ccpa_compliance)}`}>
-                        {result.analysis.regulatory_compliance.ccpa_compliance.replace('_', ' ')}
-                      </Badge>
+                <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-purple-600" />
+                      <span className="font-semibold text-sm">CCPA</span>
                     </div>
+                    <Badge className={`px-2.5 py-0.5 text-xs font-bold ${getComplianceColor(result.analysis.regulatory_compliance.ccpa_compliance || 'NOT_APPLICABLE')}`}>
+                      {(result.analysis.regulatory_compliance.ccpa_compliance || 'NOT_APPLICABLE').replace('_', ' ')}
+                    </Badge>
                   </div>
-                )}
+                </div>
+
+                <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-orange-600" />
+                      <span className="font-semibold text-sm">DPDP Act</span>
+                    </div>
+                    <Badge className={`px-2.5 py-0.5 text-xs font-bold ${getComplianceColor(result.analysis.regulatory_compliance.dpdp_act_compliance || 'NOT_APPLICABLE')}`}>
+                      {(result.analysis.regulatory_compliance.dpdp_act_compliance || 'N/A').replace('_', ' ')}
+                    </Badge>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
