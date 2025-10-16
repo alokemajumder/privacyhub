@@ -3,14 +3,26 @@
 import React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Shield, Github, Menu, X as XIcon, Twitter } from 'lucide-react';
+import { Shield, Github, Menu, X as XIcon } from 'lucide-react';
 import { useState } from 'react';
+
+// Custom X (Twitter) Icon Component
+const XTwitterIcon = ({ className }: { className?: string }) => (
+  <svg
+    viewBox="0 0 24 24"
+    className={className}
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+  </svg>
+);
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navigation = [
-    { name: 'Analyser', href: '/' },
+    { name: 'Home', href: '/' },
     { name: 'Digital Fingerprint', href: '/digital-fingerprint' },
     { name: 'Methodology', href: '/methodology' },
     { name: 'Support', href: '/support' },
@@ -54,7 +66,7 @@ export function Header() {
                   rel="noopener noreferrer"
                   className="flex items-center space-x-2"
                 >
-                  <Twitter className="h-4 w-4" />
+                  <XTwitterIcon className="h-4 w-4" />
                   <span>Follow</span>
                 </a>
               </Button>
@@ -111,7 +123,7 @@ export function Header() {
                 className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <Twitter className="h-4 w-4" />
+                <XTwitterIcon className="h-4 w-4" />
                 <span>Follow on X</span>
               </a>
 

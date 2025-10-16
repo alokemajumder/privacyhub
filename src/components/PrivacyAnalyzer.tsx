@@ -10,7 +10,7 @@ import { CircularProgress } from '@/components/ui/circular-progress';
 import { Heatmap } from '@/components/ui/heatmap';
 import { ScoreCard } from '@/components/ui/score-card';
 import { MethodologySection } from '@/components/MethodologySection';
-import { AlertCircle, CheckCircle, Search, ExternalLink, Shield, Lock, Eye, Users, FileText, Scale, Home, RotateCcw } from 'lucide-react';
+import { AlertCircle, CheckCircle, Search, ExternalLink, Shield, Lock, Eye, Users, FileText, Scale, Home, RotateCcw, Mail, MessageSquare, Info } from 'lucide-react';
 
 interface AnalysisResult {
   url: string;
@@ -21,6 +21,7 @@ interface AnalysisResult {
     regulatory_compliance: {
       gdpr_compliance: string;
       ccpa_compliance: string;
+      dpdp_act_compliance?: string;
       major_violations: string[];
     };
     categories: {
@@ -46,11 +47,14 @@ interface AnalysisResult {
   };
 }
 
+type AnalysisStep = 'idle' | 'fetching' | 'reading' | 'analyzing' | 'preparing' | 'complete';
+
 export default function PrivacyAnalyzer() {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState('');
+  const [currentStep, setCurrentStep] = useState<AnalysisStep>('idle');
 
   const analyzePolicy = async () => {
     if (!url.trim()) {
@@ -61,8 +65,14 @@ export default function PrivacyAnalyzer() {
     setLoading(true);
     setError('');
     setResult(null);
+    setCurrentStep('fetching');
 
     try {
+      // Simulate step progression for better UX
+      setTimeout(() => setCurrentStep('reading'), 1000);
+      setTimeout(() => setCurrentStep('analyzing'), 3000);
+      setTimeout(() => setCurrentStep('preparing'), 25000);
+
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: {
@@ -77,12 +87,19 @@ export default function PrivacyAnalyzer() {
       }
 
       const data = await response.json();
-      setResult(data);
+      setCurrentStep('complete');
+
+      // Small delay to show completion state
+      setTimeout(() => {
+        setResult(data);
+        setLoading(false);
+        setCurrentStep('idle');
+      }, 500);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred during analysis';
       setError(errorMessage);
-    } finally {
       setLoading(false);
+      setCurrentStep('idle');
     }
   };
 
@@ -91,6 +108,7 @@ export default function PrivacyAnalyzer() {
     setResult(null);
     setError('');
     setLoading(false);
+    setCurrentStep('idle');
   };
 
   const getGradeColor = (grade: string) => {
@@ -130,21 +148,21 @@ export default function PrivacyAnalyzer() {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-4xl mx-auto px-2 sm:px-4">
       {/* Search Interface */}
-      <Card className="mb-8">
-        <CardContent className="p-6">
+      <Card className="mb-6 sm:mb-8">
+        <CardContent className="p-4 sm:p-6">
           <div className="space-y-4">
             <div>
-              <h2 className="text-2xl font-bold text-foreground mb-2">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-2">
                 Analyze Privacy Policy
               </h2>
-              <p className="text-muted-foreground">
+              <p className="text-sm sm:text-base text-muted-foreground">
                 Enter a website URL to get detailed privacy policy analysis and scoring
               </p>
             </div>
-            
-            <div className="flex gap-3">
+
+            <div className="flex flex-col sm:flex-row gap-3">
               <div className="flex-1">
                 <Input
                   type="url"
@@ -153,60 +171,211 @@ export default function PrivacyAnalyzer() {
                   onChange={(e) => setUrl(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && !loading && analyzePolicy()}
                   disabled={loading}
-                  className="text-base"
+                  className="text-base h-11 sm:h-10"
                 />
               </div>
-              <Button
-                onClick={analyzePolicy}
-                disabled={loading || !url.trim()}
-                className="px-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white border-0"
-              >
-                {loading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white mr-2" />
-                    Analyzing...
-                  </>
-                ) : (
-                  <>
-                    <Search className="h-4 w-4 mr-2" />
-                    Analyze
-                  </>
-                )}
-              </Button>
-              {(url || result) && (
+              <div className="flex gap-2 sm:gap-3">
                 <Button
-                  onClick={resetAnalysis}
-                  disabled={loading}
-                  variant="outline"
-                  className="px-6 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-600 hover:via-teal-600 hover:to-cyan-600 text-white border-0"
+                  onClick={analyzePolicy}
+                  disabled={loading || !url.trim()}
+                  className="flex-1 sm:flex-none sm:px-6 h-11 sm:h-10 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white border-0"
                 >
-                  <RotateCcw className="h-4 w-4 mr-2" />
-                  Reset
+                  {loading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white mr-2" />
+                      <span className="hidden sm:inline">Analyzing...</span>
+                      <span className="sm:hidden">Wait...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Search className="h-4 w-4 sm:mr-2" />
+                      <span className="hidden sm:inline ml-2">Analyze</span>
+                    </>
+                  )}
                 </Button>
-              )}
+                {(url || result) && (
+                  <Button
+                    onClick={resetAnalysis}
+                    disabled={loading}
+                    variant="outline"
+                    className="flex-1 sm:flex-none sm:px-6 h-11 sm:h-10 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-600 hover:via-teal-600 hover:to-cyan-600 text-white border-0"
+                  >
+                    <RotateCcw className="h-4 w-4 sm:mr-2" />
+                    <span className="hidden sm:inline ml-2">Reset</span>
+                  </Button>
+                )}
+              </div>
             </div>
 
             {error && (
-              <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg">
+              <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg text-sm">
                 <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                <span>{error}</span>
+                <span className="text-xs sm:text-sm">{error}</span>
               </div>
             )}
           </div>
         </CardContent>
       </Card>
 
-      {/* Loading State */}
+      {/* Loading State with Step-by-Step Progress */}
       {loading && (
-        <Card>
-          <CardContent className="p-8 text-center">
-            <div className="space-y-4">
-              <div className="animate-pulse">
-                <div className="w-16 h-16 bg-muted rounded-full mx-auto mb-4" />
-                <h3 className="text-lg font-semibold">Analyzing Privacy Policy...</h3>
-                <p className="text-muted-foreground">This may take 30-60 seconds</p>
+        <Card className="bg-gradient-to-br from-blue-50 via-white to-purple-50 border-2 border-blue-100 shadow-xl">
+          <CardContent className="p-4 sm:p-6 md:p-8">
+            <div className="space-y-4 sm:space-y-6">
+              {/* Header */}
+              <div className="text-center">
+                <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                  Analyzing Privacy Policy
+                </h3>
+                <p className="text-xs sm:text-sm text-gray-600">
+                  This typically takes 30-60 seconds
+                </p>
               </div>
-              <Progress value={undefined} className="w-full max-w-xs mx-auto" />
+
+              {/* Step-by-Step Progress */}
+              <div className="space-y-3 sm:space-y-4">
+                {/* Step 1: Fetching */}
+                <div className={`flex items-start gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg transition-all ${
+                  currentStep === 'fetching' ? 'bg-blue-100 border-2 border-blue-400' :
+                  ['reading', 'analyzing', 'preparing', 'complete'].includes(currentStep) ? 'bg-green-50 border border-green-200' :
+                  'bg-gray-50 border border-gray-200'
+                }`}>
+                  <div className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ${
+                    currentStep === 'fetching' ? 'bg-blue-500 animate-pulse' :
+                    ['reading', 'analyzing', 'preparing', 'complete'].includes(currentStep) ? 'bg-green-500' :
+                    'bg-gray-300'
+                  }`}>
+                    {['reading', 'analyzing', 'preparing', 'complete'].includes(currentStep) ? (
+                      <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                    ) : currentStep === 'fetching' ? (
+                      <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-transparent" />
+                    ) : (
+                      <span className="text-white font-bold text-xs sm:text-sm">1</span>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-gray-800 mb-1 text-sm sm:text-base">Fetching Privacy Policy</h4>
+                    <p className="text-xs sm:text-sm text-gray-600 leading-tight">
+                      {currentStep === 'fetching' ? 'Accessing the privacy policy URL...' :
+                       ['reading', 'analyzing', 'preparing', 'complete'].includes(currentStep) ? 'Privacy policy found and retrieved' :
+                       'Waiting to fetch...'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 2: Reading */}
+                <div className={`flex items-start gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg transition-all ${
+                  currentStep === 'reading' ? 'bg-blue-100 border-2 border-blue-400' :
+                  ['analyzing', 'preparing', 'complete'].includes(currentStep) ? 'bg-green-50 border border-green-200' :
+                  'bg-gray-50 border border-gray-200'
+                }`}>
+                  <div className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ${
+                    currentStep === 'reading' ? 'bg-blue-500 animate-pulse' :
+                    ['analyzing', 'preparing', 'complete'].includes(currentStep) ? 'bg-green-500' :
+                    'bg-gray-300'
+                  }`}>
+                    {['analyzing', 'preparing', 'complete'].includes(currentStep) ? (
+                      <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                    ) : currentStep === 'reading' ? (
+                      <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-transparent" />
+                    ) : (
+                      <span className="text-white font-bold text-xs sm:text-sm">2</span>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-gray-800 mb-1 text-sm sm:text-base">Reading & Parsing Content</h4>
+                    <p className="text-xs sm:text-sm text-gray-600 leading-tight">
+                      {currentStep === 'reading' ? 'Extracting and parsing the privacy policy text...' :
+                       ['analyzing', 'preparing', 'complete'].includes(currentStep) ? 'Content successfully parsed' :
+                       'Waiting for content...'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 3: Analyzing */}
+                <div className={`flex items-start gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg transition-all ${
+                  currentStep === 'analyzing' ? 'bg-blue-100 border-2 border-blue-400' :
+                  ['preparing', 'complete'].includes(currentStep) ? 'bg-green-50 border border-green-200' :
+                  'bg-gray-50 border border-gray-200'
+                }`}>
+                  <div className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ${
+                    currentStep === 'analyzing' ? 'bg-blue-500 animate-pulse' :
+                    ['preparing', 'complete'].includes(currentStep) ? 'bg-green-500' :
+                    'bg-gray-300'
+                  }`}>
+                    {['preparing', 'complete'].includes(currentStep) ? (
+                      <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                    ) : currentStep === 'analyzing' ? (
+                      <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-transparent" />
+                    ) : (
+                      <span className="text-white font-bold text-xs sm:text-sm">3</span>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-gray-800 mb-1 text-sm sm:text-base">AI-Powered Analysis</h4>
+                    <p className="text-xs sm:text-sm text-gray-600 leading-tight">
+                      {currentStep === 'analyzing' ? 'Analyzing privacy practices, compliance, and risks using AI...' :
+                       ['preparing', 'complete'].includes(currentStep) ? 'Analysis complete with findings' :
+                       'Waiting for analysis...'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 4: Preparing */}
+                <div className={`flex items-start gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg transition-all ${
+                  currentStep === 'preparing' ? 'bg-blue-100 border-2 border-blue-400' :
+                  currentStep === 'complete' ? 'bg-green-50 border border-green-200' :
+                  'bg-gray-50 border border-gray-200'
+                }`}>
+                  <div className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ${
+                    currentStep === 'preparing' ? 'bg-blue-500 animate-pulse' :
+                    currentStep === 'complete' ? 'bg-green-500' :
+                    'bg-gray-300'
+                  }`}>
+                    {currentStep === 'complete' ? (
+                      <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                    ) : currentStep === 'preparing' ? (
+                      <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-transparent" />
+                    ) : (
+                      <span className="text-white font-bold text-xs sm:text-sm">4</span>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-gray-800 mb-1 text-sm sm:text-base">Preparing Results</h4>
+                    <p className="text-xs sm:text-sm text-gray-600 leading-tight">
+                      {currentStep === 'preparing' ? 'Generating scores, grades, and recommendations...' :
+                       currentStep === 'complete' ? 'Results ready to display' :
+                       'Waiting to prepare results...'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm font-medium text-gray-700">
+                  <span>Overall Progress</span>
+                  <span>
+                    {currentStep === 'fetching' ? '25%' :
+                     currentStep === 'reading' ? '50%' :
+                     currentStep === 'analyzing' ? '75%' :
+                     currentStep === 'preparing' ? '90%' :
+                     currentStep === 'complete' ? '100%' : '0%'}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-500 ease-out"
+                    style={{
+                      width: currentStep === 'fetching' ? '25%' :
+                             currentStep === 'reading' ? '50%' :
+                             currentStep === 'analyzing' ? '75%' :
+                             currentStep === 'preparing' ? '90%' :
+                             currentStep === 'complete' ? '100%' : '0%'
+                    }}
+                  />
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -340,12 +509,12 @@ export default function PrivacyAnalyzer() {
               </div>
 
               {/* Compliance Status */}
-              <div className="grid md:grid-cols-2 gap-3">
+              <div className="grid md:grid-cols-3 gap-3">
                 <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Scale className="h-4 w-4 text-blue-600" />
-                      <span className="font-semibold text-sm">GDPR Compliance</span>
+                      <span className="font-semibold text-sm">GDPR</span>
                     </div>
                     <Badge className={`px-2.5 py-0.5 text-xs font-bold ${getComplianceColor(result.analysis.regulatory_compliance.gdpr_compliance)}`}>
                       {result.analysis.regulatory_compliance.gdpr_compliance.replace('_', ' ')}
@@ -353,19 +522,29 @@ export default function PrivacyAnalyzer() {
                   </div>
                 </div>
 
-                {result.analysis.regulatory_compliance.ccpa_compliance !== 'NOT_APPLICABLE' && (
-                  <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Shield className="h-4 w-4 text-purple-600" />
-                        <span className="font-semibold text-sm">CCPA Compliance</span>
-                      </div>
-                      <Badge className={`px-2.5 py-0.5 text-xs font-bold ${getComplianceColor(result.analysis.regulatory_compliance.ccpa_compliance)}`}>
-                        {result.analysis.regulatory_compliance.ccpa_compliance.replace('_', ' ')}
-                      </Badge>
+                <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-purple-600" />
+                      <span className="font-semibold text-sm">CCPA</span>
                     </div>
+                    <Badge className={`px-2.5 py-0.5 text-xs font-bold ${getComplianceColor(result.analysis.regulatory_compliance.ccpa_compliance || 'NOT_APPLICABLE')}`}>
+                      {(result.analysis.regulatory_compliance.ccpa_compliance || 'NOT_APPLICABLE').replace('_', ' ')}
+                    </Badge>
                   </div>
-                )}
+                </div>
+
+                <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-orange-600" />
+                      <span className="font-semibold text-sm">DPDP Act</span>
+                    </div>
+                    <Badge className={`px-2.5 py-0.5 text-xs font-bold ${getComplianceColor(result.analysis.regulatory_compliance.dpdp_act_compliance || 'NOT_APPLICABLE')}`}>
+                      {(result.analysis.regulatory_compliance.dpdp_act_compliance || 'N/A').replace('_', ' ')}
+                    </Badge>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -588,6 +767,68 @@ export default function PrivacyAnalyzer() {
 
           {/* Methodology Section */}
           <MethodologySection />
+
+          {/* Disclaimer */}
+          <Card className="border-amber-200 bg-amber-50">
+            <CardContent className="p-5">
+              <div className="flex items-start gap-3">
+                <Info className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-base font-bold text-amber-900 mb-2">Important Disclaimer</h4>
+                  <p className="text-sm text-amber-800 leading-relaxed">
+                    This analysis is provided for <strong>educational and awareness purposes only</strong>. The information presented should not be used as legal advice or for making legal decisions. Privacy laws and regulations are complex and vary by jurisdiction. For legal compliance matters, please consult with qualified legal professionals or privacy attorneys who can provide guidance specific to your situation and jurisdiction.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Contact Section for Website Owners */}
+          <Card className="border-blue-200 bg-blue-50">
+            <CardContent className="p-5">
+              <div className="flex items-start gap-3">
+                <MessageSquare className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <h4 className="text-base font-bold text-blue-900 mb-2">For Website Owners & Organizations</h4>
+                  <p className="text-sm text-blue-800 leading-relaxed mb-3">
+                    If you are the owner, webmaster, or part of the team behind <strong>{new URL(result.url).hostname}</strong> and have observations, corrections, or feedback about this analysis, we'd like to hear from you.
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="bg-white hover:bg-blue-100 border-blue-300 text-blue-700"
+                      asChild
+                    >
+                      <a
+                        href={`mailto:contact@privacyhub.in?subject=Analysis Feedback for ${new URL(result.url).hostname}&body=Analysis URL: ${result.url}%0D%0ATimestamp: ${result.timestamp}%0D%0A%0D%0AMy observations/corrections:`}
+                        className="flex items-center gap-2"
+                      >
+                        <Mail className="h-4 w-4" />
+                        Contact Us
+                      </a>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="bg-white hover:bg-blue-100 border-blue-300 text-blue-700"
+                      asChild
+                    >
+                      <a
+                        href="https://github.com/privacypriority/privacyhub/issues/new?title=Analysis%20Feedback&labels=analysis-feedback"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        Report on GitHub
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Analysis Metadata */}
           <Card>
