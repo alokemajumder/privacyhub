@@ -51,48 +51,30 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Resources */}
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-3">Resources</h3>
-            <ul className="space-y-2">
-              <li>
-                <a
-                  href="https://gdpr.eu/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-600 hover:text-blue-600 transition-colors"
-                >
-                  GDPR Guide
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://oag.ca.gov/privacy/ccpa"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-600 hover:text-blue-600 transition-colors"
-                >
-                  CCPA Information
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://github.com/privacypriority/privacyhub"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-600 hover:text-blue-600 transition-colors flex items-center gap-1"
-                >
-                  <Github className="h-4 w-4" />
-                  Source Code
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Infrastructure & Support */}
+          {/* Infrastructure */}
           <div>
             <h3 className="font-semibold text-gray-900 mb-3">Infrastructure</h3>
             <ul className="space-y-2">
+              <li>
+                <a
+                  href="https://www.cloudflare.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                >
+                  Cloudflare (DNS & Security)
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://vercel.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                >
+                  Hosted on Vercel
+                </a>
+              </li>
               <li>
                 <a
                   href="https://firecrawl.dev"
@@ -113,23 +95,39 @@ export function Footer() {
                   AI via OpenRouter
                 </a>
               </li>
+            </ul>
+          </div>
+
+          {/* Support */}
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-3">Support</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link
+                  href="/support"
+                  className="text-gray-600 hover:text-blue-600 transition-colors flex items-center gap-1"
+                >
+                  <Heart className="h-4 w-4" />
+                  Support Us
+                </Link>
+              </li>
               <li>
                 <a
-                  href="https://vercel.com"
+                  href="https://github.com/privacypriority/privacyhub"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                  className="text-gray-600 hover:text-blue-600 transition-colors flex items-center gap-1"
                 >
-                  Hosted on Vercel
+                  <Github className="h-4 w-4" />
+                  Source Code
                 </a>
               </li>
               <li>
                 <Link
-                  href="/support"
-                  className="text-blue-600 hover:text-blue-800 transition-colors font-medium flex items-center gap-1"
+                  href="/for-website-owners"
+                  className="text-gray-600 hover:text-blue-600 transition-colors"
                 >
-                  <Heart className="h-4 w-4" />
-                  Support Us
+                  For Website Owners
                 </Link>
               </li>
             </ul>
