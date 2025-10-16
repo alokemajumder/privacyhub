@@ -57,9 +57,25 @@ export default function PrivacyAnalyzer() {
   const [error, setError] = useState('');
   const [currentStep, setCurrentStep] = useState<AnalysisStep>('idle');
   const [turnstileToken, setTurnstileToken] = useState<string>('');
+  const [turnstileLoaded, setTurnstileLoaded] = useState(false);
+  const [turnstileBypass, setTurnstileBypass] = useState(false);
   const turnstileRef = useRef<TurnstileInstance>(null);
 
   const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
+
+  // Fallback: Allow bypass if Turnstile doesn't load within 5 seconds
+  React.useEffect(() => {
+    if (TURNSTILE_SITE_KEY && !turnstileLoaded && !turnstileBypass) {
+      const timeout = setTimeout(() => {
+        if (!turnstileToken) {
+          console.warn('[Turnstile] Widget failed to load - enabling bypass mode');
+          setTurnstileBypass(true);
+        }
+      }, 5000);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [TURNSTILE_SITE_KEY, turnstileLoaded, turnstileBypass, turnstileToken]);
 
   const analyzePolicy = async () => {
     if (!url.trim()) {
@@ -67,8 +83,8 @@ export default function PrivacyAnalyzer() {
       return;
     }
 
-    // Only require Turnstile token if site key is configured
-    if (TURNSTILE_SITE_KEY && !turnstileToken) {
+    // Only require Turnstile token if site key is configured AND bypass is not enabled
+    if (TURNSTILE_SITE_KEY && !turnstileToken && !turnstileBypass) {
       setError('Please complete the security verification');
       return;
     }
@@ -124,6 +140,8 @@ export default function PrivacyAnalyzer() {
     setLoading(false);
     setCurrentStep('idle');
     setTurnstileToken('');
+    setTurnstileBypass(false);
+    setTurnstileLoaded(false);
     // Reset Turnstile widget
     if (turnstileRef.current) {
       turnstileRef.current.reset();
@@ -200,25 +218,32 @@ export default function PrivacyAnalyzer() {
                       <p className="text-xs text-gray-600 mt-1">Please complete the verification to analyze</p>
                     </div>
                     <div className="flex justify-center sm:justify-start">
-                      <Turnstile
-                        ref={turnstileRef}
-                        siteKey={TURNSTILE_SITE_KEY}
-                        onSuccess={(token) => {
-                          console.log('[Turnstile] Token received successfully');
-                          setTurnstileToken(token);
-                          setError(''); // Clear any previous errors
-                        }}
-                        onError={(errorCode) => {
-                          console.error('[Turnstile] Error:', errorCode);
-                          setError('Security verification failed. Please refresh the page and try again.');
-                          setTurnstileToken('');
-                        }}
-                        onExpire={() => {
-                          console.log('[Turnstile] Token expired');
-                          setTurnstileToken('');
-                          setError('Security verification expired. Please verify again.');
-                        }}
-                      />
+                      {!turnstileBypass ? (
+                        <Turnstile
+                          ref={turnstileRef}
+                          siteKey={TURNSTILE_SITE_KEY}
+                          onSuccess={(token) => {
+                            console.log('[Turnstile] Token received successfully');
+                            setTurnstileToken(token);
+                            setTurnstileLoaded(true);
+                            setError('');
+                          }}
+                          onError={(errorCode) => {
+                            console.error('[Turnstile] Error:', errorCode);
+                            setError('Security verification failed. Please refresh the page and try again.');
+                            setTurnstileToken('');
+                          }}
+                          onExpire={() => {
+                            console.log('[Turnstile] Token expired');
+                            setTurnstileToken('');
+                            setError('Security verification expired. Please verify again.');
+                          }}
+                        />
+                      ) : (
+                        <div className="text-sm text-yellow-700 bg-yellow-50 px-4 py-2 rounded-md border border-yellow-200">
+                          Security verification bypassed - widget failed to load
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -229,7 +254,7 @@ export default function PrivacyAnalyzer() {
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <Button
                 onClick={analyzePolicy}
-                disabled={loading || !url.trim() || (!!TURNSTILE_SITE_KEY && !turnstileToken)}
+                disabled={loading || !url.trim() || (!!TURNSTILE_SITE_KEY && !turnstileToken && !turnstileBypass)}
                 className="flex-1 h-12 text-base font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white border-0 shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
