@@ -525,7 +525,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [GDPR](https://gdpr.eu/) - General Data Protection Regulation (EU)
 - [CCPA](https://oag.ca.gov/privacy/ccpa) - California Consumer Privacy Act
-- [DPDP Act 2023](https://www.meity.gov.in/writereaddata/files/Digital%20Personal%20Data%20Protection%20Act%202023.pdf) - Digital Personal Data Protection Act (India)
+- [DPDP Act 2023](https://www.meity.gov.in/static/uploads/2024/06/2bf1f0e9f04e6fb4f8fef35e82c42aa5.pdf) - Digital Personal Data Protection Act (India)
 
 ### Inspired By
 
