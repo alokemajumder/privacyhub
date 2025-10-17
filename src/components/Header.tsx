@@ -72,7 +72,7 @@ export function Header() {
                 </a>
               </Button>
 
-              <Button variant="outline" size="sm" asChild>
+              <Button size="sm" asChild className="bg-gray-900 hover:bg-gray-800 text-white border-0">
                 <a
                   href="https://github.com/privacypriority/privacyhub"
                   target="_blank"
@@ -132,7 +132,7 @@ export function Header() {
                 href="https://github.com/privacypriority/privacyhub"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium py-2"
+                className="flex items-center space-x-2 bg-gray-900 text-white hover:bg-gray-800 transition-colors duration-200 font-medium py-2 px-3 rounded-md"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <Github className="h-4 w-4" />
