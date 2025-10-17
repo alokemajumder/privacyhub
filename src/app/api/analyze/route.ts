@@ -554,12 +554,13 @@ export async function POST(request: NextRequest) {
     // }
 
     console.log('Analyzing privacy policy with AI...');
+    console.log('[Analysis] Starting analysis with automatic key rotation and fallback');
 
     // Analyze with OpenRouter AI using free DeepSeek v3.1 model with fallback support
     // Note: Reasoning tokens are automatically enabled for DeepSeek v3.1
     let analysisText: string | null | undefined = null;
     let lastError: Error | null = null;
-    const maxRetries = 2; // Try primary, then fallback
+    const maxRetries = 2; // Try first key, then fallback if needed
 
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       let currentKeyName = '';
@@ -567,7 +568,8 @@ export async function POST(request: NextRequest) {
         const { client: openai, keyName } = await getOpenAIClient();
         currentKeyName = keyName;
 
-        console.log(`[OpenRouter] Sending request with ${keyName} key to model: deepseek/deepseek-chat-v3.1:free`);
+        console.log(`[Analysis] Using ${keyName} for AI analysis (attempt ${attempt + 1}/${maxRetries})`);
+        console.log(`[OpenRouter] Sending request to model: deepseek/deepseek-chat-v3.1:free`);
 
         const completion = await openai.chat.completions.create({
           model: "deepseek/deepseek-chat-v3.1:free",
@@ -589,14 +591,14 @@ export async function POST(request: NextRequest) {
         console.log(`[OpenRouter] Response received, length: ${analysisText?.length || 0}, finish_reason: ${completion.choices[0]?.finish_reason}`);
 
         if (analysisText) {
-          console.log(`[OpenRouter] Analysis successful with ${keyName} key`);
+          console.log(`[Analysis] ✓ Successfully completed using ${keyName}`);
           break; // Success, exit retry loop
         }
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
         const errorMessage = lastError.message;
 
-        console.error(`[OpenRouter] Attempt ${attempt + 1} failed:`, errorMessage);
+        console.error(`[Analysis] ✗ ${currentKeyName} failed:`, errorMessage);
 
         // Check for HTML response (indicates OpenRouter API error)
         if (errorMessage.includes('<!DOCTYPE') || errorMessage.includes('<html') || errorMessage.includes('Unexpected token')) {
@@ -608,7 +610,7 @@ export async function POST(request: NextRequest) {
         if (errorMessage.includes('rate limit') || errorMessage.includes('429')) {
           // Mark current key as failed and try fallback
           markKeyAsFailed(currentKeyName, 'Rate limit exceeded');
-          console.log(`[OpenRouter] Marked ${currentKeyName} as rate limited, trying fallback...`);
+          console.log(`[Analysis] Marked ${currentKeyName} as rate limited, switching to fallback key...`);
           continue;
         }
 
@@ -618,8 +620,12 @@ export async function POST(request: NextRequest) {
           throw new Error('Free model requires data sharing to be enabled. Administrator: enable at https://openrouter.ai/settings/privacy');
         }
 
-        // For other errors, throw immediately if it's the last attempt
-        if (attempt === maxRetries - 1) {
+        // For other errors, try fallback if available
+        if (attempt < maxRetries - 1) {
+          console.log(`[Analysis] Error with ${currentKeyName}, trying fallback key...`);
+          continue;
+        } else {
+          // Last attempt failed
           throw error;
         }
       }

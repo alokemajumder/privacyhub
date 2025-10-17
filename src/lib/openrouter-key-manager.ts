@@ -30,13 +30,26 @@ function getAllKeys(): Array<{ name: string; key: string }> {
   const primaryKey = process.env.OPENROUTER_API;
   const fallbackKey = process.env.OPENROUTER_API_1;
 
-  // Use OPENROUTER_API_1 as primary for now
-  if (fallbackKey) {
-    keys.push({ name: 'primary', key: fallbackKey });
-  }
+  // Daily rotation: alternate between keys based on day of year
+  const dayOfYear = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
+  const useFallbackFirst = dayOfYear % 2 === 0; // Even days use OPENROUTER_API_1, odd days use OPENROUTER_API
 
-  if (primaryKey) {
-    keys.push({ name: 'fallback', key: primaryKey });
+  if (useFallbackFirst) {
+    // Even days: OPENROUTER_API_1 first, then OPENROUTER_API
+    if (fallbackKey) {
+      keys.push({ name: 'openrouter-one', key: fallbackKey });
+    }
+    if (primaryKey) {
+      keys.push({ name: 'openrouter-default', key: primaryKey });
+    }
+  } else {
+    // Odd days: OPENROUTER_API first, then OPENROUTER_API_1
+    if (primaryKey) {
+      keys.push({ name: 'openrouter-default', key: primaryKey });
+    }
+    if (fallbackKey) {
+      keys.push({ name: 'openrouter-one', key: fallbackKey });
+    }
   }
 
   return keys;
@@ -112,12 +125,12 @@ export async function getBestAvailableKey(): Promise<{
 
     // Use cached status if valid
     if (cached && isCacheValid(cached.lastChecked) && cached.isAvailable) {
-      console.log(`[KeyManager] Using cached ${name} key`);
+      console.log(`[KeyManager] Using cached ${name} (healthy)`);
       return { key, name };
     }
 
     // Check key status if cache is stale or unavailable
-    console.log(`[KeyManager] Checking ${name} key status...`);
+    console.log(`[KeyManager] Checking ${name} status...`);
     const status = await checkKeyCredits(key);
 
     // Update cache
@@ -133,7 +146,7 @@ export async function getBestAvailableKey(): Promise<{
 
     // Return first available key
     if (status.isAvailable && status.rateLimitRemaining > 0) {
-      console.log(`[KeyManager] Using ${name} key (${status.rateLimitRemaining} rate limit remaining)`);
+      console.log(`[KeyManager] ✓ Selected ${name} (${status.rateLimitRemaining} requests remaining)`);
       return { key, name };
     }
   }
