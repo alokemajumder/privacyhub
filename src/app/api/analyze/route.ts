@@ -673,9 +673,14 @@ export async function POST(request: NextRequest) {
       type: error instanceof Error ? error.constructor.name : typeof error
     });
 
+    // Always return error details for better debugging
     return NextResponse.json({
       error: 'Analysis failed. Please try again or contact support if the issue persists.',
-      details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+      details: errorMessage,
+      debugInfo: {
+        errorType: error instanceof Error ? error.constructor.name : typeof error,
+        timestamp: new Date().toISOString()
+      }
     }, { status: 500 });
   }
 }

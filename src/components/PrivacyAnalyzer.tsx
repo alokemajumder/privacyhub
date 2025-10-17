@@ -217,7 +217,15 @@ export default function PrivacyAnalyzer() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Analysis failed');
+        // Include debug details if available
+        let errorMsg = errorData.error || 'Analysis failed';
+        if (errorData.details) {
+          errorMsg += `\n\nDetails: ${errorData.details}`;
+        }
+        if (errorData.debugInfo) {
+          errorMsg += `\n\nDebug: ${JSON.stringify(errorData.debugInfo)}`;
+        }
+        throw new Error(errorMsg);
       }
 
       const data = await response.json();
@@ -231,6 +239,7 @@ export default function PrivacyAnalyzer() {
       }, 500);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred during analysis';
+      console.error('[Analysis Error]', errorMessage);
       setError(errorMessage);
       setLoading(false);
       setCurrentStep('idle');
@@ -355,9 +364,9 @@ export default function PrivacyAnalyzer() {
             </div>
 
             {error && (
-              <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg text-sm">
-                <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                <span className="text-xs sm:text-sm">{error}</span>
+              <div className="flex items-start gap-2 text-red-600 bg-red-50 p-3 rounded-lg text-sm">
+                <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                <div className="text-xs sm:text-sm whitespace-pre-wrap break-words flex-1">{error}</div>
               </div>
             )}
           </div>
