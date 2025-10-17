@@ -25,34 +25,35 @@ const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
  * Get all available API keys from environment
  */
 function getAllKeys(): Array<{ name: string; key: string }> {
-  const keys: Array<{ name: string; key: string }> = [];
+  const defaultKey = process.env.OPENROUTER_API;
+  const keyOne = process.env.OPENROUTER_API_1;
+  const keyTwo = process.env.OPENROUTER_API_2;
 
-  const primaryKey = process.env.OPENROUTER_API;
-  const fallbackKey = process.env.OPENROUTER_API_1;
-
-  // Daily rotation: alternate between keys based on day of year
+  // Daily rotation: 3-day cycle based on day of year
   const dayOfYear = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
-  const useFallbackFirst = dayOfYear % 2 === 0; // Even days use OPENROUTER_API_1, odd days use OPENROUTER_API
+  const rotationDay = dayOfYear % 3; // 0, 1, or 2
 
-  if (useFallbackFirst) {
-    // Even days: OPENROUTER_API_1 first, then OPENROUTER_API
-    if (fallbackKey) {
-      keys.push({ name: 'openrouter-one', key: fallbackKey });
-    }
-    if (primaryKey) {
-      keys.push({ name: 'openrouter-default', key: primaryKey });
-    }
-  } else {
-    // Odd days: OPENROUTER_API first, then OPENROUTER_API_1
-    if (primaryKey) {
-      keys.push({ name: 'openrouter-default', key: primaryKey });
-    }
-    if (fallbackKey) {
-      keys.push({ name: 'openrouter-one', key: fallbackKey });
-    }
+  // Create array of available keys
+  const availableKeys: Array<{ name: string; key: string }> = [];
+  if (defaultKey) availableKeys.push({ name: 'openrouter-default', key: defaultKey });
+  if (keyOne) availableKeys.push({ name: 'openrouter-one', key: keyOne });
+  if (keyTwo) availableKeys.push({ name: 'openrouter-two', key: keyTwo });
+
+  // Rotate based on day
+  if (availableKeys.length === 0) {
+    console.error('[KeyManager] No API keys configured');
+    return [];
   }
 
-  return keys;
+  // Rotate the array to start from different key each day
+  for (let i = 0; i < rotationDay && availableKeys.length > 0; i++) {
+    const first = availableKeys.shift();
+    if (first) availableKeys.push(first);
+  }
+
+  console.log(`[KeyManager] Daily rotation: Day ${rotationDay} of 3-day cycle, primary: ${availableKeys[0]?.name}`);
+
+  return availableKeys;
 }
 
 /**

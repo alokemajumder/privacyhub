@@ -560,7 +560,7 @@ export async function POST(request: NextRequest) {
     // Note: Reasoning tokens are automatically enabled for DeepSeek v3.1
     let analysisText: string | null | undefined = null;
     let lastError: Error | null = null;
-    const maxRetries = 2; // Try first key, then fallback if needed
+    const maxRetries = 3; // Try all available keys (up to 3) if needed
 
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       let currentKeyName = '';
