@@ -19,7 +19,7 @@ interface KeyUsageCache {
 
 // In-memory cache for key status (resets on serverless function restart)
 const keyStatusCache: KeyUsageCache = {};
-const CACHE_DURATION = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
+const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
 /**
  * Get all available API keys from environment
