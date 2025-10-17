@@ -19,7 +19,7 @@ interface KeyUsageCache {
 
 // In-memory cache for key status (resets on serverless function restart)
 const keyStatusCache: KeyUsageCache = {};
-const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+const CACHE_DURATION = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
 
 /**
  * Get all available API keys from environment
@@ -173,6 +173,17 @@ export function markKeyAsFailed(keyName: string, error: string): void {
  */
 export function getAllKeyStatus(): KeyUsageCache {
   return keyStatusCache;
+}
+
+/**
+ * Check if any cached key status is stale (older than CACHE_DURATION)
+ */
+export function isCacheStale(): boolean {
+  const keys = Object.values(keyStatusCache);
+  if (keys.length === 0) return true;
+
+  // Check if any key is older than cache duration
+  return keys.some(status => Date.now() - status.lastChecked > CACHE_DURATION);
 }
 
 /**
