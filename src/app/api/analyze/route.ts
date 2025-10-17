@@ -689,6 +689,13 @@ export async function POST(request: NextRequest) {
       }, { status: 429 });
     }
 
+    if (errorMessage?.includes('404') && errorMessage?.includes('data policy')) {
+      return NextResponse.json({
+        error: 'API configuration error. The free model requires data policy configuration. Please contact the administrator.',
+        details: 'The free AI model requires enabling data sharing on OpenRouter. Administrator: configure at https://openrouter.ai/settings/privacy'
+      }, { status: 500 });
+    }
+
     if (errorMessage?.includes('API key') || errorMessage?.includes('401') || errorMessage?.includes('403')) {
       return NextResponse.json({
         error: 'API configuration error. Please contact support.'
