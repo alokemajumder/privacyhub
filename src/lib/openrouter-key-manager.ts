@@ -30,12 +30,13 @@ function getAllKeys(): Array<{ name: string; key: string }> {
   const primaryKey = process.env.OPENROUTER_API;
   const fallbackKey = process.env.OPENROUTER_API_1;
 
-  if (primaryKey) {
-    keys.push({ name: 'primary', key: primaryKey });
+  // Use OPENROUTER_API_1 as primary for now
+  if (fallbackKey) {
+    keys.push({ name: 'primary', key: fallbackKey });
   }
 
-  if (fallbackKey) {
-    keys.push({ name: 'fallback', key: fallbackKey });
+  if (primaryKey) {
+    keys.push({ name: 'fallback', key: primaryKey });
   }
 
   return keys;

@@ -35,6 +35,10 @@ async function getOpenAIClient() {
     client: new OpenAI({
       baseURL: "https://openrouter.ai/api/v1",
       apiKey: keyInfo.key,
+      defaultHeaders: {
+        "HTTP-Referer": "https://privacyhub.in",
+        "X-Title": "PrivacyHub - Privacy Policy Analyzer",
+      },
     }),
     keyName: keyInfo.name,
   };
@@ -576,7 +580,7 @@ export async function POST(request: NextRequest) {
             }
           ],
           temperature: 0.3,
-          max_tokens: 2000,
+          max_tokens: 4000,
         });
 
         analysisText = completion.choices[0]?.message?.content;
