@@ -80,7 +80,7 @@ export default function PrivacyAnalyzer() {
   const [error, setError] = useState('');
   const [currentStep, setCurrentStep] = useState<AnalysisStep>('idle');
   const [turnstileToken, setTurnstileToken] = useState<string>('');
-  const [turnstileBypass, setTurnstileBypass] = useState(false);
+  const [_turnstileBypass, setTurnstileBypass] = useState(false);
   const turnstileWidgetId = useRef<string | null>(null);
   const turnstileContainerRef = useRef<HTMLDivElement>(null);
 

@@ -15,17 +15,29 @@ import { PlaywrightCrawler } from '@crawlee/playwright';
 // import { errorHandler, ErrorSeverity } from '@/lib/error-handler';
 // import { analysisRateLimiter, getClientIp, createRateLimitHeaders } from '@/lib/rate-limiter';
 import { validateUrl } from '@/lib/input-validation';
+import { getBestAvailableKey, markKeyAsFailed } from '@/lib/openrouter-key-manager';
 
 // Configure Vercel timeout (max 60 seconds on Pro plan, 10 seconds on Hobby)
 export const maxDuration = 60; // seconds
 export const dynamic = 'force-dynamic';
 
-// Initialize OpenAI client inside the route handler to avoid build-time issues
-function getOpenAIClient() {
-  return new OpenAI({
-    baseURL: "https://openrouter.ai/api/v1",
-    apiKey: process.env.OPENROUTER_API,
-  });
+// Initialize OpenAI client with best available API key
+async function getOpenAIClient() {
+  const keyInfo = await getBestAvailableKey();
+
+  if (!keyInfo) {
+    throw new Error('No OpenRouter API keys available');
+  }
+
+  console.log(`[OpenRouter] Using ${keyInfo.name} API key`);
+
+  return {
+    client: new OpenAI({
+      baseURL: "https://openrouter.ai/api/v1",
+      apiKey: keyInfo.key,
+    }),
+    keyName: keyInfo.name,
+  };
 }
 
 // Initialize Firecrawl client
@@ -282,7 +294,7 @@ export async function POST(request: NextRequest) {
     //   );
     // }
 
-    const { url, turnstileToken } = await request.json();
+    const { url, turnstileToken: _turnstileToken } = await request.json();
 
     if (!url) {
       console.error('No URL provided in request');
@@ -539,26 +551,60 @@ export async function POST(request: NextRequest) {
 
     console.log('Analyzing privacy policy with AI...');
 
-    // Analyze with OpenRouter AI using free DeepSeek v3.1 model (no rate limits)
+    // Analyze with OpenRouter AI using free DeepSeek v3.1 model with fallback support
     // Note: Reasoning tokens are automatically enabled for DeepSeek v3.1
-    const openai = getOpenAIClient();
-    const completion = await openai.chat.completions.create({
-      model: "deepseek/deepseek-chat-v3.1:free",
-      messages: [
-        {
-          role: "system",
-          content: PRIVACY_ANALYSIS_PROMPT
-        },
-        {
-          role: "user",
-          content: `Analyze this privacy policy:\n\n${content.substring(0, 16000)}` // Limit content size
-        }
-      ],
-      temperature: 0.3,
-      max_tokens: 2000,
-    });
+    let analysisText: string | null | undefined = null;
+    let lastError: Error | null = null;
+    const maxRetries = 2; // Try primary, then fallback
 
-    const analysisText = completion.choices[0]?.message?.content;
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      let currentKeyName = '';
+      try {
+        const { client: openai, keyName } = await getOpenAIClient();
+        currentKeyName = keyName;
+
+        const completion = await openai.chat.completions.create({
+          model: "deepseek/deepseek-chat-v3.1:free",
+          messages: [
+            {
+              role: "system",
+              content: PRIVACY_ANALYSIS_PROMPT
+            },
+            {
+              role: "user",
+              content: `Analyze this privacy policy:\n\n${content.substring(0, 16000)}` // Limit content size
+            }
+          ],
+          temperature: 0.3,
+          max_tokens: 2000,
+        });
+
+        analysisText = completion.choices[0]?.message?.content;
+
+        if (analysisText) {
+          console.log(`[OpenRouter] Analysis successful with ${keyName} key`);
+          break; // Success, exit retry loop
+        }
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+        const errorMessage = lastError.message;
+
+        console.error(`[OpenRouter] Attempt ${attempt + 1} failed:`, errorMessage);
+
+        // Check if it's a rate limit error
+        if (errorMessage.includes('rate limit') || errorMessage.includes('429')) {
+          // Mark current key as failed and try fallback
+          markKeyAsFailed(currentKeyName, 'Rate limit exceeded');
+          console.log(`[OpenRouter] Marked ${currentKeyName} as rate limited, trying fallback...`);
+          continue;
+        }
+
+        // For other errors, throw immediately if it's the last attempt
+        if (attempt === maxRetries - 1) {
+          throw error;
+        }
+      }
+    }
 
     if (!analysisText) {
       throw new Error('No analysis generated');
