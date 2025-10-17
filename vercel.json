@@ -4,6 +4,12 @@
       "maxDuration": 60
     }
   },
+  "crons": [
+    {
+      "path": "/api/cron/refresh-keys",
+      "schedule": "0 */12 * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",

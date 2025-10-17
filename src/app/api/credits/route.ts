@@ -1,34 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAllKeyStatus } from '@/lib/openrouter-key-manager';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest) {
+/**
+ * Check OpenRouter API credits for all configured keys
+ * This endpoint is intentionally sanitized to not expose API keys
+ */
+export async function GET(_request: NextRequest) {
   try {
-    const apiKey = process.env.OPENROUTER_API;
+    // Get status from key manager (keys are never exposed)
+    const keyStatus = getAllKeyStatus();
 
-    if (!apiKey) {
-      return NextResponse.json({
-        error: 'OPENROUTER_API key not configured'
-      }, { status: 500 });
-    }
-
-    const response = await fetch('https://openrouter.ai/api/v1/key', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`OpenRouter API returned ${response.status}: ${response.statusText}`);
-    }
-
-    const data = await response.json();
+    // Sanitize response to remove sensitive data
+    const sanitizedStatus = Object.entries(keyStatus).map(([name, status]) => ({
+      name,
+      isAvailable: status.isAvailable,
+      credits: status.credits,
+      rateLimitRemaining: status.rateLimitRemaining,
+      lastChecked: new Date(status.lastChecked).toISOString(),
+      error: status.error,
+      // Never include the actual key
+    }));
 
     return NextResponse.json({
       success: true,
-      data: data,
-      timestamp: new Date().toISOString()
+      keys: sanitizedStatus,
+      timestamp: new Date().toISOString(),
+      note: 'API keys are not exposed for security'
     });
 
   } catch (error: unknown) {
