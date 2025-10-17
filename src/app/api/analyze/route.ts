@@ -540,6 +540,7 @@ export async function POST(request: NextRequest) {
     console.log('Analyzing privacy policy with AI...');
 
     // Analyze with OpenRouter AI using free DeepSeek v3.1 model (no rate limits)
+    // Note: Reasoning tokens are automatically enabled for DeepSeek v3.1
     const openai = getOpenAIClient();
     const completion = await openai.chat.completions.create({
       model: "deepseek/deepseek-chat-v3.1:free",
