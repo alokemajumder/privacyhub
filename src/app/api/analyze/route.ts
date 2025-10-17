@@ -591,12 +591,24 @@ export async function POST(request: NextRequest) {
 
         console.error(`[OpenRouter] Attempt ${attempt + 1} failed:`, errorMessage);
 
+        // Check for HTML response (indicates OpenRouter API error)
+        if (errorMessage.includes('<!DOCTYPE') || errorMessage.includes('<html') || errorMessage.includes('Unexpected token')) {
+          console.error('[OpenRouter] Received HTML instead of JSON - likely API configuration issue');
+          throw new Error('OpenRouter API returned an error page. Please check API key and data policy settings at https://openrouter.ai/settings/privacy');
+        }
+
         // Check if it's a rate limit error
         if (errorMessage.includes('rate limit') || errorMessage.includes('429')) {
           // Mark current key as failed and try fallback
           markKeyAsFailed(currentKeyName, 'Rate limit exceeded');
           console.log(`[OpenRouter] Marked ${currentKeyName} as rate limited, trying fallback...`);
           continue;
+        }
+
+        // Check for data policy errors
+        if (errorMessage.includes('404') || errorMessage.includes('No endpoints found') || errorMessage.includes('data policy')) {
+          console.error('[OpenRouter] Data policy error detected');
+          throw new Error('Free model requires data sharing to be enabled. Administrator: enable at https://openrouter.ai/settings/privacy');
         }
 
         // For other errors, throw immediately if it's the last attempt
@@ -693,6 +705,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         error: 'API configuration error. The free model requires data policy configuration. Please contact the administrator.',
         details: 'The free AI model requires enabling data sharing on OpenRouter. Administrator: configure at https://openrouter.ai/settings/privacy'
+      }, { status: 500 });
+    }
+
+    if (errorMessage?.includes('data sharing') || errorMessage?.includes('data policy settings')) {
+      return NextResponse.json({
+        error: 'API configuration required. The free AI model needs to be enabled.',
+        details: 'Administrator: Please enable data sharing for free models at https://openrouter.ai/settings/privacy'
+      }, { status: 500 });
+    }
+
+    if (errorMessage?.includes('OpenRouter API returned an error page')) {
+      return NextResponse.json({
+        error: 'AI service configuration error. Please contact the administrator.',
+        details: errorMessage
       }, { status: 500 });
     }
 
