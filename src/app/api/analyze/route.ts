@@ -539,10 +539,10 @@ export async function POST(request: NextRequest) {
 
     console.log('Analyzing privacy policy with AI...');
 
-    // Analyze with OpenRouter AI using free DeepSeek model
+    // Analyze with OpenRouter AI using free DeepSeek v3.1 model (no rate limits)
     const openai = getOpenAIClient();
     const completion = await openai.chat.completions.create({
-      model: "deepseek/deepseek-chat-v3-0324:free",
+      model: "deepseek/deepseek-chat-v3.1:free",
       messages: [
         {
           role: "system",
