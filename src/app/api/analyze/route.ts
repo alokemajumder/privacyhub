@@ -567,6 +567,8 @@ export async function POST(request: NextRequest) {
         const { client: openai, keyName } = await getOpenAIClient();
         currentKeyName = keyName;
 
+        console.log(`[OpenRouter] Sending request with ${keyName} key to model: deepseek/deepseek-chat-v3.1:free`);
+
         const completion = await openai.chat.completions.create({
           model: "deepseek/deepseek-chat-v3.1:free",
           messages: [
@@ -584,6 +586,7 @@ export async function POST(request: NextRequest) {
         });
 
         analysisText = completion.choices[0]?.message?.content;
+        console.log(`[OpenRouter] Response received, length: ${analysisText?.length || 0}, finish_reason: ${completion.choices[0]?.finish_reason}`);
 
         if (analysisText) {
           console.log(`[OpenRouter] Analysis successful with ${keyName} key`);
