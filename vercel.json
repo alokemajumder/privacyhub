@@ -7,7 +7,7 @@
   "crons": [
     {
       "path": "/api/cron/refresh-keys",
-      "schedule": "0 */12 * * *"
+      "schedule": "0 0 * * *"
     }
   ],
   "headers": [

@@ -5,14 +5,14 @@ export const dynamic = 'force-dynamic';
 
 /**
  * Cron endpoint to refresh OpenRouter API key statuses
- * Runs every 12 hours to check credits and rate limits
+ * Runs daily to check credits and rate limits
  *
  * To enable on Vercel:
  * Add to vercel.json:
  * {
  *   "crons": [{
  *     "path": "/api/cron/refresh-keys",
- *     "schedule": "0 STAR/12 * * *"  (replace STAR with *)
+ *     "schedule": "0 0 * * *"  (daily at midnight UTC)
  *   }]
  * }
  */
